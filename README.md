@@ -4,6 +4,25 @@ A Swift-based web framework for building server-side applications with a unique 
 
 ## Quick Start
 
+### Using the CLI (Recommended)
+
+```bash
+# Install the Swiftlets CLI
+./install-cli.sh
+
+# Create a new project
+swiftlets new my-app
+cd my-app
+
+# Start the development server
+swiftlets serve
+
+# Build your swiftlets
+swiftlets build
+```
+
+### Manual Setup
+
 ```bash
 # Build everything
 ./build.sh
@@ -39,11 +58,31 @@ swiftlets/
 - **Security First**: Source and build files outside web root
 - **MD5 Integrity**: Webbin files contain executable hashes
 
+## CLI Commands
+
+The Swiftlets CLI provides convenient commands for development:
+
+```bash
+# Create a new project from template
+swiftlets new <project-name> [--template <name>]
+
+# Initialize Swiftlets in existing directory
+swiftlets init [--force]
+
+# Start development server
+swiftlets serve [<path>] [--port <port>] [--host <host>]
+
+# Build swiftlets
+swiftlets build [<target>] [--release] [--clean]
+```
+
 ## Documentation
 
+- [CLI Guide](docs/CLI.md) - Command-line interface documentation
+- [Configuration Guide](docs/CONFIGURATION.md) - Server configuration options
 - [Routing Guide](docs/ROUTING.md) - How routing works
-- [Project Structure](docs/project-structure-proposal.md) - Architecture overview
-- [Implementation Status](docs/webbin-implementation-status.md) - Current features
+- [Project Structure](docs/project-structure.md) - Architecture overview
+- [Project Status](PROJECT_STATUS.md) - Current implementation status
 
 ## Development
 
