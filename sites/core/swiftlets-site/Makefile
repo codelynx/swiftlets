@@ -14,10 +14,10 @@ else ifeq ($(ARCH),arm64)
 endif
 
 # Binary directory
-BIN_DIR := web/bin/$(OS)/$(ARCH)
+BIN_DIR := web/bin
 
-# Swift files to compile
-SWIFT_FILES := $(wildcard src/*.swift) $(wildcard src/**/*.swift)
+# Swift files to compile (subdirectories first to avoid conflicts)
+SWIFT_FILES := $(sort $(wildcard src/**/*.swift)) $(sort $(wildcard src/*.swift))
 
 # Default target
 .PHONY: all
@@ -26,17 +26,42 @@ all: build
 # Build all swiftlets
 .PHONY: build
 build: $(BIN_DIR)
-	@echo "Building swiftlets for $(OS)/$(ARCH)..."
+	@echo "Building swiftlets..."
+	@mkdir -p .build/temp
 	@for file in $(SWIFT_FILES); do \
 		relative=$${file#src/}; \
-		output="$(BIN_DIR)/$${relative%.swift}"; \
+		output="web/bin/$${relative%.swift}"; \
+		webbin="web/$${relative%.swift}.webbin"; \
 		outdir=$$(dirname "$$output"); \
-		mkdir -p "$$outdir"; \
+		mkdir -p "$$outdir" 2>/dev/null || true; \
 		echo "  Building $$relative -> $$output"; \
-		swiftc -parse-as-library \
-		      -I ../../../core/.build/release/Modules \
-		      "$$file" -o "$$output" || exit 1; \
+		temp_file=".build/temp/$$(basename $$file)"; \
+		sed -e '/^import Swiftlets$$/d' \
+		    -e 's/let request = try/let _ = try/' \
+		    "$$file" > "$$temp_file"; \
+		if swiftc -parse-as-library \
+		      -module-name Swiftlets \
+		      ../../../core/Sources/Swiftlets/Core/*.swift \
+		      ../../../core/Sources/Swiftlets/HTML/Core/*.swift \
+		      ../../../core/Sources/Swiftlets/HTML/Elements/*.swift \
+		      ../../../core/Sources/Swiftlets/HTML/Helpers/*.swift \
+		      ../../../core/Sources/Swiftlets/HTML/Layout/*.swift \
+		      ../../../core/Sources/Swiftlets/HTML/Modifiers/*.swift \
+		      ../../../core/Sources/Swiftlets/HTML/Builders/*.swift \
+		      "$$temp_file" -o "$$output" 2>&1; then \
+			echo "    ✓ Success"; \
+			if [ -f "$$output" ]; then \
+				MD5=$$(md5 -q "$$output" 2>/dev/null || md5sum "$$output" | cut -d' ' -f1); \
+				echo "$$MD5" > "$$webbin"; \
+				echo "    ✓ Updated $$webbin"; \
+			fi; \
+		else \
+			echo "    ✗ Failed"; \
+			rm -rf .build/temp; \
+			exit 1; \
+		fi; \
 	done
+	@rm -rf .build/temp
 	@echo "Build complete!"
 
 # Create binary directory

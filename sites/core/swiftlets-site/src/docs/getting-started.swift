@@ -15,7 +15,7 @@ struct GettingStartedPage {
             Body {
                 // Navigation
                 Nav {
-                    Container(maxWidth: .extraLarge) {
+                    Container(maxWidth: .xl) {
                         HStack {
                             Link(href: "/") {
                                 H1("Swiftlets").style("margin", "0")
