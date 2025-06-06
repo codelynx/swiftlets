@@ -12,16 +12,21 @@ Create comprehensive HTML examples showing both Swift DSL code and generated HTM
 - Showcase index page with category navigation
 - Basic Elements showcase page  
 - Text Formatting showcase page
+- Tables showcase page
 - CodeExample and CategoryCard components
-- Clean, responsive CSS styling
+- Clean, responsive CSS styling with enhanced table and list styles
 - Proper routing with trailing slash support
 - Security fix: executables moved outside web root
 
+⚠️ **Issues:**
+- Lists showcase - compilation errors with list elements (UL, OL, LI, DL, DT, DD)
+
 🚧 **In Progress:**
-- Additional category pages (lists, tables, forms, etc.)
+- Investigating list element compilation issues
+- Forms showcase page
 
 📋 **Planned:**
-- Remaining 7 showcase categories
+- Remaining 5 showcase categories (media, semantic, layout, modifiers, advanced)
 - Search functionality
 - Copy code buttons
 
@@ -101,24 +106,30 @@ VStack {
 
 **Note:** Some elements like S (strikethrough), Dfn, Ruby, Wbr are not yet implemented in Swiftlets
 
-### 3. Lists
+### 3. Lists ⚠️
 **Route:** `/showcase/lists`
 
+**Status:** Compilation issues - list elements (UL, OL, LI, DL, DT, DD) cause undefined symbol errors during linking despite being properly defined in the framework.
+
+**Planned content:**
 - Unordered lists (UL)
 - Ordered lists (OL)
 - Nested lists
 - Definition lists (DL, DT, DD)
 - Custom list styles
 
-### 4. Tables
+### 4. Tables ✅
 **Route:** `/showcase/tables`
 
+**Implemented elements:**
 - Basic table structure
-- Headers and footers
+- Headers and footers (THead, TBody, TFoot)
+- Table rows and cells (TR, TH, TD)
 - Captions
-- Column groups
-- Responsive tables
-- Styled tables
+- Styled tables (striped, bordered, responsive)
+- Complex tables with spanning cells
+
+**Note:** ColGroup and Col elements are not yet implemented in Swiftlets
 
 ### 5. Forms
 **Route:** `/showcase/forms`
