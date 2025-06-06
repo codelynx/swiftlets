@@ -25,7 +25,7 @@ Swiftlets is a lightweight, Swift-based web framework that brings the simplicity
 
 ```bash
 # Install Swiftlets CLI
-./install-cli.sh
+./tools/install-cli.sh
 
 # Create a new project
 swiftlets new my-awesome-app
@@ -45,10 +45,10 @@ git clone https://github.com/yourusername/swiftlets.git
 cd swiftlets
 
 # Build everything
-./build.sh
+make build
 
-# Run the server
-./run-server.sh
+# Run the server with example site
+make run
 ```
 
 ## 📝 Your First Swiftlet
@@ -242,16 +242,30 @@ struct APIHandler {
 
 Explore working examples:
 
-- [**Swiftlets Site**](sdk/sites/swiftlets-site/) - Official documentation site
-- [**Test Sites**](core/sites/) - Testing sites for framework development
-- [**Showcase**](sdk/sites/showcase/) - Layout examples
+- [**Swiftlets Site**](sites/examples/swiftlets-site/) - Official documentation site
+- [**Test Sites**](sites/tests/) - Testing sites for framework development
+- [**Templates**](templates/) - Project templates for quick start
 
 Run the documentation site:
 
 ```bash
-cd sdk/sites/swiftlets-site
+cd sites/examples/swiftlets-site
 make serve
 ```
+
+## 📁 Project Structure
+
+```
+swiftlets/
+├── Sources/           # Framework and server source code
+├── bin/{os}/{arch}/   # Platform-specific binaries
+├── sites/             # Example and test sites
+├── templates/         # Project templates
+├── tools/             # Build and packaging tools
+└── docs/              # Documentation
+```
+
+See [Project Structure](docs/project-structure-unified.md) for details.
 
 ## 🤝 Contributing
 

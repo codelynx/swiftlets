@@ -220,11 +220,20 @@ swiftlets new mysite --from portfolio
 4. **Templates**: Ready-to-use starting points
 5. **Consistency**: Standard structure across all sites
 
-## Migration from Current Structure
+## Current Structure (As of 2025-06-06)
 
-Current POC structure:
+The sites organization has been simplified:
+
 ```
-src/hello/index.swift → sites/core/hello/src/index.swift
+sites/
+├── examples/              # Example sites for users
+│   └── swiftlets-site/   # Official documentation site
+└── tests/                # Test sites for framework development
+    ├── test-html/        # HTML DSL testing
+    ├── test-routing/     # Routing testing
+    └── benchmark/        # Performance benchmarks
 ```
 
-This organization supports both core development needs and third-party ecosystem growth.
+Templates are now at the root level in `templates/` directory.
+
+This organization clearly separates user-facing examples from internal testing sites.

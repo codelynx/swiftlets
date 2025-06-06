@@ -4,6 +4,11 @@
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m)
 
+# Normalize OS names
+ifeq ($(OS),Darwin)
+    OS := darwin
+endif
+
 # Normalize architecture names
 ifeq ($(ARCH),x86_64)
     ARCH := x86_64
@@ -41,13 +46,13 @@ build: $(BIN_DIR)
 		    "$$file" > "$$temp_file"; \
 		if swiftc -parse-as-library \
 		      -module-name Swiftlets \
-		      ../../../core/Sources/Swiftlets/Core/*.swift \
-		      ../../../core/Sources/Swiftlets/HTML/Core/*.swift \
-		      ../../../core/Sources/Swiftlets/HTML/Elements/*.swift \
-		      ../../../core/Sources/Swiftlets/HTML/Helpers/*.swift \
-		      ../../../core/Sources/Swiftlets/HTML/Layout/*.swift \
-		      ../../../core/Sources/Swiftlets/HTML/Modifiers/*.swift \
-		      ../../../core/Sources/Swiftlets/HTML/Builders/*.swift \
+		      ../../../Sources/Swiftlets/Core/*.swift \
+		      ../../../Sources/Swiftlets/HTML/Core/*.swift \
+		      ../../../Sources/Swiftlets/HTML/Elements/*.swift \
+		      ../../../Sources/Swiftlets/HTML/Helpers/*.swift \
+		      ../../../Sources/Swiftlets/HTML/Layout/*.swift \
+		      ../../../Sources/Swiftlets/HTML/Modifiers/*.swift \
+		      ../../../Sources/Swiftlets/HTML/Builders/*.swift \
 		      "$$temp_file" -o "$$output" 2>&1; then \
 			echo "    ✓ Success"; \
 			if [ -f "$$output" ]; then \
@@ -79,13 +84,13 @@ clean:
 .PHONY: serve
 serve: build
 	@echo "Starting Swiftlets server..."
-	@cd ../../.. && swiftlets serve --site sdk/sites/swiftlets-site
+	@cd ../../.. && swiftlets serve --site sites/examples/swiftlets-site
 
 # Run without CLI (direct server)
 .PHONY: run
 run: build
 	@echo "Starting server directly..."
-	@cd ../../.. && SWIFTLETS_SITE=sdk/sites/swiftlets-site ./core/.build/release/swiftlets-server
+	@cd ../../.. && SWIFTLETS_SITE=sites/examples/swiftlets-site ./bin/$(OS)/$(ARCH)/swiftlets-server
 
 # Help
 .PHONY: help

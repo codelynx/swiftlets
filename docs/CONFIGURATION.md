@@ -96,5 +96,5 @@ On Ubuntu ARM64, the platform will show as `linux/arm64` and the server will use
 ```bash
 # On Ubuntu ARM64
 cd ~/Projects/swiftlets
-SWIFTLETS_SITE=sdk/sites/swiftlets-site ./core/.build/aarch64-unknown-linux-gnu/debug/swiftlets-server
+SWIFTLETS_SITE=sites/examples/swiftlets-site ./bin/linux/arm64/swiftlets-server
 ```

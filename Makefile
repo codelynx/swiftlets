@@ -1,5 +1,4 @@
 # Swiftlets Root Makefile
-# Convenience commands for development
 
 # Colors
 GREEN = \033[0;32m
@@ -7,110 +6,183 @@ YELLOW = \033[1;33m
 RED = \033[0;31m
 NC = \033[0m # No Color
 
+# Platform detection
+OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+ARCH := $(shell uname -m)
+
+# Normalize OS names
+ifeq ($(OS),Darwin)
+    OS := darwin
+endif
+
+# Normalize architecture names
+ifeq ($(ARCH),x86_64)
+    ARCH := x86_64
+else ifeq ($(ARCH),aarch64)
+    ARCH := arm64
+else ifeq ($(ARCH),arm64)
+    ARCH := arm64
+endif
+
+# Binary output directory
+BIN_DIR := bin/$(OS)/$(ARCH)
+
 # Default target
 .PHONY: help
 help:
-	@echo "$(YELLOW)Swiftlets Development Commands$(NC)"
+	@echo "$(YELLOW)Swiftlets Build System$(NC)"
 	@echo ""
-	@echo "$(GREEN)Server Commands:$(NC)"
-	@echo "  make server              - Run the development server"
-	@echo "  make server-build        - Build the server"
-	@echo "  make server-release      - Build server in release mode"
+	@echo "$(GREEN)Build Commands:$(NC)"
+	@echo "  make build               - Build all components"
+	@echo "  make build-server        - Build server only"
+	@echo "  make build-cli           - Build CLI only"
+	@echo "  make build-release       - Build in release mode"
 	@echo ""
-	@echo "$(GREEN)Core Framework:$(NC)"
-	@echo "  make test                - Run all tests"
-	@echo "  make build               - Build core framework"
-	@echo "  make clean               - Clean all build artifacts"
+	@echo "$(GREEN)Run Commands:$(NC)"
+	@echo "  make run                 - Run server with example site"
+	@echo "  make run-dev             - Run in development mode"
 	@echo ""
-	@echo "$(GREEN)SDK Tools:$(NC)"
-	@echo "  make init NAME=mysite    - Create new project using swiftlets-init"
+	@echo "$(GREEN)Site Commands:$(NC)"
+	@echo "  make sites               - Build all example sites"
+	@echo "  make test-sites          - Build test sites"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
-	@echo "  make dev                 - Start server with swiftlets-site"
-	@echo "  make watch               - Watch for changes (requires fswatch)"
+	@echo "  make test                - Run all tests"
+	@echo "  make clean               - Clean build artifacts"
+	@echo "  make format              - Format Swift code"
 	@echo ""
-	@echo "$(GREEN)Cross-Platform:$(NC)"
-	@echo "  make check-ubuntu        - Check Ubuntu ARM64 prerequisites"
+	@echo "$(GREEN)Package Commands:$(NC)"
+	@echo "  make package-ubuntu      - Create Ubuntu .deb package"
+	@echo "  make package-macos       - Create macOS installer"
+	@echo ""
+	@echo "Platform: $(OS)/$(ARCH)"
+	@echo "Binaries: $(BIN_DIR)"
 
-# Run the server
-.PHONY: server
-server:
-	@echo "$(YELLOW)Starting Swiftlets server...$(NC)"
-	@export SWIFTLETS_SITE=sdk/sites/swiftlets-site; \
-	cd core && swift run swiftlets-server
+# Build all components
+.PHONY: build
+build: build-server build-cli
 
-# Build the server
-.PHONY: server-build
-server-build:
+# Build server
+.PHONY: build-server
+build-server:
 	@echo "$(YELLOW)Building Swiftlets server...$(NC)"
-	@cd core && swift build --product swiftlets-server
+	@mkdir -p $(BIN_DIR)
+	@swift build --product swiftlets-server
+	@cp .build/debug/swiftlets-server $(BIN_DIR)/
+	@echo "$(GREEN)Server built: $(BIN_DIR)/swiftlets-server$(NC)"
 
-# Build server in release mode
-.PHONY: server-release
-server-release:
-	@echo "$(YELLOW)Building Swiftlets server (release)...$(NC)"
-	@cd core && swift build --product swiftlets-server -c release
+# Build CLI
+.PHONY: build-cli
+build-cli:
+	@echo "$(YELLOW)Building Swiftlets CLI...$(NC)"
+	@mkdir -p $(BIN_DIR)
+	@swift build --product swiftlets
+	@cp .build/debug/swiftlets $(BIN_DIR)/
+	@echo "$(GREEN)CLI built: $(BIN_DIR)/swiftlets$(NC)"
 
+# Build release versions
+.PHONY: build-release
+build-release:
+	@echo "$(YELLOW)Building release versions...$(NC)"
+	@mkdir -p $(BIN_DIR)
+	@swift build -c release --product swiftlets-server
+	@swift build -c release --product swiftlets
+	@cp .build/release/swiftlets-server $(BIN_DIR)/
+	@cp .build/release/swiftlets $(BIN_DIR)/
+	@echo "$(GREEN)Release build complete$(NC)"
+
+# Run server
+.PHONY: run
+run: build-server
+	@echo "$(YELLOW)Starting Swiftlets server...$(NC)"
+	@export SWIFTLETS_SITE=sites/examples/swiftlets-site; \
+	$(BIN_DIR)/swiftlets-server
+
+# Run in development mode
+.PHONY: run-dev
+run-dev: build-server sites
+	@echo "$(YELLOW)Starting server in development mode...$(NC)"
+	@export SWIFTLETS_SITE=sites/examples/swiftlets-site; \
+	$(BIN_DIR)/swiftlets-server
+
+# Build example sites
+.PHONY: sites
+sites:
+	@echo "$(YELLOW)Building example sites...$(NC)"
+	@cd sites/examples/swiftlets-site && make build
+	@echo "$(GREEN)Sites built successfully$(NC)"
+
+# Build test sites
+.PHONY: test-sites
+test-sites:
+	@echo "$(YELLOW)Building test sites...$(NC)"
+	@for site in sites/tests/*/; do \
+		if [ -f "$$site/Makefile" ]; then \
+			echo "Building $$site..."; \
+			cd "$$site" && make build && cd -; \
+		fi \
+	done
 
 # Run tests
 .PHONY: test
 test:
 	@echo "$(YELLOW)Running tests...$(NC)"
-	@cd core && swift test
+	@swift test
 
-# Build core framework
-.PHONY: build
-build:
-	@echo "$(YELLOW)Building core framework...$(NC)"
-	@cd core && swift build
-
-# Clean everything
+# Clean build artifacts
 .PHONY: clean
 clean:
-	@echo "$(YELLOW)Cleaning all build artifacts...$(NC)"
-	@cd core && swift package clean
+	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
+	@swift package clean
+	@rm -rf bin/*/
 	@echo "$(GREEN)Clean complete$(NC)"
 
-# Create new project
-.PHONY: init
-init:
-ifndef NAME
-	@echo "$(RED)Error: NAME is required$(NC)"
-	@echo "Usage: make init NAME=mysite"
-else
-	@echo "$(YELLOW)Creating new project '$(NAME)'...$(NC)"
-	@sdk/tools/swiftlets-init $(NAME)
-endif
+# Format code
+.PHONY: format
+format:
+	@echo "$(YELLOW)Formatting Swift code...$(NC)"
+	@swift-format -i -r Sources/
+	@swift-format -i -r Tests/
 
-# Development mode - build and run
-.PHONY: dev
-dev:
-	@echo "$(YELLOW)Building swiftlets-site...$(NC)"
-	@cd sdk/sites/swiftlets-site && make build
-	@echo "$(GREEN)Starting server with swiftlets-site...$(NC)"
-	@export SWIFTLETS_SITE=sdk/sites/swiftlets-site; \
-	cd core && swift run swiftlets-server
+# Package for Ubuntu
+.PHONY: package-ubuntu
+package-ubuntu: build-release
+	@echo "$(YELLOW)Creating Ubuntu package...$(NC)"
+	@./tools/package/ubuntu/build-deb.sh
+	@echo "$(GREEN)Ubuntu package created$(NC)"
 
-# Watch for changes (if you implement it)
-.PHONY: watch
-watch:
-	@echo "$(YELLOW)Watching for changes...$(NC)"
-	@echo "$(RED)Not implemented yet$(NC)"
-	@echo "TODO: Implement file watching"
+# Package for macOS
+.PHONY: package-macos
+package-macos: build-release
+	@echo "$(YELLOW)Creating macOS installer...$(NC)"
+	@./tools/package/macos/build-pkg.sh
+	@echo "$(GREEN)macOS installer created$(NC)"
 
-# Check Ubuntu prerequisites
-.PHONY: check-ubuntu
-check-ubuntu:
-	@./check-ubuntu-prerequisites.sh
+# Install locally (development)
+.PHONY: install
+install: build-release
+	@echo "$(YELLOW)Installing Swiftlets...$(NC)"
+	@sudo cp $(BIN_DIR)/swiftlets /usr/local/bin/
+	@sudo cp $(BIN_DIR)/swiftlets-server /usr/local/bin/
+	@echo "$(GREEN)Installation complete$(NC)"
+
+# Uninstall
+.PHONY: uninstall
+uninstall:
+	@echo "$(YELLOW)Uninstalling Swiftlets...$(NC)"
+	@sudo rm -f /usr/local/bin/swiftlets
+	@sudo rm -f /usr/local/bin/swiftlets-server
+	@echo "$(GREEN)Uninstall complete$(NC)"
 
 # Shortcuts
-.PHONY: s
-s: server
+.PHONY: b
+b: build
 
+.PHONY: r
+r: run
 
 .PHONY: t
 t: test
 
-.PHONY: d
-d: dev
-
+.PHONY: c
+c: clean

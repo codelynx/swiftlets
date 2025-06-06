@@ -50,7 +50,7 @@ swiftlets new my-app --skip-git
 
 **Available Templates:**
 - `blank` - Minimal starter template (default)
-- More templates can be added to `sdk/templates/`
+- More templates can be added to `templates/`
 
 ### `swiftlets init`
 
@@ -101,7 +101,7 @@ swiftlets serve [path] [options]
 swiftlets serve
 
 # Serve specific site
-swiftlets serve sdk/sites/swiftlets-site
+swiftlets serve sites/examples/swiftlets-site
 
 # Use custom port
 swiftlets serve --port 3000
@@ -228,7 +228,7 @@ The CLI respects these environment variables:
 ### "Server not found" Error
 
 The CLI looks for the server in these locations:
-1. `core/.build/{debug,release}/swiftlets-server`
+1. `bin/{os}/{arch}/swiftlets-server`
 2. Platform-specific build directories
 3. `/usr/local/bin/swiftlets-server`
 
@@ -241,7 +241,7 @@ swift build --product swiftlets-server
 ### Template Not Found
 
 Templates are searched in:
-1. `../../sdk/templates/` (development)
+1. `../../templates/` (development)
 2. `/usr/local/share/swiftlets/templates/` (installed)
 3. Relative to CLI executable
 
