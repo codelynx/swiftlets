@@ -480,6 +480,16 @@ P {
                         },
                         description: "Special purpose text elements for technical content."
                     ).render()
+                    
+                    // Navigation
+                    Div {
+                        Link(href: "/showcase/basic-elements", "← Basic Elements")
+                            .class("nav-button")
+                        Link(href: "/showcase/tables", "Tables →")
+                            .class("nav-button nav-button-next")
+                    }
+                    .class("navigation-links")
+                    .style("margin-top", "3rem")
                 }
                 .class("showcase-container")
             }

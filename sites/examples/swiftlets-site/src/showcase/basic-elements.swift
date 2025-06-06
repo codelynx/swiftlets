@@ -280,6 +280,16 @@ Link(href: "/products") {
                             },
                             description: "Links connect pages and resources together."
                         ).render()
+                        
+                        // Navigation
+                        Div {
+                            Link(href: "/showcase", "← Showcase Index")
+                                .class("nav-button")
+                            Link(href: "/showcase/text-formatting", "Text Formatting →")
+                                .class("nav-button nav-button-next")
+                        }
+                        .class("navigation-links")
+                        .style("margin-top", "3rem")
                     }
                     .class("showcase-container")
                     
