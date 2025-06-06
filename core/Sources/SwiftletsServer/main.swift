@@ -169,7 +169,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         log(.debug, "Webbin file contains MD5: \(hash)")
         
         // Derive executable path from webbin path
-        // examples/basic-site/web/hello.webbin -> examples/basic-site/web/bin/hello
+        // sites/swiftlets-site/web/hello.webbin -> sites/swiftlets-site/web/bin/hello
         // web/api/users.json.webbin -> web/bin/api/users.json
         let webbinURL = URL(fileURLWithPath: webbinPath)
         let webRootURL = webbinURL.deletingLastPathComponent()

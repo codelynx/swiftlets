@@ -8,8 +8,8 @@ The Swiftlets server now supports environment variables for flexible configurati
 Sets the site directory. The server will look for a `web/` subdirectory within this path.
 
 ```bash
-# Run with the basic-site example
-SWIFTLETS_SITE=examples/basic-site ./swiftlets-server
+# Run with the swiftlets-site
+SWIFTLETS_SITE=sdk/sites/swiftlets-site ./swiftlets-server
 
 # Or use the run script
 ./run-server.sh
@@ -46,7 +46,7 @@ SWIFTLETS_PORT=3000 ./swiftlets-server
 # Using make (automatically sets SWIFTLETS_SITE)
 make server
 
-# Using run script (auto-detects examples/basic-site)
+# Using run script (auto-detects sdk/sites/swiftlets-site)
 ./run-server.sh
 
 # Specify a different site
@@ -83,7 +83,7 @@ The server now logs its configuration on startup:
 
 ```
 2025-06-06T10:30:00Z [INFO] Server Configuration:
-2025-06-06T10:30:00Z [INFO]   Web Root: examples/basic-site/web
+2025-06-06T10:30:00Z [INFO]   Web Root: sdk/sites/swiftlets-site/web
 2025-06-06T10:30:00Z [INFO]   Host: 127.0.0.1
 2025-06-06T10:30:00Z [INFO]   Port: 8080
 2025-06-06T10:30:00Z [INFO]   Platform: macos/arm64
@@ -96,5 +96,5 @@ On Ubuntu ARM64, the platform will show as `linux/arm64` and the server will use
 ```bash
 # On Ubuntu ARM64
 cd ~/Projects/swiftlets
-SWIFTLETS_SITE=examples/basic-site ./core/.build/aarch64-unknown-linux-gnu/debug/swiftlets-server
+SWIFTLETS_SITE=sdk/sites/swiftlets-site ./core/.build/aarch64-unknown-linux-gnu/debug/swiftlets-server
 ```

@@ -236,20 +236,20 @@ struct APIHandler {
 - [**HTML DSL Reference**](docs/html-elements-reference.md) - All HTML components
 - [**Configuration**](docs/CONFIGURATION.md) - Server configuration
 - [**Architecture**](docs/swiftlet-architecture.md) - How Swiftlets works
+- [**SDK Distribution**](docs/sdk-distribution-plan.md) - Future SDK packaging plans
 
 ## 🧪 Examples
 
 Explore working examples:
 
-- [**Basic Site**](examples/basic-site/) - Simple website with routing
-- [**Blog Template**](sdk/templates/blog/) - Full-featured blog
-- [**API Server**](sdk/examples/api/) - RESTful API example
-- [**Showcase**](sites/core/showcase/) - All HTML components demo
+- [**Swiftlets Site**](sdk/sites/swiftlets-site/) - Official documentation site
+- [**Test Sites**](core/sites/) - Testing sites for framework development
+- [**Showcase**](sdk/sites/showcase/) - Layout examples
 
-Run any example:
+Run the documentation site:
 
 ```bash
-cd examples/basic-site
+cd sdk/sites/swiftlets-site
 make serve
 ```
 

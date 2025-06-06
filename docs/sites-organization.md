@@ -12,30 +12,25 @@ Swiftlets needs a clear organization for different types of sites:
 
 ```
 swiftlets/
-├── sites/                      # All sites live here
-│   ├── core/                   # Core framework examples
-│   │   ├── hello/              # Minimal example
-│   │   ├── showcase/           # Feature showcase
-│   │   ├── blog/               # Blog engine example
-│   │   ├── api/                # REST API example
-│   │   └── realtime/           # WebSocket example
+├── core/
+│   ├── sites/                  # Test sites for framework development
+│   │   ├── test-html/          # HTML DSL testing
+│   │   ├── test-routing/       # Routing testing
+│   │   └── benchmark/          # Performance benchmarks
 │   │
-│   ├── test/                   # Test sites (not in production)
-│   │   ├── unit/               # Unit test sites
-│   │   ├── integration/        # Integration test sites
-│   │   ├── performance/        # Performance benchmarks
-│   │   └── error-handling/     # Error cases
+│   └── Sources/                # Framework source code
+│       └── Swiftlets/          # Unified framework
+│
+├── sdk/                        # SDK and third-party development
+│   ├── sites/                  # Production sites
+│   │   ├── swiftlets-site/     # Official documentation site
+│   │   └── showcase/           # Layout examples
 │   │
-│   └── templates/              # Third-party site templates
-│       ├── portfolio/          # Portfolio template
-│       ├── ecommerce/          # E-commerce template
-│       └── dashboard/          # Admin dashboard template
+│   ├── templates/              # Site templates
+│   └── tools/                  # Development tools
 │
-├── src/                        # Swiftlet source code (current structure)
-│   └── [swiftlet sources]
-│
-└── bin/                        # Compiled swiftlets
-    └── [platform/arch/...]
+└── cli/                        # Swiftlets CLI
+    └── Sources/
 ```
 
 ## Site Types

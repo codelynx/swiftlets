@@ -101,7 +101,7 @@ swiftlets serve [path] [options]
 swiftlets serve
 
 # Serve specific site
-swiftlets serve examples/basic-site
+swiftlets serve sdk/sites/swiftlets-site
 
 # Use custom port
 swiftlets serve --port 3000

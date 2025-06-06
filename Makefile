@@ -17,11 +17,6 @@ help:
 	@echo "  make server-build        - Build the server"
 	@echo "  make server-release      - Build server in release mode"
 	@echo ""
-	@echo "$(GREEN)Example Commands:$(NC)"
-	@echo "  make example             - Build and run basic-site example"
-	@echo "  make example-build       - Build basic-site example"
-	@echo "  make example-clean       - Clean basic-site example"
-	@echo ""
 	@echo "$(GREEN)Core Framework:$(NC)"
 	@echo "  make test                - Run all tests"
 	@echo "  make build               - Build core framework"
@@ -31,7 +26,7 @@ help:
 	@echo "  make init NAME=mysite    - Create new project using swiftlets-init"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
-	@echo "  make dev                 - Start server with basic-site example"
+	@echo "  make dev                 - Start server with swiftlets-site"
 	@echo "  make watch               - Watch for changes (requires fswatch)"
 	@echo ""
 	@echo "$(GREEN)Cross-Platform:$(NC)"
@@ -41,9 +36,7 @@ help:
 .PHONY: server
 server:
 	@echo "$(YELLOW)Starting Swiftlets server...$(NC)"
-	@if [ -d "examples/basic-site" ]; then \
-		export SWIFTLETS_SITE=examples/basic-site; \
-	fi; \
+	@export SWIFTLETS_SITE=sdk/sites/swiftlets-site; \
 	cd core && swift run swiftlets-server
 
 # Build the server
@@ -58,25 +51,6 @@ server-release:
 	@echo "$(YELLOW)Building Swiftlets server (release)...$(NC)"
 	@cd core && swift build --product swiftlets-server -c release
 
-# Build and run example
-.PHONY: example
-example:
-	@echo "$(YELLOW)Building basic-site example...$(NC)"
-	@cd examples/basic-site && make all
-	@echo "$(GREEN)Starting server with basic-site...$(NC)"
-	@cd core && swift run swiftlets-server
-
-# Build example only
-.PHONY: example-build
-example-build:
-	@echo "$(YELLOW)Building basic-site example...$(NC)"
-	@cd examples/basic-site && make all
-
-# Clean example
-.PHONY: example-clean
-example-clean:
-	@echo "$(YELLOW)Cleaning basic-site example...$(NC)"
-	@cd examples/basic-site && make clean
 
 # Run tests
 .PHONY: test
@@ -95,7 +69,6 @@ build:
 clean:
 	@echo "$(YELLOW)Cleaning all build artifacts...$(NC)"
 	@cd core && swift package clean
-	@cd examples/basic-site && make clean
 	@echo "$(GREEN)Clean complete$(NC)"
 
 # Create new project
@@ -111,7 +84,12 @@ endif
 
 # Development mode - build and run
 .PHONY: dev
-dev: example-build server
+dev:
+	@echo "$(YELLOW)Building swiftlets-site...$(NC)"
+	@cd sdk/sites/swiftlets-site && make build
+	@echo "$(GREEN)Starting server with swiftlets-site...$(NC)"
+	@export SWIFTLETS_SITE=sdk/sites/swiftlets-site; \
+	cd core && swift run swiftlets-server
 
 # Watch for changes (if you implement it)
 .PHONY: watch
@@ -129,8 +107,6 @@ check-ubuntu:
 .PHONY: s
 s: server
 
-.PHONY: e
-e: example
 
 .PHONY: t
 t: test

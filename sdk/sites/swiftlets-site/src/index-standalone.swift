@@ -1,10 +1,9 @@
 import Foundation
-import Swiftlets
 
 @main
 struct HomePage {
     static func main() async throws {
-        let _ = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
+        let request = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
         
         let html = Html {
             Head {
@@ -92,7 +91,7 @@ struct HomePage {
                                                 Title("Welcome to Swiftlets")
                                             }
                                             Body {
-                                                H1("Hello, \\(request.query[\"name\"] ?? \"World\")!")
+                                                H1("Hello, \\(request.query["name"] ?? "World")!")
                                                 P("Build web apps with Swift's type safety and performance.")
                                             }
                                         }

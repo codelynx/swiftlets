@@ -26,10 +26,10 @@ echo -e "${YELLOW}Building core framework...${NC}"
 cd core && swift build
 cd ..
 
-# Build basic-site example
-echo -e "${YELLOW}Building basic-site example...${NC}"
-cd examples/basic-site && make all
-cd ../..
+# Build swiftlets-site
+echo -e "${YELLOW}Building swiftlets-site...${NC}"
+cd sdk/sites/swiftlets-site && make build
+cd ../../..
 
 echo -e "${GREEN}✓ Build complete!${NC}"
 echo ""

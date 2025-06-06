@@ -79,13 +79,13 @@ clean:
 .PHONY: serve
 serve: build
 	@echo "Starting Swiftlets server..."
-	@cd ../../.. && swiftlets serve --site sites/core/swiftlets-site
+	@cd ../../.. && swiftlets serve --site sdk/sites/swiftlets-site
 
 # Run without CLI (direct server)
 .PHONY: run
 run: build
 	@echo "Starting server directly..."
-	@cd ../../.. && SWIFTLETS_SITE=sites/core/swiftlets-site ./core/.build/release/swiftlets-server
+	@cd ../../.. && SWIFTLETS_SITE=sdk/sites/swiftlets-site ./core/.build/release/swiftlets-server
 
 # Help
 .PHONY: help
