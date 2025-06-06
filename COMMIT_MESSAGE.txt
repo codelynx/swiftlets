@@ -1,0 +1,37 @@
+Restructure project: Separate core testing from user examples
+
+Major reorganization to improve project structure and developer experience:
+
+Structure Changes:
+- Create core/sites/ for internal framework testing
+- Create sdk/sites/ for user-facing examples
+- Add test sites: test-routing, test-html, benchmark
+- Move showcase to sdk/sites/swiftlets-site
+
+Core Test Sites:
+- test-routing: Tests path parsing and query parameters
+- test-html: Tests HTML DSL features and escaping
+- benchmark: Performance testing with large datasets
+
+Build System:
+- Add build-test-sites.sh for building core test sites
+- Remove 9 obsolete/broken build scripts
+- Keep only working, essential scripts
+
+Documentation:
+- Add project-structure-v2.md with new organization
+- Add structure-migration-guide.md for migration steps
+- Update README.md with new structure
+- Update CHANGELOG.md and PROJECT_STATUS.md
+
+Benefits:
+- Clear separation of concerns
+- Core team can test without worrying about examples
+- SDK users have clean examples to learn from
+- Cleaner project root with less confusion
+
+All sites tested and building successfully on macOS ARM64.
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
