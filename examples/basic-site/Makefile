@@ -2,8 +2,8 @@
 # This Makefile manages the building of swiftlet executables based on .webbin files
 
 # Configuration
-BIN_DIR = ../bin
-SRC_DIR = ../src
+BIN_DIR = bin
+SRC_DIR = src
 BUILD_MODE ?= debug
 SWIFT = swift
 SWIFTC = swiftc
@@ -15,7 +15,7 @@ RED = \033[0;31m
 NC = \033[0m # No Color
 
 # Find all .webbin files
-WEBBIN_FILES := $(shell find . -name "*.webbin" -type f)
+WEBBIN_FILES := $(shell find web -name "*.webbin" -type f)
 # Extract executable names from .webbin files (one per line)
 EXECUTABLES := $(shell cat $(WEBBIN_FILES) 2>/dev/null | sort -u)
 
@@ -34,13 +34,13 @@ check-structure:
 routes:
 	@echo "$(YELLOW)Available routes:$(NC)"
 	@echo "$(YELLOW)Static files:$(NC)"
-	@find . -type f ! -name "*.webbin" ! -name "Makefile" | sed 's|^\./|  /|'
+	@find web -type f ! -name "*.webbin" ! -name "Makefile" | sed 's|^web|  |'
 	@echo ""
 	@echo "$(YELLOW)Dynamic routes (.webbin files):$(NC)"
 	@for webbin in $(WEBBIN_FILES); do \
-		route=$$(echo $$webbin | sed 's|^\./||' | sed 's|\.webbin$$||'); \
+		route=$$(echo $$webbin | sed 's|^web||' | sed 's|\.webbin$$||'); \
 		exec=$$(cat $$webbin); \
-		echo "  /$$route → $$exec"; \
+		echo "  $$route → $$exec"; \
 	done
 
 # Validate all .webbin files
@@ -68,19 +68,19 @@ bin/%: FORCE
 	@src_name=$$(basename $@); \
 	src_file=$$(find $(SRC_DIR) -name "$$src_name.swift" 2>/dev/null | head -1); \
 	if [ -n "$$src_file" ]; then \
-		if [ ! -f "../$@" ] || [ "$$src_file" -nt "../$@" ] || \
-		   [ -n "$$(find ../core/Sources/SwiftletsCore ../core/Sources/SwiftletsHTML -name "*.swift" -newer "../$@" 2>/dev/null | head -1)" ]; then \
+		if [ ! -f "$@" ] || [ "$$src_file" -nt "$@" ] || \
+		   [ -n "$$(find ../../core/Sources/SwiftletsCore ../../core/Sources/SwiftletsHTML -name "*.swift" -newer "$@" 2>/dev/null | head -1)" ]; then \
 			echo "$(YELLOW)Building $@...$(NC)"; \
 			echo "  Found source: $$src_file"; \
-			(cd ../core && swift build --product SwiftletsCore --product SwiftletsHTML > /dev/null 2>&1); \
-			CORE_SOURCES=$$(find ../core/Sources/SwiftletsCore -name "*.swift"); \
-			HTML_SOURCES=$$(find ../core/Sources/SwiftletsHTML -name "*.swift"); \
+			(cd ../../core && swift build --product SwiftletsCore --product SwiftletsHTML > /dev/null 2>&1); \
+			CORE_SOURCES=$$(find ../../core/Sources/SwiftletsCore -name "*.swift"); \
+			HTML_SOURCES=$$(find ../../core/Sources/SwiftletsHTML -name "*.swift"); \
 			$(SWIFTC) $$src_file $$CORE_SOURCES $$HTML_SOURCES \
 				-parse-as-library \
-				-o ../$@ \
+				-o $@ \
 				2>&1 | sed 's/^/  /'; \
 			if [ $${PIPESTATUS[0]} -eq 0 ]; then \
-				chmod +x ../$@; \
+				chmod +x $@; \
 				echo "$(GREEN)✓ Built $@$(NC)"; \
 			else \
 				echo "$(RED)✗ Failed to build $@$(NC)"; \
@@ -114,7 +114,7 @@ watch:
 # Development server
 serve: all
 	@echo "$(GREEN)Starting development server...$(NC)"
-	@cd ../core && swift run swiftlets-server
+	@cd ../../core && swift run swiftlets-server
 
 # Build for production
 release:
