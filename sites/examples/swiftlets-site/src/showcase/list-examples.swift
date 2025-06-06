@@ -43,18 +43,6 @@ struct ShowcaseListsPage {
                             H1("Lists")
                             P("Examples of HTML list elements including unordered lists, ordered lists, and definition lists.")
                             
-                            // Note about list elements
-                            Div {
-                                Strong("Note:")
-                                Text(" List elements (UL, OL, LI, DL, DT, DD) are currently experiencing compilation issues. The previews below simulate their appearance using styled Div and Text elements, while the code examples show the intended syntax.")
-                            }
-                            .class("note")
-                            .style("background", "#fff3cd")
-                            .style("border", "1px solid #ffeeba")
-                            .style("color", "#856404")
-                            .style("padding", "1rem")
-                            .style("border-radius", "0.25rem")
-                            .style("margin-bottom", "2rem")
                             
                             // Example 1: Unordered List
                             CodeExample(
@@ -84,20 +72,15 @@ UL {
 </ul>
 """,
                                 preview: {
-                                    Div {
-                                        Text("• First item")
-                                            .style("display", "block")
-                                        Text("• Second item")
-                                            .style("display", "block")
-                                        Div {
-                                            Text("• Third item with nested list")
-                                            Div {
-                                                Text("  ◦ Nested item 1")
-                                                    .style("display", "block")
-                                                Text("  ◦ Nested item 2")
-                                                    .style("display", "block")
+                                    UL {
+                                        LI("First item")
+                                        LI("Second item")
+                                        LI {
+                                            Text("Third item with nested list")
+                                            UL {
+                                                LI("Nested item 1")
+                                                LI("Nested item 2")
                                             }
-                                            .style("margin-left", "20px")
                                         }
                                     }
                                 }
@@ -124,15 +107,11 @@ OL {
 </ol>
 """,
                                 preview: {
-                                    Div {
-                                        Text("1. First step")
-                                            .style("display", "block")
-                                        Text("2. Second step")
-                                            .style("display", "block")
-                                        Text("3. Third step")
-                                            .style("display", "block")
-                                        Text("4. Fourth step")
-                                            .style("display", "block")
+                                    OL {
+                                        LI("First step")
+                                        LI("Second step")
+                                        LI("Third step")
+                                        LI("Fourth step")
                                     }
                                     .class("custom-numbered")
                                 }
@@ -167,23 +146,15 @@ DL {
 </dl>
 """,
                                 preview: {
-                                    Div {
-                                        Strong("HTML")
-                                            .style("display", "block")
-                                        P("HyperText Markup Language - the standard markup language for web pages")
-                                            .style("margin-left", "20px")
-                                            .style("margin-bottom", "1rem")
+                                    DL {
+                                        DT("HTML")
+                                        DD("HyperText Markup Language - the standard markup language for web pages")
                                         
-                                        Strong("CSS")
-                                            .style("display", "block")
-                                        P("Cascading Style Sheets - describes how HTML elements are displayed")
-                                            .style("margin-left", "20px")
-                                            .style("margin-bottom", "1rem")
+                                        DT("CSS")
+                                        DD("Cascading Style Sheets - describes how HTML elements are displayed")
                                         
-                                        Strong("JavaScript")
-                                            .style("display", "block")
-                                        P("A programming language that enables interactive web pages")
-                                            .style("margin-left", "20px")
+                                        DT("JavaScript")
+                                        DD("A programming language that enables interactive web pages")
                                     }
                                     .class("styled-dl")
                                 }
@@ -208,17 +179,12 @@ UL {
 </ul>
 """,
                                 preview: {
-                                    Div {
-                                        ForEach(["Featured item with custom styling", "Another styled item", "Third styled item"]) { item in
-                                            Div {
-                                                Text(item)
-                                            }
-                                            .style("padding", "0.75rem 1rem")
-                                            .style("margin-bottom", "0.5rem")
-                                            .style("background", "#f8f9fa")
-                                            .style("border-left", "4px solid #007bff")
-                                        }
+                                    UL {
+                                        LI("Featured item with custom styling")
+                                        LI("Another styled item")
+                                        LI("Third styled item")
                                     }
+                                    .class("styled-list")
                                 }
                             ).render()
                             
@@ -260,25 +226,18 @@ Div {
                                 preview: {
                                     Div {
                                         H3("Recipe Instructions")
-                                        Div {
-                                            Text("1. Gather ingredients:")
-                                                .style("display", "block")
-                                            Div {
-                                                Text("• 2 cups flour")
-                                                    .style("display", "block")
-                                                Text("• 1 cup sugar")
-                                                    .style("display", "block")
-                                                Text("• 3 eggs")
-                                                    .style("display", "block")
+                                        OL {
+                                            LI {
+                                                Text("Gather ingredients:")
+                                                UL {
+                                                    LI("2 cups flour")
+                                                    LI("1 cup sugar")
+                                                    LI("3 eggs")
+                                                }
                                             }
-                                            .style("margin-left", "20px")
-                                            .style("margin-bottom", "0.5rem")
-                                            Text("2. Mix dry ingredients")
-                                                .style("display", "block")
-                                            Text("3. Add wet ingredients")
-                                                .style("display", "block")
-                                            Text("4. Bake at 350°F for 30 minutes")
-                                                .style("display", "block")
+                                            LI("Mix dry ingredients")
+                                            LI("Add wet ingredients")
+                                            LI("Bake at 350°F for 30 minutes")
                                         }
                                     }
                                 }
