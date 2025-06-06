@@ -1,21 +1,26 @@
 import Foundation
+import SwiftletsCore
+import SwiftletsHTML
 
 // Simple swiftlet that outputs HTTP response format
 // No result builders, just plain string output
 
-let method = ProcessInfo.processInfo.environment["REQUEST_METHOD"] ?? "GET"
-let path = ProcessInfo.processInfo.environment["REQUEST_PATH"] ?? "/"
-let headers = ProcessInfo.processInfo.environment["REQUEST_HEADERS"] ?? "{}"
-
-// Read body from stdin if present
-var body = ""
-if let inputData = try? FileHandle.standardInput.readToEnd(),
-   let inputString = String(data: inputData, encoding: .utf8) {
-    body = inputString
-}
-
-// Generate HTML response
-let html = """
+@main
+struct Index {
+    static func main() {
+        let method = ProcessInfo.processInfo.environment["REQUEST_METHOD"] ?? "GET"
+        let path = ProcessInfo.processInfo.environment["REQUEST_PATH"] ?? "/"
+        let headers = ProcessInfo.processInfo.environment["REQUEST_HEADERS"] ?? "{}"
+        
+        // Read body from stdin if present
+        var body = ""
+        if let inputData = try? FileHandle.standardInput.readToEnd(),
+           let inputString = String(data: inputData, encoding: .utf8) {
+            body = inputString
+        }
+        
+        // Generate HTML response
+        let html = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -87,9 +92,11 @@ let html = """
 </html>
 """
 
-// Output HTTP response format
-print("Status: 200")
-print("Content-Type: text/html; charset=utf-8")
-print("X-Swiftlet: hello/index")
-print("")  // Empty line between headers and body
-print(html)
+        // Output HTTP response format
+        print("Status: 200")
+        print("Content-Type: text/html; charset=utf-8")
+        print("X-Swiftlet: hello/index")
+        print("")  // Empty line between headers and body
+        print(html)
+    }
+}
