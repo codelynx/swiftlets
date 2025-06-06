@@ -1,0 +1,11 @@
+# Swiftlets
+bin/
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*~

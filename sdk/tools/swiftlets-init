@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Swiftlets Project Initializer
+# Usage: swiftlets-init [project-name] [template]
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Get script directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SDK_DIR="$(dirname "$SCRIPT_DIR")"
+TEMPLATES_DIR="$SDK_DIR/templates"
+
+# Default values
+PROJECT_NAME="${1:-my-swiftlets-site}"
+TEMPLATE="${2:-blank}"
+
+# Show usage
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    echo "Usage: swiftlets-init [project-name] [template]"
+    echo ""
+    echo "Arguments:"
+    echo "  project-name  Name of your project directory (default: my-swiftlets-site)"
+    echo "  template      Template to use (default: blank)"
+    echo ""
+    echo "Available templates:"
+    ls -1 "$TEMPLATES_DIR" 2>/dev/null | sed 's/^/  - /'
+    exit 0
+fi
+
+# Check if template exists
+if [ ! -d "$TEMPLATES_DIR/$TEMPLATE" ]; then
+    echo -e "${RED}Error: Template '$TEMPLATE' not found${NC}"
+    echo "Available templates:"
+    ls -1 "$TEMPLATES_DIR" 2>/dev/null | sed 's/^/  - /'
+    exit 1
+fi
+
+# Check if project directory already exists
+if [ -d "$PROJECT_NAME" ]; then
+    echo -e "${RED}Error: Directory '$PROJECT_NAME' already exists${NC}"
+    exit 1
+fi
+
+# Create project
+echo -e "${YELLOW}Creating Swiftlets project '$PROJECT_NAME' from template '$TEMPLATE'...${NC}"
+
+# Copy template
+cp -r "$TEMPLATES_DIR/$TEMPLATE" "$PROJECT_NAME"
+
+# Update project name in Package.swift if it exists
+if [ -f "$PROJECT_NAME/Package.swift" ]; then
+    sed -i '' "s/name: \"[^\"]*\"/name: \"$PROJECT_NAME\"/" "$PROJECT_NAME/Package.swift" 2>/dev/null || \
+    sed -i "s/name: \"[^\"]*\"/name: \"$PROJECT_NAME\"/" "$PROJECT_NAME/Package.swift"
+fi
+
+# Success message
+echo -e "${GREEN}✓ Project created successfully!${NC}"
+echo ""
+echo "Next steps:"
+echo "  cd $PROJECT_NAME"
+echo "  make serve"
+echo ""
+echo "Happy coding! 🚀"
