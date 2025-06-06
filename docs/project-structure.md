@@ -244,9 +244,9 @@ Swiftlets supports multiple platforms and architectures:
 - **Linux**: Ubuntu 22.04+ (x86_64 and ARM64/aarch64)
 
 ### Build System
-The project includes universal build scripts that automatically detect the platform:
-- `build-universal.sh` - Cross-platform build script
-- `run-universal.sh` - Cross-platform run script
+The project includes build scripts for different platforms:
+- `build.sh` - Build script for the current platform
+- `run-server.sh` - Run script for the development server
 - `check-ubuntu-prerequisites.sh` - Ubuntu setup verification
 
 ### Platform-Specific Paths

@@ -11,8 +11,8 @@ Sets the site directory. The server will look for a `web/` subdirectory within t
 # Run with the basic-site example
 SWIFTLETS_SITE=examples/basic-site ./swiftlets-server
 
-# Or use the universal run script
-./run-universal.sh examples/basic-site
+# Or use the run script
+./run-server.sh
 ```
 
 ### SWIFTLETS_WEB_ROOT
@@ -46,11 +46,11 @@ SWIFTLETS_PORT=3000 ./swiftlets-server
 # Using make (automatically sets SWIFTLETS_SITE)
 make server
 
-# Using universal script (auto-detects examples/basic-site)
-./run-universal.sh
+# Using run script (auto-detects examples/basic-site)
+./run-server.sh
 
 # Specify a different site
-./run-universal.sh sites/my-site
+SWIFTLETS_SITE=sites/my-site ./run-server.sh
 ```
 
 ### Running from Any Directory

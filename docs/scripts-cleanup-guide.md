@@ -4,9 +4,7 @@
 
 ### Core Build Scripts
 - **`build.sh`** - Main build script for core framework
-- **`build-universal.sh`** - Cross-platform build (macOS/Linux)
 - **`run-server.sh`** - Run the development server
-- **`run-universal.sh`** - Cross-platform server runner
 - **`install-cli.sh`** - Install the Swiftlets CLI tool
 
 ### Ubuntu/Linux Support
@@ -50,8 +48,8 @@ rm debug-test-html.sh
 ## After Cleanup
 
 You'll have a clean set of scripts:
-- Core building: `build.sh`, `build-universal.sh`
-- Running: `run-server.sh`, `run-universal.sh`
+- Core building: `build.sh`
+- Running: `run-server.sh`
 - CLI: `install-cli.sh`
 - Sites: `build-test-sites.sh`
 - Linux: `check-ubuntu-prerequisites.sh`

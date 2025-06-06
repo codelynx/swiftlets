@@ -88,5 +88,5 @@ echo "echo 'export PATH=/usr/local/swift/usr/bin:\$PATH' >> ~/.bashrc"
 echo "source ~/.bashrc"
 echo
 echo "🚀 After installing prerequisites, use:"
-echo "  ./build-universal.sh  - to build everything"
-echo "  ./run-universal.sh    - to run the server"
+echo "  ./build.sh      - to build everything"
+echo "  ./run-server.sh - to run the server"

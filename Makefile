@@ -35,8 +35,6 @@ help:
 	@echo "  make watch               - Watch for changes (requires fswatch)"
 	@echo ""
 	@echo "$(GREEN)Cross-Platform:$(NC)"
-	@echo "  make build-universal     - Build with cross-platform support"
-	@echo "  make run-universal       - Run with cross-platform support"
 	@echo "  make check-ubuntu        - Check Ubuntu ARM64 prerequisites"
 
 # Run the server
@@ -122,18 +120,6 @@ watch:
 	@echo "$(RED)Not implemented yet$(NC)"
 	@echo "TODO: Implement file watching"
 
-# Cross-platform build
-.PHONY: build-universal
-build-universal:
-	@echo "$(YELLOW)Building with cross-platform support...$(NC)"
-	@./build-universal.sh
-
-# Cross-platform run
-.PHONY: run-universal
-run-universal:
-	@echo "$(YELLOW)Running with cross-platform support...$(NC)"
-	@./run-universal.sh
-
 # Check Ubuntu prerequisites
 .PHONY: check-ubuntu
 check-ubuntu:
@@ -152,8 +138,3 @@ t: test
 .PHONY: d
 d: dev
 
-.PHONY: bu
-bu: build-universal
-
-.PHONY: ru
-ru: run-universal

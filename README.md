@@ -218,14 +218,14 @@ struct APIHandler {
 ### Cross-Platform Scripts
 
 ```bash
-# Universal build (works everywhere)
-./build-universal.sh
+# Build for current platform
+./build.sh
 
 # Check Ubuntu prerequisites
 ./check-ubuntu-prerequisites.sh
 
-# Universal run
-./run-universal.sh
+# Run the server
+./run-server.sh
 ```
 
 ## 📚 Documentation
