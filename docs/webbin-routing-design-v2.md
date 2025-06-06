@@ -253,61 +253,139 @@ web/docs/
 └── coverage.html.webbin     # Dynamic test coverage report
 ```
 
-### 8. Development Workflow
+### 8. Makefile-Based Build System
 
-```bash
-# 1. Create new route
-echo "bin/contact" > web/contact.webbin
+Create a `Makefile` in the web directory for intelligent building:
 
-# 2. Create source file
-cat > src/pages/contact.swift << 'EOF'
-import SwiftletsCore
-import SwiftletsHTML
+```makefile
+# web/Makefile
 
-@main
-struct ContactPage {
-    static func main() async throws {
-        let request = try await readRequest()
-        
-        let html = Html {
-            Body {
-                H1("Contact Us")
-                Form(action: "/contact", method: .post) {
-                    // ...
-                }
-            }
-        }
-        
-        try await writeResponse(Response(html: html.render()))
-    }
-}
-EOF
+# Configuration
+BIN_DIR = ../bin
+SRC_DIR = ../src
+BUILD_MODE = debug
 
-# 3. Update config
-echo "  contact: src/pages/contact.swift" >> swiftlets.yaml
+# Find all .webbin files and their corresponding targets
+WEBBIN_FILES := $(shell find . -name "*.webbin")
+TARGETS := $(patsubst %.webbin,$(BIN_DIR)/%,$(WEBBIN_FILES))
 
-# 4. Build all
-swiftlets build
+# Default target: build all if needed
+all: $(TARGETS)
 
-# 5. Test locally
-swiftlets serve
+# Rule to build executables from source
+$(BIN_DIR)/%: %.webbin
+	@echo "Building $@..."
+	@mkdir -p $(dir $@)
+	@source_file=$$(head -n1 $< | sed 's/bin\///'); \
+	 swift build --product $$source_file --configuration $(BUILD_MODE) --build-path ../build; \
+	 cp ../build/$(BUILD_MODE)/$$source_file $@
 
-# 6. Deploy (only bin/ and web/ needed)
-rsync -av bin/ web/ production-server:/var/www/myapp/
+# Clean all binaries
+clean:
+	rm -rf $(BIN_DIR)/*
+
+# Force rebuild everything
+rebuild: clean all
+
+# Watch for changes and rebuild (requires fswatch)
+watch:
+	fswatch -o $(SRC_DIR) | xargs -n1 -I{} make
+
+# Development server (rebuild + serve)
+serve: all
+	@echo "Starting development server..."
+	@cd .. && ./swiftlets-server
+
+.PHONY: all clean rebuild watch serve
 ```
 
-### 9. Advantages
+### 9. Smart Development Workflow
+
+```bash
+# Setup once
+cd web/
+echo "src/pages/contact.swift" > contact.webbin
+
+# Development cycle
+make          # Build only what changed
+make serve    # Build + start server
+make watch    # Auto-rebuild on file changes
+
+# Production deployment
+make BUILD_MODE=release
+rsync -av ../bin/ . production:/var/www/site/
+```
+
+### 10. Timestamp-Based Building
+
+The Makefile automatically handles timestamps:
+
+```bash
+# Only rebuilds if source is newer than binary
+web/contact.webbin → bin/contact (only if src/pages/contact.swift changed)
+
+# Example workflow:
+cd web/
+touch contact.webbin         # Creates route marker
+make                        # Builds bin/contact from src/pages/contact.swift
+# Edit src/pages/contact.swift
+make                        # Only rebuilds contact, not others
+```
+
+### 11. Advanced Makefile Features
+
+```makefile
+# web/Makefile (advanced)
+
+# Check if source file exists before building
+$(BIN_DIR)/%: %.webbin
+	@source_path=$$(cat $<); \
+	 if [ ! -f "../$$source_path" ]; then \
+	   echo "ERROR: Source file ../$$source_path not found for $@"; \
+	   exit 1; \
+	 fi; \
+	 if [ "../$$source_path" -nt "$@" ]; then \
+	   echo "Building $@ from ../$$source_path..."; \
+	   swift build --product $$(basename $$source_path .swift) --configuration $(BUILD_MODE); \
+	   cp ../build/$(BUILD_MODE)/$$(basename $$source_path .swift) $@; \
+	 else \
+	   echo "$@ is up to date"; \
+	 fi
+
+# List all routes
+routes:
+	@echo "Available routes:"
+	@find . -name "*.webbin" | sed 's/\.webbin$$//' | sed 's/^\.\//\//'
+
+# Validate all .webbin files point to valid sources
+validate:
+	@for webbin in $(WEBBIN_FILES); do \
+	  source_path=$$(cat $$webbin); \
+	  if [ ! -f "../$$source_path" ]; then \
+	    echo "ERROR: $$webbin points to missing ../$$source_path"; \
+	  fi; \
+	done
+
+# Development with hot reload
+dev: all
+	@echo "Starting development server with hot reload..."
+	@(make watch &) && make serve
+```
+
+### 12. Advantages
 
 1. **Unified Content**: All web content (static + dynamic) in one place
 2. **Intelligent Routing**: Static files served directly, dynamic when needed
 3. **Flexible**: Same URL can be static or dynamic depending on what exists
-4. **Predictable**: No surprises in production, everything pre-built
-5. **Fast**: No compilation overhead, static files served instantly
-6. **Testable**: Build errors caught in staging, not production
-7. **Simple**: Webbin files are just pointers, easy to understand
-8. **Deployable**: Only need to deploy bin/ and web/ directories
+4. **Smart Building**: Make-based builds only what changed (timestamp checking)
+5. **Fast Development**: `make serve`, `make watch` for instant feedback
+6. **Predictable**: No surprises in production, everything pre-built
+7. **Fast**: No compilation overhead, static files served instantly
+8. **Testable**: Build errors caught in staging, not production
+9. **Simple**: Webbin files are just pointers, Makefile handles complexity
+10. **Deployable**: Only need to deploy bin/ and web/ directories
 
-### 10. Advanced Features
+### 13. Advanced Features
 
 #### Dynamic Route Parameters
 ```
@@ -330,7 +408,7 @@ middleware:
   - cors
 ```
 
-### 11. Migration from Current System
+### 14. Migration from Current System
 
 1. Move executables to consistent `bin/` structure
 2. Create `web/` directory with `.webbin` files
@@ -348,11 +426,13 @@ middleware:
 
 ## Implementation Priority
 
-1. Create `swiftlets build` command
-2. Update server to read .webbin files
-3. Add static file serving from public/
-4. Implement dynamic route patterns
-5. Add development server with auto-rebuild
+1. Create basic web/ directory structure
+2. Update server to read .webbin files and serve static files
+3. Create template Makefile for web/ directory
+4. Implement timestamp-based building in Makefile
+5. Add development server integration (`make serve`)
+6. Implement dynamic route patterns ([slug])
+7. Add file watching (`make watch`)
 
 ## Key Innovation: Unified Static/Dynamic Routing
 

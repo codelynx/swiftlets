@@ -81,66 +81,113 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
             // Extract path without query string
             let path = head.uri.split(separator: "?").first.map(String.init) ?? "/"
             
-            // Route to swiftlet based on path
-            let swiftletPath: String
-            
-            // For development, we'll use a simple routing based on current site
-            // In production, this would read from site.yaml or routes config
-            let _ = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] ?? "sites/core/hello"
-            
-            // Simple routing for POC
-            // Remove leading slash and use as swiftlet name
-            let cleanPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
-            
-            // Handle empty path as index
-            if cleanPath.isEmpty || cleanPath == "/" {
-                swiftletPath = "index"
-            } else {
-                swiftletPath = cleanPath
-            }
-            
-            // Execute swiftlet
-            executeSwiftlet(path: swiftletPath, request: head, body: accumulatedData, context: context)
+            // Handle webbin routing
+            handleWebbinRequest(path: path, request: head, body: accumulatedData, context: context)
         }
     }
     
-    private func executeSwiftlet(path: String, request: HTTPRequestHead, body: Data, context: ChannelHandlerContext) {
-        // Detect platform and architecture dynamically
-        let platform = detectPlatform()
-        let arch = detectArchitecture()
-        
-        // Get current site from environment or default
-        let currentSite = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] ?? "sites/core/hello"
-        let siteName = URL(fileURLWithPath: currentSite).lastPathComponent
-        
-        // Try to find the executable in various locations
-        let possiblePaths = [
-            "bin/\(platform)/\(arch)/\(siteName)/\(path)",
-            "sites/\(siteName)/\(path)",
-            "sites/\(siteName)/.build/debug/\(path)",
-            "sites/\(siteName)/.build/release/\(path)",
-            ".build/debug/\(siteName)-\(path)",
-            ".build/release/\(siteName)-\(path)"
-        ]
-        
-        let fileManager = FileManager.default
-        var executablePath: String?
-        
-        for candidatePath in possiblePaths {
-            if fileManager.fileExists(atPath: candidatePath) && fileManager.isExecutableFile(atPath: candidatePath) {
-                executablePath = candidatePath
-                break
-            }
+    private func handleWebbinRequest(path: String, request: HTTPRequestHead, body: Data, context: ChannelHandlerContext) {
+        // Normalize path: remove leading slash, handle empty path as index
+        let cleanPath: String
+        if path == "/" || path.isEmpty {
+            cleanPath = "index"
+        } else {
+            cleanPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
         }
         
-        guard let foundPath = executablePath else {
-            log(.warning, "Swiftlet not found for path: \(path)")
-            log(.debug, "Searched in: \(possiblePaths.joined(separator: ", "))")
-            sendErrorResponse(context: context, status: .notFound, message: "Swiftlet not found: \(path)")
+        log(.debug, "Handling request for path: \(path) → \(cleanPath)")
+        
+        // 1. Check for static file in web/ directory first
+        let staticPath = "web/\(cleanPath)"
+        let fileManager = FileManager.default
+        
+        var isDirectory: ObjCBool = false
+        if fileManager.fileExists(atPath: staticPath, isDirectory: &isDirectory) && !isDirectory.boolValue {
+            log(.debug, "Serving static file: \(staticPath)")
+            serveStaticFile(path: staticPath, context: context)
             return
         }
         
-        log(.debug, "Executing swiftlet: \(foundPath)")
+        // 2. Look for .webbin file for dynamic route
+        let webbinPath = "web/\(cleanPath).webbin"
+        if fileManager.fileExists(atPath: webbinPath) {
+            log(.debug, "Found webbin file: \(webbinPath)")
+            
+            guard let executablePath = readWebbinFile(webbinPath) else {
+                log(.error, "Failed to read webbin file: \(webbinPath)")
+                sendErrorResponse(context: context, status: .internalServerError, message: "Invalid webbin file")
+                return
+            }
+            
+            // Execute the dynamic route
+            executeSwiftlet(executablePath: executablePath, originalPath: path, request: request, body: body, context: context)
+            return
+        }
+        
+        // 3. TODO: Check for pattern-based routes (e.g., [slug])
+        // For now, just return 404
+        log(.warning, "No route found for path: \(path)")
+        sendErrorResponse(context: context, status: .notFound, message: "Not Found")
+    }
+    
+    private func readWebbinFile(_ path: String) -> String? {
+        guard let content = try? String(contentsOfFile: path, encoding: .utf8) else {
+            return nil
+        }
+        return content.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    private func serveStaticFile(path: String, context: ChannelHandlerContext) {
+        guard let data = FileManager.default.contents(atPath: path) else {
+            sendErrorResponse(context: context, status: .notFound, message: "File not found")
+            return
+        }
+        
+        // Detect MIME type based on file extension
+        let mimeType = getMimeType(for: path)
+        
+        var headers = HTTPHeaders()
+        headers.add(name: "Content-Type", value: mimeType)
+        headers.add(name: "Content-Length", value: String(data.count))
+        
+        let head = HTTPResponseHead(version: .http1_1, status: .ok, headers: headers)
+        context.write(wrapOutboundOut(.head(head)), promise: nil)
+        
+        let buffer = context.channel.allocator.buffer(bytes: data)
+        context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
+        context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+        
+        log(.info, "Served static file: \(path) (\(data.count) bytes)")
+    }
+    
+    private func getMimeType(for path: String) -> String {
+        let ext = URL(fileURLWithPath: path).pathExtension.lowercased()
+        switch ext {
+        case "html", "htm": return "text/html; charset=utf-8"
+        case "css": return "text/css; charset=utf-8"
+        case "js": return "application/javascript; charset=utf-8"
+        case "json": return "application/json; charset=utf-8"
+        case "png": return "image/png"
+        case "jpg", "jpeg": return "image/jpeg"
+        case "gif": return "image/gif"
+        case "svg": return "image/svg+xml"
+        case "pdf": return "application/pdf"
+        case "txt": return "text/plain; charset=utf-8"
+        case "xml": return "application/xml; charset=utf-8"
+        default: return "application/octet-stream"
+        }
+    }
+    
+    private func executeSwiftlet(executablePath: String, originalPath: String, request: HTTPRequestHead, body: Data, context: ChannelHandlerContext) {
+        // Check if executable exists
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: executablePath) && fileManager.isExecutableFile(atPath: executablePath) else {
+            log(.error, "Executable not found or not executable: \(executablePath)")
+            sendErrorResponse(context: context, status: .internalServerError, message: "Executable not found")
+            return
+        }
+        
+        log(.debug, "Executing swiftlet: \(executablePath)")
         
         // Prepare environment variables
         var environment = ProcessInfo.processInfo.environment
@@ -160,7 +207,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         
         // Create process
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: foundPath)
+        process.executableURL = URL(fileURLWithPath: executablePath)
         process.environment = environment
         
         // Setup pipes
