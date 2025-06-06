@@ -11,16 +11,17 @@ Create comprehensive HTML examples showing both Swift DSL code and generated HTM
 ✅ **Completed:**
 - Showcase index page with category navigation
 - Basic Elements showcase page  
+- Text Formatting showcase page
 - CodeExample and CategoryCard components
 - Clean, responsive CSS styling
 - Proper routing with trailing slash support
 - Security fix: executables moved outside web root
 
 🚧 **In Progress:**
-- Additional category pages (text-formatting, lists, tables, etc.)
+- Additional category pages (lists, tables, forms, etc.)
 
 📋 **Planned:**
-- Remaining 8 showcase categories
+- Remaining 7 showcase categories
 - Search functionality
 - Copy code buttons
 
@@ -33,7 +34,7 @@ sites/examples/swiftlets-site/
 │   ├── showcase/
 │   │   ├── index.swift             # Main showcase index ✅
 │   │   ├── basic-elements.swift    # Basic HTML elements ✅
-│   │   ├── text-formatting.swift   # Text and inline elements 📋
+│   │   ├── text-formatting.swift   # Text and inline elements ✅
 │   │   ├── lists.swift             # All list types 📋
 │   │   ├── tables.swift            # Table examples 📋
 │   │   ├── forms.swift             # Form elements and inputs 📋
@@ -85,14 +86,20 @@ VStack {
 }
 ```
 
-### 2. Text Formatting
+### 2. Text Formatting ✅
 **Route:** `/showcase/text-formatting`
 
-- Strong, Em, Mark
+**Implemented elements:**
+- Strong, Em, Mark, Small
 - Code, Pre, BlockQuote
-- Small, Sub, Sup
-- Del, Ins
+- Sub, Sup
+- Del, Ins  
 - Abbr, Time
+- Q, Cite
+- Kbd, Samp, Var
+- Data
+
+**Note:** Some elements like S (strikethrough), Dfn, Ruby, Wbr are not yet implemented in Swiftlets
 
 ### 3. Lists
 **Route:** `/showcase/lists`
