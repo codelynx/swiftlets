@@ -44,9 +44,8 @@ $(BIN_DIR)/%: FORCE
 			echo "$(YELLOW)Building $@...$(NC)"; \
 			echo "  Found source: $$src_file"; \
 			(cd $(SWIFTLETS_CORE) && swift build > /dev/null 2>&1); \
-			CORE_SOURCES=$$(find $(SWIFTLETS_CORE)/Sources/SwiftletsCore -name "*.swift"); \
-			HTML_SOURCES=$$(find $(SWIFTLETS_CORE)/Sources/SwiftletsHTML -name "*.swift"); \
-			$(SWIFTC) $$src_file $$CORE_SOURCES $$HTML_SOURCES \
+			CORE_SOURCES=$$(find $(SWIFTLETS_CORE)/Sources/Swiftlets -name "*.swift"); \
+			$(SWIFTC) $$src_file $$CORE_SOURCES \
 				-parse-as-library \
 				-o $@ \
 				2>&1 | sed 's/^/  /'; \

@@ -68,8 +68,6 @@ find "$SRC_DIR" -name "*.swift" -type f | while read -r swift_file; do
     # Compile the swiftlet
     if swiftc -parse-as-library \
               -I "$CORE_DIR/.build/release/Modules" \
-              -L "$CORE_DIR/.build/release" \
-              -lSwiftletsCore -lSwiftletsHTML \
               "$swift_file" -o "$output"; then
         echo -e "${GREEN}    ✓ Success${NC}"
     else

@@ -7,8 +7,6 @@ echo "Testing compilation of index.swift..."
 if [ -d "../../../core/.build/release" ]; then
     echo "Core is built, attempting with package modules..."
     swiftc -I ../../../core/.build/release/Modules \
-           -L ../../../core/.build/release \
-           -lSwiftletsCore -lSwiftletsHTML \
            src/index.swift -o test-index
     
     if [ $? -eq 0 ]; then

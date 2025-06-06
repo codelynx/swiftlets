@@ -53,11 +53,11 @@ cd swiftlets
 
 ## 📝 Your First Swiftlet
 
-Create a simple page using the SwiftletsHTML DSL:
+Create a simple page using the Swiftlets HTML DSL:
 
 ```swift
 // src/index.swift
-import SwiftletsHTML
+import Swiftlets
 
 @main
 struct HomePage {
@@ -155,7 +155,7 @@ Your file structure automatically defines your routes:
 - `src/blog/post.swift` → `/blog/post`
 - `src/api/users.json.swift` → `/api/users.json`
 
-### SwiftletsHTML DSL
+### HTML DSL
 
 Build HTML with Swift's type safety:
 
@@ -181,7 +181,7 @@ VStack(alignment: .center, spacing: .large) {
 Handle dynamic requests with ease:
 
 ```swift
-import SwiftletsCore
+import Swiftlets
 
 @main
 struct APIHandler {

@@ -5,8 +5,9 @@ This directory contains the core Swiftlets framework components:
 ## Structure
 
 - `Sources/` - Framework source code
-  - `SwiftletsCore/` - Core types (Request, Response, Swiftlet protocol)
-  - `SwiftletsHTML/` - HTML DSL for building web pages
+  - `Swiftlets/` - Unified framework containing:
+    - `Core/` - Core types (Request, Response, Swiftlet protocol)
+    - `HTML/` - HTML DSL for building web pages
   - `SwiftletsServer/` - HTTP server with webbin routing
 - `Tests/` - Framework unit tests
 - `Package.swift` - Swift package definition

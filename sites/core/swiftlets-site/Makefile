@@ -35,8 +35,6 @@ build: $(BIN_DIR)
 		echo "  Building $$relative -> $$output"; \
 		swiftc -parse-as-library \
 		      -I ../../../core/.build/release/Modules \
-		      -L ../../../core/.build/release \
-		      -lSwiftletsCore -lSwiftletsHTML \
 		      "$$file" -o "$$output" || exit 1; \
 	done
 	@echo "Build complete!"

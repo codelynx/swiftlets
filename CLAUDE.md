@@ -52,13 +52,14 @@ See `TODO.md` for the current task list and priorities.
 - `/docs/sites-organization.md` - Organization of sites for core, test, and third-party development
 - `/docs/html-builder-implementation-plan.md` - Detailed plan for HTML component builder using result builders
 - `/docs/html-builder-poc.swift` - Proof of concept demonstrating SwiftUI-like HTML generation
-- `/docs/html-dsl-implementation-status.md` - Current implementation status of SwiftletsHTML DSL
+- `/docs/html-dsl-implementation-status.md` - Current implementation status of Swiftlets HTML DSL
 - `/docs/html-elements-reference.md` - Complete reference of all implemented HTML elements
 - `/docs/roadmap.md` - Comprehensive development roadmap and vision
 - `/docs/roadmap-quick.md` - Quick reference for immediate priorities and tasks
 
 ## Latest Development
-- Implemented comprehensive SwiftletsHTML library with Ignite-inspired DSL
+- **Unified Swiftlets Framework**: Consolidated SwiftletsCore and SwiftletsHTML into a single `Swiftlets` framework
+- Implemented comprehensive HTML DSL with Ignite-inspired syntax
 - **60+ HTML elements** covering all common HTML5 tags:
   - Document structure: Html, Head, Body, Title, Meta, Script, Style, Link
   - Text elements: Headings (H1-H6), Paragraph, Text, Span
@@ -85,6 +86,7 @@ See `TODO.md` for the current task list and priorities.
 - Request/Response now support JSON encoding/decoding
 - Server updated to parse JSON responses from swiftlets
 - Working showcase at `/layout` demonstrating all components
+- **Single import**: Just `import Swiftlets` for all functionality
 
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)
