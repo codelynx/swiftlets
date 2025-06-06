@@ -3,6 +3,33 @@ import NIO
 import NIOHTTP1
 import NIOFoundationCompat
 
+// Simple logger for server messages
+enum LogLevel {
+    case debug, info, warning, error
+}
+
+func log(_ level: LogLevel, _ message: String) {
+    let timestamp = ISO8601DateFormatter().string(from: Date())
+    let prefix: String
+    
+    switch level {
+    case .debug:
+        #if DEBUG
+        prefix = "[DEBUG]"
+        print("\(timestamp) \(prefix) \(message)")
+        #endif
+        return
+    case .info:
+        prefix = "[INFO]"
+    case .warning:
+        prefix = "[WARN]"
+    case .error:
+        prefix = "[ERROR]"
+    }
+    
+    print("\(timestamp) \(prefix) \(message)")
+}
+
 // Simple HTTP handler that executes swiftlets
 // Marked as @unchecked Sendable because NIO ensures this handler is only used on a single event loop
 final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
@@ -70,12 +97,12 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         // Check if executable exists
         let fileManager = FileManager.default
         if !fileManager.fileExists(atPath: executablePath) {
-            print("Swiftlet not found: \(executablePath)")
+            log(.warning, "Swiftlet not found: \(executablePath)")
             sendErrorResponse(context: context, status: .notFound, message: "Swiftlet not found: \(path)")
             return
         }
         
-        print("Executing swiftlet: \(executablePath)")
+        log(.debug, "Executing swiftlet: \(executablePath)")
         
         // Prepare environment variables
         var environment = ProcessInfo.processInfo.environment
@@ -124,7 +151,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         // Write request JSON to stdin
         if let requestData = try? JSONSerialization.data(withJSONObject: requestDict),
            let requestJSON = String(data: requestData, encoding: .utf8) {
-            print("Sending request JSON: \(requestJSON)")
+            log(.debug, "Sending request JSON: \(requestJSON)")
             inputPipe.fileHandleForWriting.write(requestJSON.data(using: .utf8)!)
         }
         inputPipe.fileHandleForWriting.closeFile()
@@ -140,19 +167,19 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
             
             if !errorData.isEmpty {
                 let errorString = String(data: errorData, encoding: .utf8) ?? "Unknown error"
-                print("Swiftlet error: \(errorString)")
+                log(.error, "Swiftlet stderr: \(errorString)")
             }
             
             // Parse swiftlet output
             if let output = String(data: outputData, encoding: .utf8) {
-                print("Swiftlet output: \(output.prefix(200))...")
+                log(.debug, "Swiftlet output: \(output.prefix(200))...")
                 parseAndSendResponse(output: output, context: context)
             } else {
                 sendErrorResponse(context: context, status: .internalServerError, message: "Invalid swiftlet output")
             }
             
         } catch {
-            print("Failed to execute swiftlet: \(error)")
+            log(.error, "Failed to execute swiftlet: \(error)")
             sendErrorResponse(context: context, status: .internalServerError, message: "Failed to execute swiftlet")
         }
     }
@@ -251,8 +278,8 @@ let bootstrap = ServerBootstrap(group: group)
 let host = "127.0.0.1"
 let port = 8080
 
-print("Starting Swiftlets server on \(host):\(port)")
-print("Visit http://\(host):\(port)/hello to test")
+log(.info, "Starting Swiftlets server on \(host):\(port)")
+log(.info, "Visit http://\(host):\(port)/ to test")
 
 let channel = try bootstrap.bind(host: host, port: port).wait()
 
