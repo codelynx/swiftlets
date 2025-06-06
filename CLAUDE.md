@@ -29,6 +29,12 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 
 See `TODO.md` for the current task list and priorities.
 
+## Development Workflow
+
+- Always work on the `develop` branch
+- Merge to `main` manually when ready
+- Don't merge automatically
+
 ## Goals
 - Create a SwiftUI-like declarative syntax for building dynamic web applications
 - Support server-side rendering with real-time data
