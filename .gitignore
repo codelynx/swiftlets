@@ -1,0 +1,66 @@
+# Swift
+.build/
+*.xcodeproj
+*.xcworkspace
+Package.resolved
+.swiftpm/
+DerivedData/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Binaries
+bin/
+
+# Build artifacts
+*.o
+*.dylib
+*.so
+*.a
+
+# Logs
+*.log
+server.log
+nohup.out
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Test coverage
+.coverage/
+*.lcov
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Cache
+cache/
+.cache/
+
+# Process pools (runtime)
+processes/
+
+# Local configuration
+.env
+.env.local
+config.local.yaml
+
+# Build metadata
+*.build
+
+# Debug symbols
+*.dSYM/
+
+# Package managers
+node_modules/
+Pods/
+
+# Generated documentation
+docs/api/
+docs/_build/

@@ -38,6 +38,15 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 ## Project Structure
 - `/docs/project-structure.md` - Modular structure for core and third-party development
 - `/docs/swiftlet-architecture.md` - Detailed explanation of the executable module system
+- `/docs/poc-simple-server.md` - First POC implementation without result builders
+- `/docs/sites-organization.md` - Organization of sites for core, test, and third-party development
+
+## Sites
+- `/sites/core/` - Official example sites (hello, showcase)
+- `/sites/test/` - Test sites for framework development
+- `/sites/templates/` - Third-party site templates
+
+Run with: `SWIFTLETS_SITE=sites/core/showcase .build/release/swiftlets-server`
 
 ## References
 - Ignite framework (in `/external/Ignite/`) - MIT Licensed static site generator by Paul Hudson

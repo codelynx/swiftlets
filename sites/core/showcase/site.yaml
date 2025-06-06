@@ -1,0 +1,34 @@
+name: showcase
+version: 1.0.0
+description: Feature showcase demonstrating all Swiftlets capabilities
+author: Swiftlets Team
+type: example
+
+swiftlets:
+  - path: /
+    source: src/index.swift
+    
+  - path: /elements
+    source: src/elements.swift
+    
+  - path: /forms
+    source: src/forms.swift
+    
+  - path: /api/data
+    source: src/api-data.swift
+    
+  - path: /api/users/:id
+    source: src/api-users.swift
+
+dependencies:
+  - SwiftletsCore
+  - SwiftletsHTML  # Future: result builders
+
+build:
+  platforms: [macos, linux]
+  architectures: [x86_64, arm64]
+
+metadata:
+  tags: [example, showcase, demo]
+  difficulty: intermediate
+  estimated_time: 30min
