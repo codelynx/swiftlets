@@ -795,7 +795,7 @@ Table {
                     
                     // Navigation
                     Div {
-                        Link(href: "/showcase/text-formatting", "← Text Formatting")
+                        Link(href: "/showcase/lists", "← Lists")
                             .class("nav-button")
                         Link(href: "/showcase/forms", "Forms →")
                             .class("nav-button nav-button-next")

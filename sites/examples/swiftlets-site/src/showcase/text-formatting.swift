@@ -485,7 +485,7 @@ P {
                     Div {
                         Link(href: "/showcase/basic-elements", "← Basic Elements")
                             .class("nav-button")
-                        Link(href: "/showcase/tables", "Tables →")
+                        Link(href: "/showcase/lists", "Lists →")
                             .class("nav-button nav-button-next")
                     }
                     .class("navigation-links")

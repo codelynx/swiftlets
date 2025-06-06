@@ -69,13 +69,12 @@ struct ShowcasePage {
                                     icon: "✨"
                                 ).render()
                                 
-                                // Lists currently have compilation issues
-                                // CategoryCard(
-                                //     title: "Lists",
-                                //     description: "Ordered, unordered, and definition lists",
-                                //     href: "/showcase/lists",
-                                //     icon: "📋"
-                                // ).render()
+                                CategoryCard(
+                                    title: "Lists",
+                                    description: "Ordered, unordered, and definition lists",
+                                    href: "/showcase/lists",
+                                    icon: "📋"
+                                ).render()
                                 
                                 CategoryCard(
                                     title: "Tables",
