@@ -81,7 +81,6 @@ $(BIN_DIR)/%: FORCE
 			CORE_SOURCES=$$(find ../../core/Sources/SwiftletsCore -name "*.swift"); \
 			HTML_SOURCES=$$(find ../../core/Sources/SwiftletsHTML -name "*.swift"); \
 			$(SWIFTC) $$src_file $$CORE_SOURCES $$HTML_SOURCES \
-				-parse-as-library \
 				-o $@ \
 				2>&1 | sed 's/^/  /'; \
 			if [ $${PIPESTATUS[0]} -eq 0 ]; then \
