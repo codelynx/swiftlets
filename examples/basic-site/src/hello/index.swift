@@ -1,6 +1,4 @@
 import Foundation
-import SwiftletsCore
-import SwiftletsHTML
 
 // Simple swiftlet that outputs HTTP response format
 // No result builders, just plain string output
