@@ -64,3 +64,6 @@ Pods/
 # Generated documentation
 docs/api/
 docs/_build/
+
+# Untracked documentation
+docs-untracked/
