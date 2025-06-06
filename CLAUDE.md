@@ -44,6 +44,8 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 - `/docs/html-builder-poc.swift` - Proof of concept demonstrating SwiftUI-like HTML generation
 - `/docs/html-dsl-implementation-status.md` - Current implementation status of SwiftletsHTML DSL
 - `/docs/html-elements-reference.md` - Complete reference of all implemented HTML elements
+- `/docs/roadmap.md` - Comprehensive development roadmap and vision
+- `/docs/roadmap-quick.md` - Quick reference for immediate priorities and tasks
 
 ## Latest Development
 - Implemented comprehensive SwiftletsHTML library with Ignite-inspired DSL
