@@ -40,6 +40,8 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 - `/docs/swiftlet-architecture.md` - Detailed explanation of the executable module system
 - `/docs/poc-simple-server.md` - First POC implementation without result builders
 - `/docs/sites-organization.md` - Organization of sites for core, test, and third-party development
+- `/docs/html-builder-implementation-plan.md` - Detailed plan for HTML component builder using result builders
+- `/docs/html-builder-poc.swift` - Proof of concept demonstrating SwiftUI-like HTML generation
 
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)
