@@ -25,6 +25,10 @@ Third-party SDKs provide pre-built executables in `sdk/{platform}/{architecture}
 
 See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 
+## Current Status
+
+See `TODO.md` for the current task list and priorities.
+
 ## Goals
 - Create a SwiftUI-like declarative syntax for building dynamic web applications
 - Support server-side rendering with real-time data
