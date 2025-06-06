@@ -7,7 +7,11 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "index", targets: ["index"])
+        .executable(name: "index", targets: ["index"]),
+        .executable(name: "index-dsl", targets: ["index-dsl"])
+    ],
+    dependencies: [
+        .package(path: "../../..")
     ],
     targets: [
         .executableTarget(
@@ -15,6 +19,14 @@ let package = Package(
             dependencies: [],
             path: "src",
             sources: ["index.swift"]
+        ),
+        .executableTarget(
+            name: "index-dsl",
+            dependencies: [
+                .product(name: "SwiftletsHTML", package: "swiftlets")
+            ],
+            path: "src",
+            sources: ["index-dsl.swift"]
         )
     ]
 )

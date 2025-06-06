@@ -43,6 +43,14 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 - `/docs/html-builder-implementation-plan.md` - Detailed plan for HTML component builder using result builders
 - `/docs/html-builder-poc.swift` - Proof of concept demonstrating SwiftUI-like HTML generation
 
+## Latest Development
+- Implemented SwiftletsHTML library with Ignite-inspired DSL
+- Basic HTML elements: Text, Div, Section, Headings (H1-H6), Paragraph, Link
+- Document structure: Html, Head, Body, Title, Meta
+- Modifiers: classes, styles, padding, margin, colors, etc.
+- Result builder (@HTMLBuilder) for SwiftUI-like syntax
+- Working example at `/dsl` route showing type-safe HTML generation
+
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)
 - `/sites/test/` - Test sites for framework development

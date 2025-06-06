@@ -8,7 +8,8 @@ let package = Package(
     ],
     products: [
         .executable(name: "swiftlets-server", targets: ["SwiftletsServer"]),
-        .library(name: "SwiftletsCore", targets: ["SwiftletsCore"])
+        .library(name: "SwiftletsCore", targets: ["SwiftletsCore"]),
+        .library(name: "SwiftletsHTML", targets: ["SwiftletsHTML"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.77.0"),
@@ -18,6 +19,10 @@ let package = Package(
             name: "SwiftletsCore",
             dependencies: []
         ),
+        .target(
+            name: "SwiftletsHTML",
+            dependencies: ["SwiftletsCore"]
+        ),
         .executableTarget(
             name: "SwiftletsServer",
             dependencies: [
@@ -25,6 +30,10 @@ let package = Package(
                 .product(name: "NIOHTTP1", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio")
             ]
+        ),
+        .testTarget(
+            name: "SwiftletsHTMLTests",
+            dependencies: ["SwiftletsHTML"]
         )
     ]
 )
