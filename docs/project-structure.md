@@ -235,6 +235,27 @@ git push origin feature/new-auth-provider
 4. **Community Contributions**: Easy for third parties to create plugins
 5. **Clear Boundaries**: Obvious separation between core and extensions
 
+## Cross-Platform Support
+
+Swiftlets supports multiple platforms and architectures:
+
+### Supported Platforms
+- **macOS**: 13+ (Intel x86_64 and Apple Silicon arm64)
+- **Linux**: Ubuntu 22.04+ (x86_64 and ARM64/aarch64)
+
+### Build System
+The project includes universal build scripts that automatically detect the platform:
+- `build-universal.sh` - Cross-platform build script
+- `run-universal.sh` - Cross-platform run script
+- `check-ubuntu-prerequisites.sh` - Ubuntu setup verification
+
+### Platform-Specific Paths
+Build artifacts are organized by platform triple:
+- macOS Intel: `.build/x86_64-apple-macosx/`
+- macOS ARM: `.build/arm64-apple-macosx/`
+- Linux x64: `.build/x86_64-unknown-linux-gnu/`
+- Linux ARM64: `.build/aarch64-unknown-linux-gnu/` (uses arm64 in binary paths)
+
 ## Core Components
 
 ### 1. Core Framework (`Sources/Swiftlets/`)
@@ -335,7 +356,7 @@ let package = Package(
     name: "swiftlets",
     platforms: [
         .macOS(.v13),
-        .linux
+        .linux  // Supports x86_64 and ARM64 (aarch64)
     ],
     products: [
         .library(name: "Swiftlets", targets: ["Swiftlets"]),

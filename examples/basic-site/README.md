@@ -32,6 +32,18 @@ basic-site/
 
 ## Running
 
+### From Project Root
+
+```bash
+# Quick development mode
+make dev
+
+# Or just run the server
+make server
+```
+
+### From This Directory
+
 ```bash
 # Build all swiftlets
 make all

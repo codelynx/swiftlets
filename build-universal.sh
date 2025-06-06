@@ -15,16 +15,12 @@ ARCH=$(uname -m)
 
 # Normalize architecture names
 case $ARCH in
-    arm64)
-        if [[ "$OS" == "Linux" ]]; then
-            ARCH="aarch64"
-        fi
-        ;;
     aarch64)
-        # Already correct for Linux ARM64
+        # Normalize Linux's aarch64 to arm64 for consistency
+        ARCH="arm64"
         ;;
-    x86_64)
-        # Already correct
+    arm64|x86_64)
+        # Already in desired format
         ;;
     *)
         echo -e "${RED}Unknown architecture: $ARCH${NC}"
@@ -41,7 +37,12 @@ case $OS in
         ;;
     Linux)
         PLATFORM="linux"
-        BUILD_TRIPLE="${ARCH}-unknown-linux-gnu"
+        # Use the actual triple for building (aarch64 for ARM64 on Linux)
+        if [[ "$ARCH" == "arm64" ]]; then
+            BUILD_TRIPLE="aarch64-unknown-linux-gnu"
+        else
+            BUILD_TRIPLE="${ARCH}-unknown-linux-gnu"
+        fi
         LIB_EXT="so"
         ;;
     *)

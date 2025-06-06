@@ -46,6 +46,16 @@ Swiftlets supports multiple platforms and architectures:
 - **macOS**: x86_64 (Intel) and arm64 (Apple Silicon)
 - **Linux**: x86_64 and arm64 (Ubuntu and other distributions)
 
+### Architecture Naming
+- Binary paths use consistent `arm64` naming for both platforms: `linux/arm64` and `macos/arm64`
+- Swift build triples still use platform-specific names (e.g., `aarch64-unknown-linux-gnu` for Linux ARM64)
+
+### Universal Build System
+The project includes cross-platform build scripts that automatically detect the platform:
+- `build-universal.sh` - Detects OS and architecture, builds with correct settings
+- `run-universal.sh` - Automatically finds and runs the correct binary
+- `check-ubuntu-prerequisites.sh` - Verifies Ubuntu ARM64 setup requirements
+
 ## Directory Structure
 
 ```
@@ -94,7 +104,7 @@ swiftlets/
 │   └── linux/                  # Linux
 │       ├── x86_64/
 │       │   └── [same structure as macos]
-│       └── arm64/
+│       └── arm64/              # Consistent naming (internally uses aarch64)
 │           └── [same structure as macos]
 │
 ├── sdk/                        # Third-party pre-built executables

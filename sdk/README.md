@@ -24,6 +24,20 @@ Welcome to the Swiftlets SDK! This directory contains everything you need to sta
 
 ## Quick Start
 
+### From Project Root
+
+```bash
+# Create a new project
+make init NAME=my-website
+# Or use the tool directly
+sdk/tools/swiftlets-init my-website
+
+cd my-website
+make serve
+```
+
+### Manual Template Copy
+
 ```bash
 # Copy the blank template
 cp -r sdk/templates/blank my-website

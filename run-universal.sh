@@ -15,16 +15,12 @@ ARCH=$(uname -m)
 
 # Normalize architecture names
 case $ARCH in
-    arm64)
-        if [[ "$OS" == "Linux" ]]; then
-            ARCH="aarch64"
-        fi
-        ;;
     aarch64)
-        # Already correct for Linux ARM64
+        # Normalize Linux's aarch64 to arm64 for consistency
+        ARCH="arm64"
         ;;
-    x86_64)
-        # Already correct
+    arm64|x86_64)
+        # Already in desired format
         ;;
     *)
         echo -e "${RED}Unknown architecture: $ARCH${NC}"
@@ -40,7 +36,12 @@ case $OS in
         ;;
     Linux)
         PLATFORM="linux"
-        BUILD_TRIPLE="${ARCH}-unknown-linux-gnu"
+        # Use the actual triple for building (aarch64 for ARM64 on Linux)
+        if [[ "$ARCH" == "arm64" ]]; then
+            BUILD_TRIPLE="aarch64-unknown-linux-gnu"
+        else
+            BUILD_TRIPLE="${ARCH}-unknown-linux-gnu"
+        fi
         ;;
     *)
         echo -e "${RED}Unsupported platform: $OS${NC}"
@@ -67,7 +68,7 @@ if ! command -v swift &> /dev/null; then
         Linux)
             echo "For Ubuntu ${ARCH}:"
             echo "1. Download Swift from https://swift.org/download/"
-            if [[ "$ARCH" == "aarch64" ]]; then
+            if [[ "$ARCH" == "arm64" ]]; then
                 echo "2. Look for 'Ubuntu 22.04 aarch64' or your Ubuntu version"
                 echo "3. Example for Swift 5.10.1:"
                 echo "   wget https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz"

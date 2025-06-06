@@ -126,7 +126,7 @@ dependencies:
 
 build:
   platforms: [macos, linux]
-  architectures: [x86_64, arm64]
+  architectures: [x86_64, arm64]  # arm64 used for both macOS and Linux
 ```
 
 ## Development Workflow

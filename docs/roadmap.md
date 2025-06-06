@@ -22,7 +22,7 @@ The core architecture and basic functionality have been implemented:
 - **Executable Architecture**: Each route runs as an isolated process
 - **Request/Response Model**: JSON-based communication between server and swiftlets
 - **Basic Routing**: Simple path-based routing system
-- **Multi-platform Support**: Structure for macOS (Intel/Apple Silicon) and Linux
+- **Cross-platform Support**: Full support for macOS (Intel/Apple Silicon) and Linux (x86_64/ARM64)
 
 ### ✅ Phase 2: HTML DSL (Complete)
 
@@ -106,10 +106,11 @@ Enterprise-grade reliability and performance.
 - **Load Balancing**: Multi-core utilization
 
 #### 5.2 Deployment & Operations
-- **Docker Support**: Official Docker images and compose files
-- **Kubernetes**: Helm charts and operators
-- **Cloud Platforms**: One-click deploy to AWS, GCP, Azure, Heroku
-- **CI/CD**: GitHub Actions, GitLab CI templates
+- **Docker Support**: Multi-arch Docker images for all platforms
+- **Kubernetes**: Helm charts and operators with ARM64 support
+- **Cloud Platforms**: One-click deploy to AWS (including Graviton), GCP, Azure, Heroku
+- **Linux ARM64**: First-class support for AWS Graviton and Raspberry Pi
+- **CI/CD**: GitHub Actions, GitLab CI templates with cross-platform builds
 - **Zero-downtime**: Blue-green deployment support
 
 #### 5.3 Observability
