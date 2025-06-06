@@ -11,6 +11,9 @@ swiftlets:
   - path: /elements
     source: src/elements.swift
     
+  - path: /all-elements
+    source: src/all-elements.swift
+    
   - path: /forms
     source: src/forms.swift
     

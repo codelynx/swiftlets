@@ -9,7 +9,11 @@ let package = Package(
     products: [
         .executable(name: "index", targets: ["index"]),
         .executable(name: "elements", targets: ["elements"]),
+        .executable(name: "all-elements", targets: ["all-elements"]),
         .executable(name: "api-data", targets: ["api-data"])
+    ],
+    dependencies: [
+        .package(path: "../../..")
     ],
     targets: [
         .executableTarget(
@@ -23,6 +27,14 @@ let package = Package(
             dependencies: [],
             path: "src",
             sources: ["elements.swift"]
+        ),
+        .executableTarget(
+            name: "all-elements",
+            dependencies: [
+                .product(name: "SwiftletsHTML", package: "swiftlets")
+            ],
+            path: "src",
+            sources: ["all-elements.swift"]
         ),
         .executableTarget(
             name: "api-data",

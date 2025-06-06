@@ -47,6 +47,8 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
                 swiftletPath = "index-dsl"
             case "/elements":
                 swiftletPath = "elements"
+            case "/all-elements":
+                swiftletPath = "all-elements"
             case "/forms":
                 swiftletPath = "forms"
             case "/api/data":

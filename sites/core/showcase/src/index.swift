@@ -4,6 +4,7 @@ import Foundation
 
 let examples = [
     ("Elements", "/elements", "HTML elements and styling"),
+    ("All Elements (DSL)", "/all-elements", "Complete HTML elements showcase using SwiftletsHTML"),
     ("Forms", "/forms", "Form handling and validation"),
     ("API Data", "/api/data", "JSON API example"),
     ("API Users", "/api/users/123", "Dynamic routing example")
