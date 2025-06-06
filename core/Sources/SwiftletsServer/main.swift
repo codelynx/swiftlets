@@ -328,8 +328,23 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         var headers = HTTPHeaders()
         var body = ""
         
-        // Try to parse as JSON first
-        if let data = output.data(using: .utf8),
+        // First, try to decode as Base64-encoded JSON (new format)
+        let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let base64Data = Data(base64Encoded: trimmedOutput),
+           let json = try? JSONSerialization.jsonObject(with: base64Data) as? [String: Any],
+           let statusCode = json["status"] as? Int,
+           let responseHeaders = json["headers"] as? [String: String],
+           let responseBody = json["body"] as? String {
+            
+            status = HTTPResponseStatus(statusCode: statusCode)
+            for (name, value) in responseHeaders {
+                headers.add(name: name, value: value)
+            }
+            body = responseBody
+            
+        }
+        // Try to parse as plain JSON (old format)
+        else if let data = output.data(using: .utf8),
            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            let statusCode = json["status"] as? Int,
            let responseHeaders = json["headers"] as? [String: String],
