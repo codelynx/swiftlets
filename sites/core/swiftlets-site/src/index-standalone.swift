@@ -79,8 +79,7 @@ struct HomePage {
                             
                             Pre {
                                 Code("""
-                                import SwiftletsCore
-                                import SwiftletsHTML
+                                import Swiftlets
                                 
                                 @main
                                 struct HomePage {

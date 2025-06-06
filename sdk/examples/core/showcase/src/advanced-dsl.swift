@@ -1,5 +1,5 @@
 import Foundation
-import SwiftletsHTML
+import Swiftlets
 
 // Advanced DSL features showcase
 

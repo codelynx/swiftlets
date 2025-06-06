@@ -13,8 +13,7 @@ let package = Package(
         .executableTarget(
             name: "showcase-layout",
             dependencies: [
-                .product(name: "SwiftletsCore", package: "swiftlets"),
-                .product(name: "SwiftletsHTML", package: "swiftlets")
+                .product(name: "Swiftlets", package: "swiftlets")
             ],
             path: ".",
             sources: ["main.swift"]

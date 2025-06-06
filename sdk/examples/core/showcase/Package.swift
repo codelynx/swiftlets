@@ -31,7 +31,7 @@ let package = Package(
         .executableTarget(
             name: "all-elements",
             dependencies: [
-                .product(name: "SwiftletsHTML", package: "swiftlets")
+                .product(name: "Swiftlets", package: "swiftlets")
             ],
             path: "src",
             sources: ["all-elements.swift"]

@@ -1,6 +1,5 @@
 import Foundation
-import SwiftletsCore
-import SwiftletsHTML
+import Swiftlets
 
 @main
 struct GettingStartedPage {

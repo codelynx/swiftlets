@@ -13,8 +13,7 @@ let package = Package(
         .executableTarget(
             name: "SwiftletsSite",
             dependencies: [
-                .product(name: "SwiftletsCore", package: "core"),
-                .product(name: "SwiftletsHTML", package: "core")
+                .product(name: "Swiftlets", package: "core")
             ],
             path: "src"
         )

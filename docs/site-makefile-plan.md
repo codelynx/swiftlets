@@ -5,7 +5,7 @@ Create a comprehensive Makefile that:
 1. Recursively builds all `*.swift` files under `src/`
 2. Creates corresponding executables in `web/bin/`
 3. Generates/updates `.webbin` files with MD5 hashes
-4. Direct compilation from source (no pre-built libraries needed)
+4. Links against the unified Swiftlets framework
 5. Includes development conveniences
 
 ## Directory Structure
@@ -35,11 +35,11 @@ sdk/sites/swiftlets-site/
 - Update with MD5 hash after successful build
 - Location determines route: `web/api/users.json.webbin` → `/api/users.json`
 
-### 3. SDK Direct Compilation
-- Compiles directly from SwiftletsCore/HTML source files
-- No dependency on pre-built libraries in core/.build
+### 3. Framework-Based Build
+- Links against the unified `Swiftlets` framework
+- Requires pre-built framework in `core/.build/release/`
 - Build directly to `web/bin/` without platform subdirectories
-- Self-contained and portable for distribution
+- Clean imports with just `import Swiftlets`
 
 ### 4. Build Optimization
 - Timestamp-based rebuilding (only rebuild changed files)
@@ -65,15 +65,9 @@ CORE_DIR := ../../../core
 
 # Build settings
 SWIFT_FLAGS := -parse-as-library
-
-# Source files from core (SDK uses direct compilation)
-CORE_SOURCES := $(CORE_DIR)/Sources/SwiftletsCore/*.swift
-HTML_SOURCES := $(CORE_DIR)/Sources/SwiftletsHTML/Core/*.swift \
-               $(CORE_DIR)/Sources/SwiftletsHTML/Elements/*.swift \
-               $(CORE_DIR)/Sources/SwiftletsHTML/Helpers/*.swift \
-               $(CORE_DIR)/Sources/SwiftletsHTML/Layout/*.swift \
-               $(CORE_DIR)/Sources/SwiftletsHTML/Modifiers/*.swift \
-               $(CORE_DIR)/Sources/SwiftletsHTML/Builders/*.swift
+LINK_FLAGS := -I $(CORE_DIR)/.build/release/Modules \
+              -L $(CORE_DIR)/.build/release \
+              -lSwiftlets
 ```
 
 ### Step 2: Source Discovery
@@ -90,13 +84,22 @@ WEBBINS := $(patsubst $(SRC_DIR)/%.swift,web/%.webbin,$(SWIFT_SOURCES))
 
 ### Step 3: Build Rules
 ```makefile
+# Check if core framework is built
+check-core:
+    @if [ ! -f $(CORE_DIR)/.build/release/libSwiftlets.dylib ] && \
+       [ ! -f $(CORE_DIR)/.build/release/libSwiftlets.so ]; then \
+        echo "Error: Swiftlets framework not built!"; \
+        echo "Run: cd $(CORE_DIR) && swift build -c release --product Swiftlets"; \
+        exit 1; \
+    fi
+
 # Build all targets
 all: check-core $(BINARIES) $(WEBBINS)
 
-# Individual binary rule (SDK direct compilation)
+# Individual binary rule
 $(BIN_DIR)/%: $(SRC_DIR)/%.swift
     @mkdir -p $(dir $@)
-    swiftc $(SWIFT_FLAGS) $(CORE_SOURCES) $(HTML_SOURCES) $< -o $@
+    swiftc $(SWIFT_FLAGS) $(LINK_FLAGS) $< -o $@
     
 # Webbin generation rule
 web/%.webbin: $(BIN_DIR)/%

@@ -2,38 +2,35 @@
 import PackageDescription
 
 let package = Package(
-    name: "swiftlets",
+    name: "Swiftlets",
     platforms: [
         .macOS(.v13)
     ],
     products: [
         .executable(name: "swiftlets-server", targets: ["SwiftletsServer"]),
-        .library(name: "SwiftletsCore", targets: ["SwiftletsCore"]),
-        .library(name: "SwiftletsHTML", targets: ["SwiftletsHTML"])
+        .library(name: "Swiftlets", targets: ["Swiftlets"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.77.0"),
     ],
     targets: [
         .target(
-            name: "SwiftletsCore",
-            dependencies: []
-        ),
-        .target(
-            name: "SwiftletsHTML",
-            dependencies: ["SwiftletsCore"]
+            name: "Swiftlets",
+            dependencies: [],
+            path: "Sources/Swiftlets"
         ),
         .executableTarget(
             name: "SwiftletsServer",
             dependencies: [
+                "Swiftlets",
                 .product(name: "NIO", package: "swift-nio"),
                 .product(name: "NIOHTTP1", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio")
             ]
         ),
         .testTarget(
-            name: "SwiftletsHTMLTests",
-            dependencies: ["SwiftletsHTML"]
+            name: "SwiftletsTests",
+            dependencies: ["Swiftlets"]
         )
     ]
 )

@@ -1,5 +1,5 @@
 import Foundation
-import SwiftletsHTML
+import Swiftlets
 
 // Comprehensive showcase of all HTML elements
 

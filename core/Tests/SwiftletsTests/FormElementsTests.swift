@@ -1,5 +1,5 @@
 import XCTest
-@testable import SwiftletsHTML
+@testable import Swiftlets
 
 final class FormElementsTests: XCTestCase {
     func testBasicForm() {

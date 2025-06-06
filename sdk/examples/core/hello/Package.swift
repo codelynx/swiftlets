@@ -23,7 +23,7 @@ let package = Package(
         .executableTarget(
             name: "index-dsl",
             dependencies: [
-                .product(name: "SwiftletsHTML", package: "swiftlets")
+                .product(name: "Swiftlets", package: "swiftlets")
             ],
             path: "src",
             sources: ["index-dsl.swift"]

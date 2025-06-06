@@ -1,5 +1,5 @@
 import Foundation
-import SwiftletsHTML
+import Swiftlets
 
 // Get request info from environment
 let method = ProcessInfo.processInfo.environment["REQUEST_METHOD"] ?? "GET"

@@ -1,4 +1,5 @@
 import Foundation
+import Swiftlets
 
 @main
 struct HomePage {
@@ -79,8 +80,7 @@ struct HomePage {
                             
                             Pre {
                                 Code("""
-                                import SwiftletsCore
-                                import SwiftletsHTML
+                                import Swiftlets
                                 
                                 @main
                                 struct HomePage {
