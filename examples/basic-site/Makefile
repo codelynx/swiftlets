@@ -1,6 +1,9 @@
 # Swiftlets Web Directory Makefile
 # This Makefile manages the building of swiftlet executables based on .webbin files
 
+# Use bash for Ubuntu compatibility
+SHELL := /bin/bash
+
 # Configuration
 BIN_DIR = web/bin
 SRC_DIR = src
