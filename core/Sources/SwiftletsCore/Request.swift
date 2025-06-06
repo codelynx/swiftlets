@@ -5,9 +5,9 @@ public struct Request: Codable {
     public let path: String
     public let headers: [String: String]
     public let queryParameters: [String: String]
-    public let body: Data?
+    public let body: Foundation.Data?
     
-    public init(method: String, path: String, headers: [String: String] = [:], queryParameters: [String: String] = [:], body: Data? = nil) {
+    public init(method: String, path: String, headers: [String: String] = [:], queryParameters: [String: String] = [:], body: Foundation.Data? = nil) {
         self.method = method
         self.path = path
         self.headers = headers
