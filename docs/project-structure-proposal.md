@@ -95,45 +95,50 @@ my-awesome-site/
 ├── src/                         # Swiftlet sources (NOT in web root!)
 │   ├── index.swift
 │   ├── about.swift
-│   └── api/
-│       └── posts.swift
-├── bin/                         # Compiled swiftlets (NOT in web root!)
-│   ├── index
-│   ├── about
-│   └── api-posts
+│   └── posts.json.swift         # Named to match route: /api/posts.json
 ├── web/                         # Web root (ONLY this is served)
+│   ├── bin/                     # Compiled executables (derived paths)
+│   │   ├── index
+│   │   ├── about
+│   │   └── api/
+│   │       └── posts.json
 │   ├── assets/                  # Static assets
 │   │   ├── css/
 │   │   ├── js/
 │   │   └── images/
-│   ├── index.webbin
-│   ├── about.webbin
+│   ├── index.webbin             # Contains MD5 hash
+│   ├── about.webbin             # Contains MD5 hash
 │   └── api/
-│       └── posts.json.webbin
+│       └── posts.json.webbin    # Contains MD5 hash
 ├── .gitignore
 └── README.md
 ```
 
 ## Security Considerations
 
-### Critical: Keep Build Artifacts Outside Web Root
-- **`Makefile`, `src/`, and `bin/` MUST be outside the web root**
+### Critical: Keep Sensitive Files Outside Web Root
+- **`Makefile` and `src/` MUST be outside the web root**
 - Only files inside `web/` directory should be accessible via HTTP
 - This prevents:
   - Exposing source code via `/src/index.swift`
   - Leaking build configuration via `/Makefile`
-  - Direct access to executables via `/bin/index`
 
-### Proper Structure
+### New Webbin Routing Structure
 ```
 project/
 ├── Makefile    # Safe from web access
 ├── src/        # Safe from web access
-├── bin/        # Safe from web access
 └── web/        # ONLY this directory is served
-    ├── *.webbin files
+    ├── bin/    # Executables (derived from webbin paths)
+    │   └── [executables matching webbin structure]
+    ├── *.webbin files (contain MD5 hashes)
     └── static assets
 ```
+
+### Webbin File Changes
+- `.webbin` files now contain MD5 hash of the executable (for future integrity checking)
+- Executable path is derived: `web/api/users.json.webbin` → `web/bin/api/users.json`
+- Source files should be named to match routes: `users.json.swift` for `/api/users.json`
 
 ## Key Decisions to Discuss
 

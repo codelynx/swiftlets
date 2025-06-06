@@ -49,15 +49,20 @@ web/                      # Root directory matching URL structure
 
 ### What is a .webbin file?
 
-A `.webbin` file is a simple text file that contains the path to an executable:
+A `.webbin` file is a simple text file that contains the MD5 hash of the executable:
 
 ```bash
 # Content of web/index.webbin:
-bin/index
+eee7e849eddf2a5ede187ed729abb491
 
 # Content of web/api/users.json.webbin:
-bin/api-users
+e0c1dc3396a4da7d0ee7a5fcf9afcf2b
 ```
+
+The executable path is derived from the webbin file location:
+- `web/index.webbin` → `web/bin/index`
+- `web/hello.webbin` → `web/bin/hello`
+- `web/api/users.json.webbin` → `web/bin/api/users.json`
 
 ### Naming Convention
 
@@ -82,16 +87,20 @@ bin/api-users
 ### Source Structure
 
 ```
-src/                     # Swift source files
-├── index.swift         # Homepage swiftlet
-├── hello.swift         # Hello page swiftlet
-└── api-users.swift     # Users API swiftlet
-
-bin/                    # Compiled executables
-├── index
-├── hello
-└── api-users
+project/
+├── src/                # Swift source files (outside web root)
+│   ├── index.swift     # Homepage swiftlet
+│   ├── hello.swift     # Hello page swiftlet
+│   └── users.json.swift # Users API swiftlet (named to match route)
+└── web/
+    └── bin/            # Compiled executables (inside web root)
+        ├── index
+        ├── hello
+        └── api/
+            └── users.json
 ```
+
+Note: Source file names should match the final route name (e.g., `users.json.swift` for `/api/users.json`)
 
 ### Makefile Commands
 
@@ -158,12 +167,7 @@ Access via: `http://localhost:8080/style.css`
 
 ### Dynamic Route
 
-1. Create webbin file at `web/hello.webbin`:
-```
-bin/hello
-```
-
-2. Create source at `src/hello.swift`:
+1. Create source at `src/hello.swift`:
 ```swift
 import Foundation
 
@@ -189,9 +193,14 @@ struct HelloPage {
 }
 ```
 
+2. Create webbin file at `web/hello.webbin` (empty file or placeholder)
+
 3. Build and access:
 ```bash
-cd web && make bin/hello
+make web/bin/hello
+# This will:
+# - Compile src/hello.swift to web/bin/hello
+# - Generate MD5 hash and update web/hello.webbin
 # Access via: http://localhost:8080/hello
 ```
 

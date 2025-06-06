@@ -130,11 +130,27 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         sendErrorResponse(context: context, status: .notFound, message: "Not Found")
     }
     
-    private func readWebbinFile(_ path: String) -> String? {
-        guard let content = try? String(contentsOfFile: path, encoding: .utf8) else {
+    private func readWebbinFile(_ webbinPath: String) -> String? {
+        // Read MD5 hash from webbin file (for future use)
+        guard let md5Hash = try? String(contentsOfFile: webbinPath, encoding: .utf8) else {
             return nil
         }
-        return content.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hash = md5Hash.trimmingCharacters(in: .whitespacesAndNewlines)
+        log(.debug, "Webbin file contains MD5: \(hash)")
+        
+        // Derive executable path from webbin path
+        // web/hello/world.webbin -> web/bin/world
+        // web/api/users.json.webbin -> web/bin/users.json
+        let pathComponents = webbinPath.components(separatedBy: "/")
+        if pathComponents.count >= 2 {
+            let webRoot = pathComponents[0] // "web"
+            let filename = pathComponents.last!.replacingOccurrences(of: ".webbin", with: "")
+            let executablePath = "\(webRoot)/bin/\(filename)"
+            log(.debug, "Derived executable path: \(executablePath)")
+            return executablePath
+        }
+        
+        return nil
     }
     
     private func serveStaticFile(path: String, context: ChannelHandlerContext) {

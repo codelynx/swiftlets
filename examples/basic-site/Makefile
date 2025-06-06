@@ -2,7 +2,7 @@
 # This Makefile manages the building of swiftlet executables based on .webbin files
 
 # Configuration
-BIN_DIR = bin
+BIN_DIR = web/bin
 SRC_DIR = src
 BUILD_MODE ?= debug
 SWIFT = swift
@@ -16,8 +16,9 @@ NC = \033[0m # No Color
 
 # Find all .webbin files
 WEBBIN_FILES := $(shell find web -name "*.webbin" -type f)
-# Extract executable names from .webbin files (one per line)
-EXECUTABLES := $(shell cat $(WEBBIN_FILES) 2>/dev/null | sort -u)
+# Extract executable names from .webbin files
+# Derive executable paths from webbin locations: web/hello.webbin -> web/bin/hello
+EXECUTABLES := $(shell for f in $(WEBBIN_FILES); do echo $$f | sed 's|^web/||' | sed 's|\.webbin$$||' | sed 's|^|$(BIN_DIR)/|'; done | sort -u)
 
 # Default target
 all: check-structure $(EXECUTABLES)
@@ -64,7 +65,7 @@ validate:
 	fi
 
 # Build individual executables with timestamp checking
-bin/%: FORCE
+$(BIN_DIR)/%: FORCE
 	@src_name=$$(basename $@); \
 	src_file=$$(find $(SRC_DIR) -name "$$src_name.swift" 2>/dev/null | head -1); \
 	if [ -n "$$src_file" ]; then \
@@ -72,6 +73,7 @@ bin/%: FORCE
 		   [ -n "$$(find ../../core/Sources/SwiftletsCore ../../core/Sources/SwiftletsHTML -name "*.swift" -newer "$@" 2>/dev/null | head -1)" ]; then \
 			echo "$(YELLOW)Building $@...$(NC)"; \
 			echo "  Found source: $$src_file"; \
+			mkdir -p $$(dirname $@); \
 			(cd ../../core && swift build --product SwiftletsCore --product SwiftletsHTML > /dev/null 2>&1); \
 			CORE_SOURCES=$$(find ../../core/Sources/SwiftletsCore -name "*.swift"); \
 			HTML_SOURCES=$$(find ../../core/Sources/SwiftletsHTML -name "*.swift"); \
@@ -81,6 +83,14 @@ bin/%: FORCE
 				2>&1 | sed 's/^/  /'; \
 			if [ $${PIPESTATUS[0]} -eq 0 ]; then \
 				chmod +x $@; \
+				MD5=$$(md5 -q $@ 2>/dev/null || md5sum $@ | cut -d' ' -f1); \
+				for webbin in $$(find web -name "*.webbin" -type f); do \
+					webbin_target=$$(basename $$webbin .webbin); \
+					if [ "$$webbin_target" = "$$src_name" ]; then \
+						echo "$$MD5" > "$$webbin"; \
+						echo "  Updated $$webbin with MD5: $$MD5"; \
+					fi; \
+				done; \
 				echo "$(GREEN)✓ Built $@$(NC)"; \
 			else \
 				echo "$(RED)✗ Failed to build $@$(NC)"; \
