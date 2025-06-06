@@ -40,25 +40,14 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
             let currentSite = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] ?? "sites/core/hello"
             
             // Simple routing for POC
-            switch path {
-            case "/", "/hello":
+            // Remove leading slash and use as swiftlet name
+            let cleanPath = path.hasPrefix("/") ? String(path.dropFirst()) : path
+            
+            // Handle empty path as index
+            if cleanPath.isEmpty || cleanPath == "/" {
                 swiftletPath = "index"
-            case "/dsl":
-                swiftletPath = "index-dsl"
-            case "/elements":
-                swiftletPath = "elements"
-            case "/all-elements":
-                swiftletPath = "all-elements"
-            case "/forms":
-                swiftletPath = "forms"
-            case "/api/data":
-                swiftletPath = "api-data"
-            default:
-                if path.hasPrefix("/api/users/") {
-                    swiftletPath = "api-users"
-                } else {
-                    swiftletPath = "index"
-                }
+            } else {
+                swiftletPath = cleanPath
             }
             
             // Execute swiftlet
@@ -84,6 +73,8 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
             sendErrorResponse(context: context, status: .notFound, message: "Swiftlet not found: \(path)")
             return
         }
+        
+        print("Executing swiftlet: \(executablePath)")
         
         // Prepare environment variables
         var environment = ProcessInfo.processInfo.environment
@@ -115,9 +106,25 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
         process.standardError = errorPipe
         process.standardInput = inputPipe
         
-        // Write request body to stdin if present
+        // Create Request JSON
+        var requestDict: [String: Any] = [
+            "method": request.method.rawValue,
+            "path": request.uri,
+            "headers": headers,
+            "queryParameters": [:] // TODO: Parse query parameters
+        ]
+        
         if !body.isEmpty {
-            inputPipe.fileHandleForWriting.write(body)
+            requestDict["body"] = body.base64EncodedString()
+        } else {
+            requestDict["body"] = NSNull()
+        }
+        
+        // Write request JSON to stdin
+        if let requestData = try? JSONSerialization.data(withJSONObject: requestDict),
+           let requestJSON = String(data: requestData, encoding: .utf8) {
+            print("Sending request JSON: \(requestJSON)")
+            inputPipe.fileHandleForWriting.write(requestJSON.data(using: .utf8)!)
         }
         inputPipe.fileHandleForWriting.closeFile()
         
@@ -137,6 +144,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
             
             // Parse swiftlet output
             if let output = String(data: outputData, encoding: .utf8) {
+                print("Swiftlet output: \(output.prefix(200))...")
                 parseAndSendResponse(output: output, context: context)
             } else {
                 sendErrorResponse(context: context, status: .internalServerError, message: "Invalid swiftlet output")
@@ -149,35 +157,50 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
     }
     
     private func parseAndSendResponse(output: String, context: ChannelHandlerContext) {
-        // Simple parsing: look for headers and body separated by blank line
-        let parts = output.components(separatedBy: "\n\n")
-        
         var status = HTTPResponseStatus.ok
         var headers = HTTPHeaders()
         var body = ""
         
-        if parts.count >= 2 {
-            // Parse headers
-            let headerLines = parts[0].components(separatedBy: "\n")
-            for line in headerLines {
-                if line.hasPrefix("Status:") {
-                    let statusCode = line.replacingOccurrences(of: "Status:", with: "").trimmingCharacters(in: .whitespaces)
-                    if let code = Int(statusCode) {
-                        status = HTTPResponseStatus(statusCode: code)
-                    }
-                } else if let colonIndex = line.firstIndex(of: ":") {
-                    let name = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
-                    let value = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
-                    headers.add(name: name, value: value)
-                }
-            }
+        // Try to parse as JSON first
+        if let data = output.data(using: .utf8),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           let statusCode = json["status"] as? Int,
+           let responseHeaders = json["headers"] as? [String: String],
+           let responseBody = json["body"] as? String {
             
-            // Rest is body
-            body = parts[1...].joined(separator: "\n\n")
+            status = HTTPResponseStatus(statusCode: statusCode)
+            for (name, value) in responseHeaders {
+                headers.add(name: name, value: value)
+            }
+            body = responseBody
+            
         } else {
-            // No headers, entire output is body
-            body = output
-            headers.add(name: "Content-Type", value: "text/html; charset=utf-8")
+            // Fall back to plain text parsing
+            let parts = output.components(separatedBy: "\n\n")
+            
+            if parts.count >= 2 {
+                // Parse headers
+                let headerLines = parts[0].components(separatedBy: "\n")
+                for line in headerLines {
+                    if line.hasPrefix("Status:") {
+                        let statusCode = line.replacingOccurrences(of: "Status:", with: "").trimmingCharacters(in: .whitespaces)
+                        if let code = Int(statusCode) {
+                            status = HTTPResponseStatus(statusCode: code)
+                        }
+                    } else if let colonIndex = line.firstIndex(of: ":") {
+                        let name = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
+                        let value = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
+                        headers.add(name: name, value: value)
+                    }
+                }
+                
+                // Rest is body
+                body = parts[1...].joined(separator: "\n\n")
+            } else {
+                // No headers, entire output is body
+                body = output
+                headers.add(name: "Content-Type", value: "text/html; charset=utf-8")
+            }
         }
         
         // Send response

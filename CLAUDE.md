@@ -42,14 +42,37 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 - `/docs/sites-organization.md` - Organization of sites for core, test, and third-party development
 - `/docs/html-builder-implementation-plan.md` - Detailed plan for HTML component builder using result builders
 - `/docs/html-builder-poc.swift` - Proof of concept demonstrating SwiftUI-like HTML generation
+- `/docs/html-dsl-implementation-status.md` - Current implementation status of SwiftletsHTML DSL
+- `/docs/html-elements-reference.md` - Complete reference of all implemented HTML elements
 
 ## Latest Development
-- Implemented SwiftletsHTML library with Ignite-inspired DSL
-- Basic HTML elements: Text, Div, Section, Headings (H1-H6), Paragraph, Link
-- Document structure: Html, Head, Body, Title, Meta
-- Modifiers: classes, styles, padding, margin, colors, etc.
-- Result builder (@HTMLBuilder) for SwiftUI-like syntax
-- Working example at `/dsl` route showing type-safe HTML generation
+- Implemented comprehensive SwiftletsHTML library with Ignite-inspired DSL
+- **60+ HTML elements** covering all common HTML5 tags:
+  - Document structure: Html, Head, Body, Title, Meta, Script, Style, Link
+  - Text elements: Headings (H1-H6), Paragraph, Text, Span
+  - Lists: UL, OL, LI, DL, DT, DD
+  - Tables: Table, THead, TBody, TFoot, TR, TH, TD, Caption
+  - Forms: Form, Input (all types), TextArea, Select, Option, Button, Label, FieldSet
+  - Semantic: Header, Footer, Nav, Main, Article, Section, Aside, Figure
+  - Media: Img, Picture, Video, Audio, IFrame
+  - Inline: Strong, Em, Code, Pre, BlockQuote, Small, Mark
+  - And many more...
+- **Layout Components** with SwiftUI-like syntax:
+  - HStack/VStack with alignment and spacing
+  - ZStack for layered layouts
+  - Grid with flexible column/row definitions
+  - Container with responsive breakpoints
+  - Spacer for flexible spacing
+- **Helpers** for dynamic content:
+  - ForEach with index support
+  - If for conditional rendering
+  - Fragment/Group for multiple elements
+- **Modifiers** system: classes, styles, padding, margin, colors, width, height, etc.
+- **Type-safe** HTML generation with proper escaping
+- Result builder (@HTMLBuilder) for composable UI
+- Request/Response now support JSON encoding/decoding
+- Server updated to parse JSON responses from swiftlets
+- Working showcase at `/layout` demonstrating all components
 
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)

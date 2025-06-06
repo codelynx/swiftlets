@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Response {
+public struct Response: Codable {
     public let status: Int
     public let headers: [String: String]
     public let body: String

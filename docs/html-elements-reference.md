@@ -99,6 +99,14 @@
 - `Time` - Time/date
 - `Data` - Machine-readable data
 
+### Layout Components
+- `HStack` - Horizontal stack (flexbox row)
+- `VStack` - Vertical stack (flexbox column)
+- `ZStack` - Z-axis stack (layered positioning)
+- `Spacer` - Flexible space
+- `Grid` - CSS Grid container
+- `Container` - Max-width container
+
 ### Helpers & Utilities
 - `Text` - Plain text content
 - `RawHTML` - Unescaped HTML
@@ -169,6 +177,35 @@ If(isLoggedIn) {
     P("Welcome back!")
 } else: {
     P("Please log in")
+}
+```
+
+### Layout Examples
+```swift
+// Horizontal layout with spacing
+HStack(spacing: 16) {
+    Text("Left")
+    Spacer()
+    Text("Right")
+}
+
+// Vertical layout with alignment
+VStack(alignment: .center, spacing: 12) {
+    H2("Title")
+    P("Description")
+    Button("Action")
+}
+
+// Grid layout
+Grid(columns: .count(3), spacing: 16) {
+    ForEach(items) { item in
+        Card(item: item)
+    }
+}
+
+// Responsive container
+Container(maxWidth: .large, padding: 24) {
+    // Content constrained to 1024px
 }
 ```
 

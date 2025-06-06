@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Request {
+public struct Request: Codable {
     public let method: String
     public let path: String
     public let headers: [String: String]
