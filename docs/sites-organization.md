@@ -2,238 +2,45 @@
 
 ## Overview
 
-Swiftlets needs a clear organization for different types of sites:
-- **Core Examples**: Official examples demonstrating framework features
-- **Test Sites**: For framework testing and CI/CD
-- **Developer Sites**: For local development and experimentation
-- **Third-Party Templates**: Community-contributed site templates
+Sites in Swiftlets are organized into two main categories under the `sites/` directory:
 
-## Directory Structure
+1. **examples/** - User-facing example sites and documentation
+2. **tests/** - Internal test sites for framework development
+
+## Site Structure
+
+Each site follows a standard layout:
 
 ```
-swiftlets/
-├── core/
-│   ├── sites/                  # Test sites for framework development
-│   │   ├── test-html/          # HTML DSL testing
-│   │   ├── test-routing/       # Routing testing
-│   │   └── benchmark/          # Performance benchmarks
-│   │
-│   └── Sources/                # Framework source code
-│       └── Swiftlets/          # Unified framework
-│
-├── sdk/                        # SDK and third-party development
-│   ├── sites/                  # Production sites
-│   │   ├── swiftlets-site/     # Official documentation site
-│   │   └── showcase/           # Layout examples
-│   │
-│   ├── templates/              # Site templates
-│   └── tools/                  # Development tools
-│
-└── cli/                        # Swiftlets CLI
-    └── Sources/
+site-name/
+├── Makefile           # Build configuration
+├── README.md         # Site documentation
+├── src/              # Swift source files
+│   ├── index.swift   # Home page
+│   ├── about.swift   # About page
+│   └── docs/         # Nested routes
+│       └── *.swift
+└── web/              # Web root directory
+    ├── bin/          # Compiled executables
+    ├── *.webbin      # Route markers
+    └── styles/       # Static assets
 ```
 
-## Site Types
+## How It Works
 
-### 1. Core Examples (`sites/core/`)
+1. Each `.swift` file in `src/` becomes a route
+2. Files are compiled to executables in `web/bin/`
+3. `.webbin` files mark dynamic routes and contain MD5 hashes
+4. The server executes the appropriate binary for each request
 
-Official examples maintained by the Swiftlets team:
-
-#### hello
-- Minimal "Hello World" example
-- No dependencies
-- Demonstrates basic request/response
-
-#### showcase
-- Demonstrates all HTML elements
-- Shows result builders in action
-- Interactive examples
-
-#### blog
-- Full blog engine
-- Markdown support
-- Categories and tags
-- RSS feed generation
-
-#### api
-- RESTful API example
-- JSON responses
-- CRUD operations
-- Authentication example
-
-#### realtime
-- WebSocket support
-- Live updates
-- Chat example
-- Server-sent events
-
-### 2. Test Sites (`sites/test/`)
-
-For automated testing - not meant for production:
-
-#### unit
-- Individual component tests
-- Element rendering tests
-- Builder tests
-
-#### integration
-- Multi-swiftlet communication
-- Session management
-- Database integration
-
-#### performance
-- Load testing scenarios
-- Memory usage tests
-- Startup time benchmarks
-
-#### error-handling
-- 404/500 error pages
-- Malformed request handling
-- Security testing
-
-### 3. Third-Party Templates (`sites/templates/`)
-
-Community-contributed, production-ready templates:
-- Each template includes documentation
-- Licensed separately
-- Can be installed via CLI
-
-## Site Configuration
-
-Each site has a `site.yaml` configuration:
-
-```yaml
-# sites/core/hello/site.yaml
-name: hello
-version: 1.0.0
-description: Minimal Hello World example
-author: Swiftlets Team
-type: example
-
-swiftlets:
-  - path: /
-    source: index.swift
-  - path: /about
-    source: about.swift
-
-dependencies:
-  - SwiftletsCore
-
-build:
-  platforms: [macos, linux]
-  architectures: [x86_64, arm64]  # arm64 used for both macOS and Linux
-```
-
-## Development Workflow
-
-### Core Developer Workflow
+## Building Sites
 
 ```bash
-# Work on a core example
-cd sites/core/blog
-swiftlets dev
+# From site directory
+make build
 
-# Run all tests
-cd sites/test
-swiftlets test --all
-
-# Build all core examples
-cd sites/core
-swiftlets build --all
+# Build and serve
+make serve
 ```
 
-### Third-Party Developer Workflow
-
-```bash
-# Create new template
-swiftlets new template portfolio
-cd sites/templates/portfolio
-
-# Test locally
-swiftlets dev
-
-# Package for distribution
-swiftlets package
-
-# Submit to registry
-swiftlets publish
-```
-
-## Site Registry
-
-For third-party templates, maintain a registry:
-
-```yaml
-# registry.yaml
-templates:
-  - name: portfolio
-    author: john_doe
-    version: 2.1.0
-    description: Modern portfolio site
-    url: https://github.com/johndoe/swiftlets-portfolio
-    stars: 245
-    
-  - name: ecommerce
-    author: jane_smith
-    version: 1.5.0
-    description: E-commerce starter
-    url: https://github.com/janesmith/swiftlets-shop
-    stars: 189
-```
-
-## CLI Commands
-
-### Site Management
-
-```bash
-# List available sites
-swiftlets sites list
-
-# Create new site from template
-swiftlets sites new mysite --template portfolio
-
-# Run a specific site
-swiftlets dev --site sites/core/blog
-
-# Build site for production
-swiftlets build --site sites/core/api
-```
-
-### Template Commands
-
-```bash
-# Search templates
-swiftlets templates search blog
-
-# Install template
-swiftlets templates install portfolio
-
-# Create site from template
-swiftlets new mysite --from portfolio
-```
-
-## Benefits
-
-1. **Clear Separation**: Core vs third-party vs test sites
-2. **Easy Discovery**: Users can browse examples
-3. **Testing**: Dedicated test sites for CI/CD
-4. **Templates**: Ready-to-use starting points
-5. **Consistency**: Standard structure across all sites
-
-## Current Structure (As of 2025-06-06)
-
-The sites organization has been simplified:
-
-```
-sites/
-├── examples/              # Example sites for users
-│   └── swiftlets-site/   # Official documentation site
-└── tests/                # Test sites for framework development
-    ├── test-html/        # HTML DSL testing
-    ├── test-routing/     # Routing testing
-    └── benchmark/        # Performance benchmarks
-```
-
-Templates are now at the root level in `templates/` directory.
-
-This organization clearly separates user-facing examples from internal testing sites.
+For more details, see the main [Project Structure](PROJECT-STRUCTURE.md) documentation.

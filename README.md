@@ -265,7 +265,7 @@ swiftlets/
 └── docs/              # Documentation
 ```
 
-See [Project Structure](docs/project-structure-unified.md) for details.
+See [Project Structure](docs/PROJECT-STRUCTURE.md) for details.
 
 ## 🤝 Contributing
 

@@ -2,424 +2,242 @@
 
 ## Overview
 
-Swiftlets is designed with a modular architecture that separates core functionality from third-party extensions. This allows the framework to be extended via plugins while maintaining a stable core API.
+Swiftlets uses a unified directory structure designed for clarity, cross-platform support, and standard package distribution. All source code lives under a single `Sources/` directory, with platform-specific binaries organized by OS and architecture.
 
-## Repository Organization
-
-### Main Repository (swiftlets)
-Core framework and essential components only.
-
-### Submodules for Extensions
-- `swiftlets-plugins` - Official plugins repository
-- `swiftlets-themes` - UI themes and templates
-- `swiftlets-adapters` - Database and service adapters
-
-## Recommended Directory Layout
+## Directory Layout
 
 ```
-swiftlets/                      # Main repository (core only)
-├── Package.swift
-├── README.md
-├── LICENSE
-├── CLAUDE.md
-├── Sources/
-│   ├── SwiftletsCore/          # Core framework (minimal, stable API)
-│   │   ├── Protocols/          # Public protocols for extensions
-│   │   │   ├── Component.swift
-│   │   │   ├── Middleware.swift
-│   │   │   ├── Plugin.swift
-│   │   │   ├── Renderer.swift
-│   │   │   └── Router.swift
-│   │   ├── Builders/           # Core result builders
-│   │   │   ├── ComponentBuilder.swift
-│   │   │   ├── RouteBuilder.swift
-│   │   │   └── PluginBuilder.swift
-│   │   ├── Base/               # Base implementations
-│   │   │   ├── Request.swift
-│   │   │   ├── Response.swift
-│   │   │   └── Application.swift
-│   │   └── Extensions/         # Protocol extensions
+swiftlets/
+├── Sources/                    # All source code
+│   ├── Swiftlets/             # Framework library
+│   │   ├── Core/              # Core types (Request, Response, Swiftlet)
+│   │   └── HTML/              # HTML DSL
+│   │       ├── Builders/      # Result builders (@HTMLBuilder)
+│   │       ├── Core/          # Base HTML types
+│   │       ├── Elements/      # HTML elements (Div, H1, P, etc.)
+│   │       ├── Helpers/       # ForEach, If, Fragment
+│   │       ├── Layout/        # HStack, VStack, Grid, Container
+│   │       └── Modifiers/     # Style and attribute modifiers
 │   │
-│   ├── Swiftlets/              # Standard library (built on Core)
-│   │   ├── Elements/           # HTML elements
-│   │   │   ├── Basic/          # Text, Image, Link
-│   │   │   ├── Forms/          # Input, Button, Form
-│   │   │   └── Layout/         # HStack, VStack, Grid
-│   │   ├── Middleware/         # Built-in middleware
-│   │   │   ├── Logger.swift
-│   │   │   ├── Static.swift
-│   │   │   └── Session.swift
-│   │   ├── Server/             # Default server implementation
-│   │   │   └── HTTPServer.swift
-│   │   └── Rendering/          # HTML renderer
-│   │       └── HTMLRenderer.swift
+│   ├── SwiftletsServer/       # Web server executable
+│   │   └── main.swift         # Server implementation
 │   │
-│   ├── SwiftletsCLI/           # Command-line tool
-│   │   └── main.swift
+│   └── SwiftletsCLI/          # Command-line interface
+│       ├── SwiftletsCLI.swift # Main CLI entry point
+│       └── Commands/          # CLI commands
+│           ├── Build.swift    # Build command
+│           ├── Init.swift     # Init command
+│           ├── New.swift      # New project command
+│           └── Serve.swift    # Development server command
+│
+├── Tests/                     # Test suite
+│   └── SwiftletsTests/        # Framework tests
+│       ├── BasicElementsTests.swift
+│       ├── FormElementsTests.swift
+│       ├── HelpersTests.swift
+│       ├── LayoutTests.swift
+│       └── ListsAndTablesTests.swift
+│
+├── bin/                       # Platform-specific binaries (gitignored)
+│   ├── darwin/                # macOS
+│   │   ├── x86_64/           # Intel Macs
+│   │   │   ├── swiftlets
+│   │   │   └── swiftlets-server
+│   │   └── arm64/            # Apple Silicon
+│   │       ├── swiftlets
+│   │       └── swiftlets-server
+│   └── linux/                 # Linux
+│       ├── x86_64/           # Intel/AMD
+│       │   ├── swiftlets
+│       │   └── swiftlets-server
+│       └── arm64/            # ARM processors
+│           ├── swiftlets
+│           └── swiftlets-server
+│
+├── sites/                     # Websites and web applications
+│   ├── examples/              # Example sites for users
+│   │   └── swiftlets-site/    # Official documentation site
+│   │       ├── Makefile       # Build configuration
+│   │       ├── src/           # Swift source files
+│   │       │   ├── index.swift
+│   │       │   ├── about.swift
+│   │       │   ├── showcase.swift
+│   │       │   └── docs/
+│   │       │       └── getting-started.swift
+│   │       └── web/           # Web root directory
+│   │           ├── bin/       # Compiled swiftlets
+│   │           ├── *.webbin   # Route markers
+│   │           └── styles/    # Static assets
 │   │
-│   └── SwiftletsCGI/           # CGI adapter
-│       └── CGIAdapter.swift
+│   └── tests/                 # Test sites for framework development
+│       ├── test-html/         # HTML DSL testing
+│       ├── test-routing/      # Routing system testing
+│       └── benchmark/         # Performance benchmarks
 │
-├── Tests/
-│   ├── SwiftletsCoreTests/
-│   └── SwiftletsTests/
+├── templates/                 # Project templates
+│   └── blank/                 # Minimal starter template
+│       ├── Makefile
+│       ├── Package.swift
+│       ├── src/
+│       │   └── index.swift
+│       └── web/
+│           └── index.webbin
 │
-├── Examples/                    # Example applications
-│   └── HelloWorld/
+├── tools/                     # Build tools and utilities
+│   ├── build.sh              # Build script
+│   ├── install-cli.sh        # CLI installer
+│   ├── run-server.sh         # Server runner
+│   └── package/              # Platform packaging
+│       ├── ubuntu/           # Debian/Ubuntu .deb
+│       │   └── build-deb.sh
+│       ├── macos/            # macOS installer
+│       └── docker/           # Docker images
 │
-└── docs/                       # Documentation
-    ├── project-structure.md
-    └── plugin-development.md
-
-swiftlets-plugins/              # Separate repository (git submodule)
-├── Package.swift
-├── Sources/
-│   ├── SwiftletsAuth/          # Authentication plugin
-│   │   ├── Providers/
-│   │   │   ├── OAuth.swift
-│   │   │   └── JWT.swift
-│   │   └── Plugin.swift
-│   │
-│   ├── SwiftletsDB/            # Database plugin
-│   │   ├── Adapters/
-│   │   │   ├── SQLite.swift
-│   │   │   ├── PostgreSQL.swift
-│   │   │   └── MySQL.swift
-│   │   └── Plugin.swift
-│   │
-│   └── SwiftletsWebSocket/     # WebSocket plugin
-│       └── Plugin.swift
+├── docs/                      # Documentation
+├── external/                  # External dependencies
+│   └── Ignite/               # Ignite framework (reference)
 │
-└── Tests/
-
-swiftlets-themes/               # Separate repository (git submodule)
-├── Package.swift
-├── Sources/
-│   ├── Bootstrap/              # Bootstrap theme
-│   ├── Tailwind/               # Tailwind CSS theme
-│   └── Material/               # Material Design theme
-│
-└── Resources/
-
-swiftlets-adapters/             # Separate repository (git submodule)
-├── Package.swift
-├── Sources/
-│   ├── FastCGI/
-│   ├── Lambda/                 # AWS Lambda adapter
-│   └── Vapor/                  # Vapor integration
-│
-└── Tests/
+├── Package.swift             # Swift package manifest
+├── Makefile                  # Main build system
+├── README.md                 # Project readme
+└── CLAUDE.md                 # AI context file
 ```
 
-## Core vs Extensions
+## Key Concepts
 
-### SwiftletsCore (Minimal, Stable)
-Only essential protocols and base types:
-- Protocol definitions for plugins
-- Core result builders
-- Basic request/response types
-- Plugin loading system
+### Source Organization
 
-### Swiftlets (Standard Library)
-Built-in implementations using Core protocols:
-- Basic HTML elements
-- Default HTTP server
-- Common middleware
-- HTML rendering
+All Swift source code lives under `Sources/` with three main components:
 
-### Third-Party Development
+1. **Swiftlets** - The framework library providing HTML DSL and core types
+2. **SwiftletsServer** - The web server that executes swiftlets
+3. **SwiftletsCLI** - Command-line tools for development
 
-#### Plugin Protocol
-```swift
-// In SwiftletsCore/Protocols/Plugin.swift
-public protocol Plugin {
-    static var name: String { get }
-    static var version: String { get }
-    
-    func configure(_ app: Application) throws
-}
+### Binary Organization
 
-// In third-party plugin
-public struct DatabasePlugin: Plugin {
-    public static let name = "SwiftletsDB"
-    public static let version = "1.0.0"
-    
-    public func configure(_ app: Application) throws {
-        app.register(singleton: Database.self) { _ in
-            PostgreSQLDatabase(config: .default)
-        }
-    }
-}
+Compiled binaries are organized by platform in `bin/{os}/{arch}/`:
+- `darwin/x86_64` - macOS Intel
+- `darwin/arm64` - macOS Apple Silicon  
+- `linux/x86_64` - Linux x64
+- `linux/arm64` - Linux ARM
+
+The Makefile automatically detects your platform and builds to the correct location.
+
+### Sites Structure
+
+Sites are divided into two categories:
+
+1. **examples/** - User-facing example sites and documentation
+2. **tests/** - Internal test sites for framework development
+
+Each site follows a standard structure:
+```
+site-name/
+├── Makefile           # Site-specific build configuration
+├── src/               # Swift source files
+│   └── *.swift       # One file per route
+└── web/              # Web root (served by server)
+    ├── bin/          # Compiled executables
+    ├── *.webbin      # Route markers (contain MD5 hash)
+    └── static/       # CSS, images, etc.
 ```
 
-#### Component Extension
-```swift
-// Third-party component library
-import SwiftletsCore
+### Swiftlet Architecture
 
-public struct Calendar: Component {
-    @Binding var selectedDate: Date
-    
-    public var body: some Component {
-        // Implementation
-    }
-}
-```
+Each route is an independent executable:
+- Source: `src/index.swift`
+- Compiled to: `web/bin/index`
+- Marked by: `web/index.webbin` (contains MD5 hash)
 
-## Package Structure for Third-Party Developers
+This provides perfect isolation and enables hot-reload during development.
 
-### Plugin Package.swift Example
-```swift
-// swift-tools-version: 6.0
-import PackageDescription
+## Building
 
-let package = Package(
-    name: "swiftlets-calendar",
-    platforms: [.macOS(.v13), .linux],
-    products: [
-        .library(
-            name: "SwiftletsCalendar",
-            targets: ["SwiftletsCalendar"]
-        )
-    ],
-    dependencies: [
-        .package(url: "https://github.com/swiftlets/swiftlets", from: "1.0.0")
-    ],
-    targets: [
-        .target(
-            name: "SwiftletsCalendar",
-            dependencies: [
-                .product(name: "SwiftletsCore", package: "swiftlets")
-            ]
-        )
-    ]
-)
-```
-
-## Using Submodules
-
-### Initial Setup
+### Quick Start
 ```bash
-# Clone main repository
-git clone https://github.com/swiftlets/swiftlets
-cd swiftlets
+# Build everything
+make build
 
-# Add plugin submodules
-git submodule add https://github.com/swiftlets/swiftlets-plugins plugins
-git submodule add https://github.com/swiftlets/swiftlets-themes themes
-git submodule add https://github.com/swiftlets/swiftlets-adapters adapters
+# Build release version
+make build-release
 
-# Initialize submodules
-git submodule init
-git submodule update
+# Run server with example site
+make run
 ```
 
-### Development Workflow
+### Platform Detection
+
+The build system automatically detects your OS and architecture:
+```makefile
+OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+ARCH := $(shell uname -m)
+```
+
+### Building Sites
+
+Each site has its own Makefile that:
+1. Compiles Swift files directly with framework sources
+2. Creates executables in `web/bin/`
+3. Generates `.webbin` files with MD5 hashes
+
 ```bash
-# Update all submodules
-git submodule update --remote
-
-# Work on a specific plugin
-cd plugins
-git checkout -b feature/new-auth-provider
-# ... make changes ...
-git commit -m "Add OAuth2 provider"
-git push origin feature/new-auth-provider
+cd sites/examples/swiftlets-site
+make build
 ```
 
-## Benefits of This Structure
+## Package Distribution
 
-1. **Stable Core API**: Core protocols rarely change, ensuring plugin compatibility
-2. **Independent Versioning**: Plugins can be versioned separately
-3. **Lighter Dependencies**: Apps only import what they need
-4. **Community Contributions**: Easy for third parties to create plugins
-5. **Clear Boundaries**: Obvious separation between core and extensions
+The structure supports standard package managers:
 
-## Cross-Platform Support
-
-Swiftlets supports multiple platforms and architectures:
-
-### Supported Platforms
-- **macOS**: 13+ (Intel x86_64 and Apple Silicon arm64)
-- **Linux**: Ubuntu 22.04+ (x86_64 and ARM64/aarch64)
-
-### Build System
-The project includes build scripts for different platforms:
-- `build.sh` - Build script for the current platform
-- `run-server.sh` - Run script for the development server
-- `check-ubuntu-prerequisites.sh` - Ubuntu setup verification
-
-### Platform-Specific Paths
-Build artifacts are organized by platform triple:
-- macOS Intel: `.build/x86_64-apple-macosx/`
-- macOS ARM: `.build/arm64-apple-macosx/`
-- Linux x64: `.build/x86_64-unknown-linux-gnu/`
-- Linux ARM64: `.build/aarch64-unknown-linux-gnu/` (uses arm64 in binary paths)
-
-## Core Components
-
-### 1. Core Framework (`Sources/Swiftlets/`)
-
-#### Core Types
-- **Request**: Represents HTTP requests with headers, body, parameters
-- **Response**: HTTP response with status, headers, and body
-- **Middleware**: Request/response processing pipeline
-- **Router**: URL routing with parameter extraction
-
-#### Elements (HTML Components)
-Similar to Ignite but with dynamic capabilities:
-- Support for data binding
-- Event handling for server-side actions
-- Form submission handling
-- WebSocket integration points
-
-#### Builders
-- **@HTMLBuilder**: For composing HTML (like Ignite)
-- **@RouteBuilder**: For defining routes declaratively
-- **@MiddlewareBuilder**: For composing middleware chains
-
-#### Server
-- Built-in HTTP server for development
-- CGI/FastCGI support for production deployment
-- WebSocket support for real-time features
-
-### 2. CLI Tool (`Sources/SwiftletsCLI/`)
-Commands for:
-- Creating new projects
-- Running development server
-- Building for production
-- Generating components
-
-### 3. CGI Adapter (`Sources/SwiftletsCGI/`)
-- Traditional CGI support
-- FastCGI for better performance
-- Integration with Apache/Nginx
-
-## Example API Design
-
-```swift
-// main.swift
-import Swiftlets
-
-@main
-struct MyApp: App {
-    var body: some Routes {
-        Route("/") {
-            HomePage()
-        }
-        
-        Route("/api/users") { request in
-            UserAPI(request: request)
-        }
-        
-        Route("/blog/:id") { request, params in
-            BlogPost(id: params["id"]!)
-        }
-    }
-    
-    var middleware: some Middleware {
-        Logger()
-        Authentication()
-        CORS()
-    }
-}
-
-// HomePage.swift
-struct HomePage: Component {
-    @State var visitors = 0
-    
-    var body: some HTML {
-        Html {
-            Head {
-                Title("Welcome to Swiftlets")
-                CSS("/styles.css")
-            }
-            Body {
-                H1("Hello, World!")
-                Text("Visitors: \(visitors)")
-                Button("Increment") {
-                    visitors += 1
-                }
-            }
-        }
-    }
-}
+### Ubuntu/Debian
+```bash
+make package-ubuntu  # Creates .deb package
 ```
 
-## Package.swift Structure
+Installs to:
+- `/usr/bin/` - Executables
+- `/usr/lib/swiftlets/` - Framework sources
+- `/usr/share/swiftlets/` - Templates and examples
 
-```swift
-// swift-tools-version: 6.0
-import PackageDescription
+### macOS
+Future support for Homebrew and .pkg installers.
 
-let package = Package(
-    name: "swiftlets",
-    platforms: [
-        .macOS(.v13),
-        .linux  // Supports x86_64 and ARM64 (aarch64)
-    ],
-    products: [
-        .library(name: "Swiftlets", targets: ["Swiftlets"]),
-        .executable(name: "swiftlets", targets: ["SwiftletsCLI"]),
-        .executable(name: "swiftlets-cgi", targets: ["SwiftletsCGI"])
-    ],
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/apple/swift-nio", from: "2.77.0"),
-        .package(url: "https://github.com/apple/swift-collections", from: "1.1.0")
-    ],
-    targets: [
-        .target(
-            name: "Swiftlets",
-            dependencies: [
-                .product(name: "NIO", package: "swift-nio"),
-                .product(name: "NIOHTTP1", package: "swift-nio"),
-                .product(name: "Collections", package: "swift-collections")
-            ]
-        ),
-        .executableTarget(
-            name: "SwiftletsCLI",
-            dependencies: [
-                "Swiftlets",
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
-            ]
-        ),
-        .executableTarget(
-            name: "SwiftletsCGI",
-            dependencies: ["Swiftlets"]
-        ),
-        .testTarget(name: "SwiftletsTests", dependencies: ["Swiftlets"])
-    ]
-)
+### Docker
+Container images with pre-built binaries.
+
+## Environment Variables
+
+### SWIFTLETS_SITE
+Specifies which site to serve:
+```bash
+SWIFTLETS_SITE=sites/examples/swiftlets-site ./bin/darwin/arm64/swiftlets-server
 ```
 
-## Development Phases
+### SWIFTLETS_SDK_ROOT (Future)
+For installed SDK packages:
+```bash
+export SWIFTLETS_SDK_ROOT=/usr/local/opt/swiftlets
+```
 
-### Phase 1: Core Foundation
-1. Basic HTML elements and result builders
-2. Simple HTTP request/response handling
-3. Basic routing
+## Development Workflow
 
-### Phase 2: Dynamic Features
-1. State management
-2. Server-side event handling
-3. Form processing
+1. **Edit source files** in `Sources/` or site `src/`
+2. **Build** with `make build` or site-specific `make`
+3. **Run** with `make run` or direct execution
+4. **Test** with `make test`
+5. **Package** with `make package-{platform}`
 
-### Phase 3: Advanced Features
-1. WebSocket support
-2. Database integration
-3. Session management
-4. Authentication/authorization
+## File Types
 
-### Phase 4: Deployment
-1. CGI/FastCGI adapters
-2. Performance optimization
-3. Production tooling
+- `.swift` - Swift source files
+- `.webbin` - Route marker files (contain MD5 hash)
+- `Makefile` - Build configuration
+- `Package.swift` - Swift package manifest
 
-## Key Differences from Ignite
+## Benefits
 
-1. **Dynamic Rendering**: Generate HTML on each request with live data
-2. **Request Handling**: Process HTTP requests and form submissions
-3. **State Management**: Server-side state with session support
-4. **Real-time Features**: WebSocket support for live updates
-5. **CGI Support**: Deploy as CGI scripts on traditional web hosts
+1. **Unified Structure** - Single source tree, no confusing separations
+2. **Platform Support** - Clear binary organization for all platforms
+3. **Package Ready** - Aligns with standard OS package layouts
+4. **Development Friendly** - Simple imports and clear dependencies
+5. **Distribution Ready** - Easy to package for any platform
