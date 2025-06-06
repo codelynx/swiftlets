@@ -128,6 +128,16 @@ if [[ "$OS" == "Linux" ]]; then
     echo -e "Library path: ${GREEN}$LIB_PATH${NC}"
 fi
 
+# Check for site directory
+if [ -n "$1" ]; then
+    export SWIFTLETS_SITE="$1"
+    echo -e "Site directory: ${GREEN}$SWIFTLETS_SITE${NC}"
+elif [ -d "examples/basic-site" ]; then
+    # Default to basic-site if it exists
+    export SWIFTLETS_SITE="examples/basic-site"
+    echo -e "Using default site: ${GREEN}$SWIFTLETS_SITE${NC}"
+fi
+
 # Run the server
 echo -e "${GREEN}Server starting on http://localhost:8080${NC}"
 echo -e "Binary: ${GREEN}$SERVER_BINARY${NC} (${BUILD_TYPE})"

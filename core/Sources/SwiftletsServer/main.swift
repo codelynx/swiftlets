@@ -29,6 +29,31 @@ func detectArchitecture() -> String {
     #endif
 }
 
+// Configuration
+struct ServerConfig {
+    let webRoot: String
+    let host: String
+    let port: Int
+    
+    static func fromEnvironment() -> ServerConfig {
+        // Get web root from environment or use default
+        let webRoot: String
+        if let site = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] {
+            webRoot = "\(site)/web"
+        } else if let root = ProcessInfo.processInfo.environment["SWIFTLETS_WEB_ROOT"] {
+            webRoot = root
+        } else {
+            webRoot = "web"
+        }
+        
+        // Get host and port
+        let host = ProcessInfo.processInfo.environment["SWIFTLETS_HOST"] ?? "127.0.0.1"
+        let port = Int(ProcessInfo.processInfo.environment["SWIFTLETS_PORT"] ?? "8080") ?? 8080
+        
+        return ServerConfig(webRoot: webRoot, host: host, port: port)
+    }
+}
+
 func log(_ level: LogLevel, _ message: String) {
     let timestamp = ISO8601DateFormatter().string(from: Date())
     let prefix: String
@@ -57,8 +82,13 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     typealias InboundIn = HTTPServerRequestPart
     typealias OutboundOut = HTTPServerResponsePart
     
+    private let config: ServerConfig
     private var accumulatedData = Data()
     private var requestHead: HTTPRequestHead?
+    
+    init(config: ServerConfig) {
+        self.config = config
+    }
     
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let reqPart = unwrapInboundIn(data)
@@ -97,8 +127,8 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         
         log(.debug, "Handling request for path: \(path) → \(cleanPath)")
         
-        // 1. Check for static file in web/ directory first
-        let staticPath = "web/\(cleanPath)"
+        // 1. Check for static file in web root directory first
+        let staticPath = "\(config.webRoot)/\(cleanPath)"
         let fileManager = FileManager.default
         
         var isDirectory: ObjCBool = false
@@ -109,7 +139,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         }
         
         // 2. Look for .webbin file for dynamic route
-        let webbinPath = "web/\(cleanPath).webbin"
+        let webbinPath = "\(config.webRoot)/\(cleanPath).webbin"
         if fileManager.fileExists(atPath: webbinPath) {
             log(.debug, "Found webbin file: \(webbinPath)")
             
@@ -139,18 +169,26 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         log(.debug, "Webbin file contains MD5: \(hash)")
         
         // Derive executable path from webbin path
-        // web/hello/world.webbin -> web/bin/world
-        // web/api/users.json.webbin -> web/bin/users.json
-        let pathComponents = webbinPath.components(separatedBy: "/")
-        if pathComponents.count >= 2 {
-            let webRoot = pathComponents[0] // "web"
-            let filename = pathComponents.last!.replacingOccurrences(of: ".webbin", with: "")
-            let executablePath = "\(webRoot)/bin/\(filename)"
-            log(.debug, "Derived executable path: \(executablePath)")
-            return executablePath
+        // examples/basic-site/web/hello.webbin -> examples/basic-site/web/bin/hello
+        // web/api/users.json.webbin -> web/bin/api/users.json
+        let webbinURL = URL(fileURLWithPath: webbinPath)
+        let webRootURL = webbinURL.deletingLastPathComponent()
+        let filename = webbinURL.lastPathComponent.replacingOccurrences(of: ".webbin", with: "")
+        
+        // Get relative path from web root for nested routes
+        let relativePath = webbinURL.deletingLastPathComponent().path
+            .replacingOccurrences(of: webRootURL.path, with: "")
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        
+        let executablePath: String
+        if relativePath.isEmpty {
+            executablePath = "\(webRootURL.path)/bin/\(filename)"
+        } else {
+            executablePath = "\(webRootURL.path)/bin/\(relativePath)/\(filename)"
         }
         
-        return nil
+        log(.debug, "Derived executable path: \(executablePath)")
+        return executablePath
     }
     
     private func serveStaticFile(path: String, context: ChannelHandlerContext) {
@@ -359,6 +397,24 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
 }
 
 // Main server
+let config = ServerConfig.fromEnvironment()
+
+// Log configuration
+log(.info, "Server Configuration:")
+log(.info, "  Web Root: \(config.webRoot)")
+log(.info, "  Host: \(config.host)")
+log(.info, "  Port: \(config.port)")
+log(.info, "  Platform: \(detectPlatform())/\(detectArchitecture())")
+
+// Check if web root exists
+let fileManager = FileManager.default
+var isDirectory: ObjCBool = false
+if !fileManager.fileExists(atPath: config.webRoot, isDirectory: &isDirectory) || !isDirectory.boolValue {
+    log(.warning, "Web root directory not found: \(config.webRoot)")
+    log(.info, "Creating web root directory...")
+    try? fileManager.createDirectory(atPath: config.webRoot, withIntermediateDirectories: true)
+}
+
 let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
 defer {
     try! group.syncShutdownGracefully()
@@ -369,20 +425,17 @@ let bootstrap = ServerBootstrap(group: group)
     .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
     .childChannelInitializer { channel in
         channel.pipeline.configureHTTPServerPipeline().flatMap {
-            channel.pipeline.addHandler(SwiftletHTTPHandler())
+            channel.pipeline.addHandler(SwiftletHTTPHandler(config: config))
         }
     }
     .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
     .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
     .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
-let host = "127.0.0.1"
-let port = 8080
+log(.info, "Starting Swiftlets server on \(config.host):\(config.port)")
+log(.info, "Visit http://\(config.host):\(config.port)/ to test")
 
-log(.info, "Starting Swiftlets server on \(host):\(port)")
-log(.info, "Visit http://\(host):\(port)/ to test")
-
-let channel = try bootstrap.bind(host: host, port: port).wait()
+let channel = try bootstrap.bind(host: config.host, port: config.port).wait()
 
 // Wait for server to close
 try channel.closeFuture.wait()

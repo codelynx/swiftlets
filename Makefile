@@ -43,7 +43,10 @@ help:
 .PHONY: server
 server:
 	@echo "$(YELLOW)Starting Swiftlets server...$(NC)"
-	@cd core && swift run swiftlets-server
+	@if [ -d "examples/basic-site" ]; then \
+		export SWIFTLETS_SITE=examples/basic-site; \
+	fi; \
+	cd core && swift run swiftlets-server
 
 # Build the server
 .PHONY: server-build
