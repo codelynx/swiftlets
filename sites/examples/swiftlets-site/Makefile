@@ -18,8 +18,8 @@ else ifeq ($(ARCH),arm64)
     ARCH := arm64
 endif
 
-# Binary directory
-BIN_DIR := web/bin
+# Binary directory (OUTSIDE web root for security)
+BIN_DIR := bin
 
 # Swift files to compile (subdirectories first to avoid conflicts)
 SWIFT_FILES := $(sort $(wildcard src/**/*.swift)) $(sort $(wildcard src/*.swift))
@@ -35,11 +35,15 @@ build: $(BIN_DIR)
 	@mkdir -p .build/temp
 	@for file in $(SWIFT_FILES); do \
 		relative=$${file#src/}; \
-		output="web/bin/$${relative%.swift}"; \
+		output="bin/$${relative%.swift}"; \
 		webbin="web/$${relative%.swift}.webbin"; \
 		outdir=$$(dirname "$$output"); \
 		mkdir -p "$$outdir" 2>/dev/null || true; \
 		echo "  Building $$relative -> $$output"; \
+		if [[ "$$file" == *"Components.swift" ]]; then \
+			echo "    → Skipping Components.swift (included in builds)"; \
+			continue; \
+		fi; \
 		temp_file=".build/temp/$$(basename $$file)"; \
 		sed -e '/^import Swiftlets$$/d' \
 		    -e 's/let request = try/let _ = try/' \
@@ -53,6 +57,7 @@ build: $(BIN_DIR)
 		      ../../../Sources/Swiftlets/HTML/Layout/*.swift \
 		      ../../../Sources/Swiftlets/HTML/Modifiers/*.swift \
 		      ../../../Sources/Swiftlets/HTML/Builders/*.swift \
+		      src/Components.swift \
 		      "$$temp_file" -o "$$output" 2>&1; then \
 			echo "    ✓ Success"; \
 			if [ -f "$$output" ]; then \
@@ -77,7 +82,7 @@ $(BIN_DIR):
 .PHONY: clean
 clean:
 	@echo "Cleaning build artifacts..."
-	@rm -rf web/bin
+	@rm -rf bin
 	@echo "Clean complete!"
 
 # Run the site using swiftlets CLI

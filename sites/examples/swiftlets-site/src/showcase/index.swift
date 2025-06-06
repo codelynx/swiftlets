@@ -14,38 +14,110 @@ struct ShowcasePage {
             }
             Body {
                 // Navigation
-                Nav {
-                    Container(maxWidth: .xxl) {
-                        HStack {
-                            Link(href: "/") {
-                                H1("Swiftlets").style("margin", "0")
-                            }
-                            Spacer()
-                            HStack(spacing: 20) {
-                                Link(href: "/docs", "Documentation")
-                                Link(href: "/showcase", "Showcase").class("active")
-                                Link(href: "/about", "About")
-                                Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
-                                    .attribute("target", "_blank")
-                            }
+                Div {
+                    Div {
+                        Link(href: "/", "Swiftlets")
+                            .class("nav-brand")
+                        Div {
+                            Link(href: "/docs", "Documentation")
+                            Link(href: "/showcase", "Showcase")
+                                .class("active")
+                            Link(href: "/about", "About")
+                            Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                                .attribute("target", "_blank")
                         }
-                        .style("align-items", "center")
+                        .class("nav-links")
                     }
+                    .class("nav-content")
                 }
-                .style("background", "#f8f9fa")
-                .style("padding", "1rem 0")
-                .style("border-bottom", "1px solid #dee2e6")
+                .class("nav-container")
                 
-                // Showcase Content
-                Container(maxWidth: .xxl) {
-                    VStack(spacing: 50) {
-                        // Header
-                        VStack(spacing: 20) {
-                            H1("Component Showcase")
-                                .style("text-align", "center")
-                            P("Explore the components and layouts available in Swiftlets")
-                                .style("text-align", "center")
-                                .style("font-size", "1.25rem")
+                // Header
+                Div {
+                    Div {
+                        H1("Component Showcase")
+                        P("Explore the components and layouts available in Swiftlets")
+                            .style("font-size", "1.25rem")
+                            .style("color", "#6c757d")
+                    }
+                    .class("showcase-container")
+                    .style("text-align", "center")
+                }
+                .class("showcase-header")
+                
+                // Main Content
+                Div {
+                    Div {
+                        
+                        // Category Navigation
+                        Section {
+                            H2("HTML Element Categories")
+                            P("Browse comprehensive examples showing Swift DSL code and generated HTML")
+                            
+                            Grid(columns: .count(3), spacing: 20) {
+                                CategoryCard(
+                                    title: "Basic Elements",
+                                    description: "Headings, paragraphs, divs, spans, links, and more",
+                                    href: "/showcase/basic-elements",
+                                    icon: "📝"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Text Formatting",
+                                    description: "Bold, italic, code, quotes, and text styling",
+                                    href: "/showcase/text-formatting",
+                                    icon: "✨"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Lists",
+                                    description: "Ordered, unordered, and definition lists",
+                                    href: "/showcase/lists",
+                                    icon: "📋"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Tables",
+                                    description: "Table structures with headers, bodies, and styling",
+                                    href: "/showcase/tables",
+                                    icon: "📊"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Forms",
+                                    description: "Input fields, buttons, selects, and form layouts",
+                                    href: "/showcase/forms",
+                                    icon: "📝"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Media",
+                                    description: "Images, videos, audio, and embedded content",
+                                    href: "/showcase/media",
+                                    icon: "🖼️"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Semantic HTML",
+                                    description: "Header, footer, nav, article, section, and more",
+                                    href: "/showcase/semantic",
+                                    icon: "🏗️"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Layout Components",
+                                    description: "HStack, VStack, Grid, Container, and spacing",
+                                    href: "/showcase/layout",
+                                    icon: "📐"
+                                ).render()
+                                
+                                CategoryCard(
+                                    title: "Modifiers",
+                                    description: "Classes, styles, attributes, and chaining",
+                                    href: "/showcase/modifiers",
+                                    icon: "🎨"
+                                ).render()
+                            }
                         }
                         
                         // Layout Examples

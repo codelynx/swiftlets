@@ -154,6 +154,26 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
             return
         }
         
+        // 2b. If path ends with / or no .webbin found, try index
+        if path.hasSuffix("/") || (!fileManager.fileExists(atPath: webbinPath)) {
+            let indexPath = cleanPath.hasSuffix("/") ? "\(cleanPath)index" : "\(cleanPath)/index"
+            let indexWebbinPath = "\(config.webRoot)/\(indexPath).webbin"
+            
+            if fileManager.fileExists(atPath: indexWebbinPath) {
+                log(.debug, "Found index webbin file: \(indexWebbinPath)")
+                
+                guard let executablePath = readWebbinFile(indexWebbinPath) else {
+                    log(.error, "Failed to read webbin file: \(indexWebbinPath)")
+                    sendErrorResponse(context: context, status: .internalServerError, message: "Invalid webbin file")
+                    return
+                }
+                
+                // Execute the dynamic route
+                executeSwiftlet(executablePath: executablePath, originalPath: path, request: request, body: body, context: context)
+                return
+            }
+        }
+        
         // 3. TODO: Check for pattern-based routes (e.g., [slug])
         // For now, just return 404
         log(.warning, "No route found for path: \(path)")
@@ -169,22 +189,35 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         log(.debug, "Webbin file contains MD5: \(hash)")
         
         // Derive executable path from webbin path
-        // sites/swiftlets-site/web/hello.webbin -> sites/swiftlets-site/web/bin/hello
-        // web/api/users.json.webbin -> web/bin/api/users.json
+        // SECURITY: Executables are in bin/ directory OUTSIDE web root
+        // sites/examples/swiftlets-site/web/hello.webbin -> sites/examples/swiftlets-site/bin/hello
+        // sites/examples/swiftlets-site/web/showcase/index.webbin -> sites/examples/swiftlets-site/bin/showcase/index
+        
         let webbinURL = URL(fileURLWithPath: webbinPath)
-        let webRootURL = webbinURL.deletingLastPathComponent()
         let filename = webbinURL.lastPathComponent.replacingOccurrences(of: ".webbin", with: "")
         
-        // Get relative path from web root for nested routes
-        let relativePath = webbinURL.deletingLastPathComponent().path
-            .replacingOccurrences(of: webRootURL.path, with: "")
-            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        // Get the site root (parent of web/)
+        let webRootURL = URL(fileURLWithPath: config.webRoot)
+        let siteRootURL = webRootURL.deletingLastPathComponent()
+        
+        // Get relative path from web root
+        let webbinDirURL = webbinURL.deletingLastPathComponent()
+        let relativePath: String
+        if webbinDirURL.path == webRootURL.path {
+            relativePath = ""
+        } else {
+            // Remove web root path and any leading slashes
+            relativePath = webbinDirURL.path
+                .replacingOccurrences(of: webRootURL.path + "/", with: "")
+                .replacingOccurrences(of: webRootURL.path, with: "")
+                .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        }
         
         let executablePath: String
         if relativePath.isEmpty {
-            executablePath = "\(webRootURL.path)/bin/\(filename)"
+            executablePath = "\(siteRootURL.path)/bin/\(filename)"
         } else {
-            executablePath = "\(webRootURL.path)/bin/\(relativePath)/\(filename)"
+            executablePath = "\(siteRootURL.path)/bin/\(relativePath)/\(filename)"
         }
         
         log(.debug, "Derived executable path: \(executablePath)")
