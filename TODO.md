@@ -5,7 +5,7 @@
 - [x] Fix `Sendable` protocol warning in `SwiftletHTTPHandler` (main.swift:243)
 - [x] Remove debug `print` statements from server
 - [x] Add newline at end of Package.swift
-- [ ] Fix server to properly discover swiftlets without hardcoded paths
+- [x] Fix server to properly discover swiftlets without hardcoded paths
 
 ## 🎯 High Priority (This Week)
 

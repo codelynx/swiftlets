@@ -8,6 +8,27 @@ enum LogLevel {
     case debug, info, warning, error
 }
 
+// Platform and architecture detection
+func detectPlatform() -> String {
+    #if os(macOS)
+    return "macos"
+    #elseif os(Linux)
+    return "linux"
+    #else
+    return "unknown"
+    #endif
+}
+
+func detectArchitecture() -> String {
+    #if arch(x86_64)
+    return "x86_64"
+    #elseif arch(arm64)
+    return "arm64"
+    #else
+    return "unknown"
+    #endif
+}
+
 func log(_ level: LogLevel, _ message: String) {
     let timestamp = ISO8601DateFormatter().string(from: Date())
     let prefix: String
@@ -84,25 +105,42 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     }
     
     private func executeSwiftlet(path: String, request: HTTPRequestHead, body: Data, context: ChannelHandlerContext) {
-        // Detect platform and architecture
-        let platform = "macos"  // For POC, hardcoded
-        let arch = "arm64"      // For POC, hardcoded
+        // Detect platform and architecture dynamically
+        let platform = detectPlatform()
+        let arch = detectArchitecture()
         
         // Get current site from environment or default
         let currentSite = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] ?? "sites/core/hello"
         let siteName = URL(fileURLWithPath: currentSite).lastPathComponent
         
-        let executablePath = "bin/\(platform)/\(arch)/\(siteName)/\(path)"
+        // Try to find the executable in various locations
+        let possiblePaths = [
+            "bin/\(platform)/\(arch)/\(siteName)/\(path)",
+            "sites/\(siteName)/\(path)",
+            "sites/\(siteName)/.build/debug/\(path)",
+            "sites/\(siteName)/.build/release/\(path)",
+            ".build/debug/\(siteName)-\(path)",
+            ".build/release/\(siteName)-\(path)"
+        ]
         
-        // Check if executable exists
         let fileManager = FileManager.default
-        if !fileManager.fileExists(atPath: executablePath) {
-            log(.warning, "Swiftlet not found: \(executablePath)")
+        var executablePath: String?
+        
+        for candidatePath in possiblePaths {
+            if fileManager.fileExists(atPath: candidatePath) && fileManager.isExecutableFile(atPath: candidatePath) {
+                executablePath = candidatePath
+                break
+            }
+        }
+        
+        guard let foundPath = executablePath else {
+            log(.warning, "Swiftlet not found for path: \(path)")
+            log(.debug, "Searched in: \(possiblePaths.joined(separator: ", "))")
             sendErrorResponse(context: context, status: .notFound, message: "Swiftlet not found: \(path)")
             return
         }
         
-        log(.debug, "Executing swiftlet: \(executablePath)")
+        log(.debug, "Executing swiftlet: \(foundPath)")
         
         // Prepare environment variables
         var environment = ProcessInfo.processInfo.environment
@@ -122,7 +160,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         
         // Create process
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: executablePath)
+        process.executableURL = URL(fileURLWithPath: foundPath)
         process.environment = environment
         
         // Setup pipes
