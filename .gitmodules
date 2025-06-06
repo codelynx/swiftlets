@@ -1,0 +1,3 @@
+[submodule "external/Ignite"]
+	path = external/Ignite
+	url = https://github.com/twostraws/Ignite
