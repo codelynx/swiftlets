@@ -4,7 +4,8 @@ import NIOHTTP1
 import NIOFoundationCompat
 
 // Simple HTTP handler that executes swiftlets
-final class SwiftletHTTPHandler: ChannelInboundHandler {
+// Marked as @unchecked Sendable because NIO ensures this handler is only used on a single event loop
+final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     typealias InboundIn = HTTPServerRequestPart
     typealias OutboundOut = HTTPServerResponsePart
     
@@ -37,7 +38,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler {
             
             // For development, we'll use a simple routing based on current site
             // In production, this would read from site.yaml or routes config
-            let currentSite = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] ?? "sites/core/hello"
+            let _ = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] ?? "sites/core/hello"
             
             // Simple routing for POC
             // Remove leading slash and use as swiftlet name
