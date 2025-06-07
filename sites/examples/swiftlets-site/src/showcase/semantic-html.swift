@@ -593,7 +593,7 @@ P {
                     }
                     
                     Div {
-                        Link(href: "/showcase/media", "Media Elements")
+                        Link(href: "/showcase/media-elements", "Media Elements")
                             .class("nav-button")
                         Link(href: "/showcase/layout", "Layout Components")
                             .class("nav-button nav-button-next")

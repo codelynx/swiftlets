@@ -16,25 +16,28 @@ Create comprehensive HTML examples showing both Swift DSL code and generated HTM
 - Forms showcase page (all form elements and input types)
 - Media showcase page (all media elements working - Img, Picture, Video, Audio, IFrame)
 - Semantic HTML showcase page (Header, Footer, Nav, Main, Article, Section, Aside, Figure, Details, Progress, Meter, Data)
+- Layout Components showcase page (HStack, VStack, ZStack, Grid, Container, Spacer)
 - CodeExample and CategoryCard components
-- Clean, responsive CSS styling with enhanced table, list, form, and media styles
+- Clean, responsive CSS styling with enhanced table, list, form, media, and layout styles
 - Navigation links with card-style category display and navigation buttons between pages
 - Proper routing with trailing slash support
 - Security fix: executables moved outside web root
 - CSS-based chart visualization in semantic showcase
+- Complex dashboard layout example combining all components
 
 ⚠️ **Resolved Issues:**
 - Lists compilation issue fixed by renaming file from `lists.swift` to `list-examples.swift`
 - Media compilation issue fixed by renaming file from `media.swift` to `media-elements.swift`
 - Semantic compilation issue fixed by renaming file from `semantic.swift` to `semantic-html.swift`
+- Layout compilation issue fixed by renaming file from `layout.swift` to `layout-components.swift`
 - Routing mismatches fixed by ensuring webbin files match expected names
+- Grid `.flexible()` API mismatch resolved using `.custom()` with CSS grid syntax
 
 🔴 **Still Blocked:**
 - Tables showcase - Table elements (Table, THead, TBody, etc.) not exported from framework
 - Some elements not implemented: ColGroup, Col, OptGroup
 
 📋 **Remaining:**
-- Layout Components showcase (HStack, VStack, Grid, Container)
 - Modifiers showcase (classes, styles, attributes)
 - Advanced examples page
 - Search functionality
@@ -51,11 +54,10 @@ sites/examples/swiftlets-site/
 │   │   ├── basic-elements.swift    # Basic HTML elements ✅
 │   │   ├── text-formatting.swift   # Text and inline elements ✅
 │   │   ├── list-examples.swift     # All list types ✅
-│   │   ├── tables.swift            # Table examples ✅
 │   │   ├── forms.swift             # Form elements and inputs ✅
-│   │   ├── media.swift             # Images, video, audio 📋
-│   │   ├── semantic.swift          # Semantic HTML5 elements 📋
-│   │   ├── layout.swift            # HStack, VStack, Grid 📋
+│   │   ├── media-elements.swift    # Images, video, audio ✅
+│   │   ├── semantic-html.swift     # Semantic HTML5 elements ✅
+│   │   ├── layout-components.swift # HStack, VStack, Grid ✅
 │   │   └── modifiers.swift         # Style and attribute modifiers 📋
 │   └── [other pages]
 ├── bin/                            # Compiled executables (OUTSIDE web root for security)

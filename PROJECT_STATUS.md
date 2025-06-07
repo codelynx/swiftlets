@@ -49,8 +49,8 @@ Last Updated: June 2025
 - [x] Forms showcase
 - [x] Media showcase (images, picture, video, audio, iframe)
 - [x] Semantic HTML showcase (header, footer, nav, article, section, figure, details, progress, meter)
+- [x] Layout Components showcase (HStack, VStack, ZStack, Grid, Container, Spacer)
 - [ ] Tables showcase (blocked: Table elements not exported from framework)
-- [ ] Layout Components showcase
 - [ ] Modifiers showcase
 
 ### Automatic Compilation
@@ -106,9 +106,12 @@ Last Updated: June 2025
   - Added Forms showcase (all HTML5 input types)
   - Added Media Elements showcase (Img, Picture, Video, Audio, IFrame)
   - Added Semantic HTML showcase (Header, Footer, Nav, Article, Section, Figure, Details, Progress, Meter)
+  - Added Layout Components showcase (HStack, VStack, ZStack, Grid, Container, Spacer)
   - Enhanced navigation with previous/next buttons
   - Fixed module name conflicts by renaming showcase files
   - Improved CSS styling for all showcases
+  - Created complex dashboard layout example
+  - Fixed Grid API usage with proper CSS grid syntax
 
 ## Usage Statistics
 
