@@ -4,7 +4,7 @@
 
 Create comprehensive HTML examples showing both Swift DSL code and generated HTML output, organized by category.
 
-**Status: Partially Implemented** (as of January 2025)
+**Status: Mostly Implemented** (as of June 2025)
 
 ## Current Implementation Status
 
@@ -13,23 +13,29 @@ Create comprehensive HTML examples showing both Swift DSL code and generated HTM
 - Basic Elements showcase page  
 - Text Formatting showcase page
 - Lists showcase page (all list elements working)
-- Tables showcase page (removed temporarily due to missing elements)
 - Forms showcase page (all form elements and input types)
+- Media showcase page (all media elements working - Img, Picture, Video, Audio, IFrame)
+- Semantic HTML showcase page (Header, Footer, Nav, Main, Article, Section, Aside, Figure, Details, Progress, Meter, Data)
 - CodeExample and CategoryCard components
-- Clean, responsive CSS styling with enhanced table, list, and form styles
-- Navigation links with card-style category display
+- Clean, responsive CSS styling with enhanced table, list, form, and media styles
+- Navigation links with card-style category display and navigation buttons between pages
 - Proper routing with trailing slash support
 - Security fix: executables moved outside web root
+- CSS-based chart visualization in semantic showcase
 
 ⚠️ **Resolved Issues:**
 - Lists compilation issue fixed by renaming file from `lists.swift` to `list-examples.swift`
+- Media compilation issue fixed by renaming file from `media.swift` to `media-elements.swift`
+- Semantic compilation issue fixed by renaming file from `semantic.swift` to `semantic-html.swift`
+- Routing mismatches fixed by ensuring webbin files match expected names
 
-🔴 **Blocked:**
-- Media showcase page - media elements (Img, Picture, Video, etc.) not exported from framework
-- Tables showcase - had to remove due to missing exports
+🔴 **Still Blocked:**
+- Tables showcase - Table elements (Table, THead, TBody, etc.) not exported from framework
+- Some elements not implemented: ColGroup, Col, OptGroup
 
-📋 **Planned:**
-- Remaining showcase categories (semantic, layout, modifiers) once framework issues resolved
+📋 **Remaining:**
+- Layout Components showcase (HStack, VStack, Grid, Container)
+- Modifiers showcase (classes, styles, attributes)
 - Advanced examples page
 - Search functionality
 - Copy code buttons

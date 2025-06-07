@@ -48,8 +48,8 @@ Last Updated: June 2025
 - [x] Lists showcase
 - [x] Forms showcase
 - [x] Media showcase (images, picture, video, audio, iframe)
-- [ ] Tables showcase (blocked: ColGroup/Col not implemented)
-- [ ] Semantic HTML showcase
+- [x] Semantic HTML showcase (header, footer, nav, article, section, figure, details, progress, meter)
+- [ ] Tables showcase (blocked: Table elements not exported from framework)
 - [ ] Layout Components showcase
 - [ ] Modifiers showcase
 
@@ -76,10 +76,13 @@ Last Updated: June 2025
 2. Query parameters not parsed from URLs
 3. No hot reload for development
 4. Basic error pages (no custom 404/500)
-5. **Missing HTML Elements**: `ColGroup`, `Col`, `OptGroup`, `Br`, `S`, `Wbr` are not implemented
-6. **Module Name Conflicts**: Files named after framework modules cause compilation errors
+5. **Table Elements Not Exported**: `Table`, `THead`, `TBody`, `TFoot`, `TR`, `TH`, `TD`, `Caption` defined but not accessible
+6. **Missing HTML Elements**: `ColGroup`, `Col`, `OptGroup`, `Br`, `S`, `Wbr` are not implemented
+7. **Module Name Conflicts**: Files named after framework modules cause compilation errors
    - `lists.swift` conflicts with `Lists.swift`
-   - `media.swift` conflicts with `Media.swift`
+   - `media.swift` conflicts with `Media.swift`  
+   - `semantic.swift` conflicts with `Semantic.swift`
+8. **Routing Mismatches**: Showcase routes expect specific names (e.g., `/showcase/semantic` expects `semantic` binary)
 
 ## Platform Support Matrix
 
@@ -97,6 +100,15 @@ Last Updated: June 2025
 - Implemented configurable web root support
 - Fixed Ubuntu ARM64 compilation issues
 - Improved cross-platform build scripts
+- Completed HTML showcase implementation:
+  - Added Text Formatting showcase (16+ elements)
+  - Added Lists showcase (UL, OL, DL with examples)
+  - Added Forms showcase (all HTML5 input types)
+  - Added Media Elements showcase (Img, Picture, Video, Audio, IFrame)
+  - Added Semantic HTML showcase (Header, Footer, Nav, Article, Section, Figure, Details, Progress, Meter)
+  - Enhanced navigation with previous/next buttons
+  - Fixed module name conflicts by renaming showcase files
+  - Improved CSS styling for all showcases
 
 ## Usage Statistics
 

@@ -75,10 +75,10 @@ This document tracks the implementation progress of the SwiftletsHTML DSL librar
 - [x] Details, Summary
 
 #### Media Elements
-- [x] Img with src and alt (defined but not exported)
-- [x] Picture, Source (defined but not exported)
-- [x] Video, Audio with controls (defined but not exported)
-- [x] IFrame (defined but not exported)
+- [x] Img with src and alt
+- [x] Picture, Source
+- [x] Video, Audio with controls
+- [x] IFrame
 
 #### Inline Elements
 - [x] Strong, Em, Code, Pre
@@ -120,7 +120,6 @@ This document tracks the implementation progress of the SwiftletsHTML DSL librar
 ## Known Issues
 
 ### Export Issues
-- Media elements (Img, Picture, Source, Video, Audio, IFrame) are defined but not exported from the Swiftlets module
 - Table elements (Table, THead, TBody, TFoot, TR, TH, TD, Caption) are defined but not exported
 - These elements exist in the codebase but are not accessible to users
 
@@ -130,8 +129,11 @@ This document tracks the implementation progress of the SwiftletsHTML DSL librar
 - Text: Br, S (strikethrough), Dfn, Ruby, Wbr elements not implemented
 
 ### Naming Conflicts
-- Files named `lists.swift` in user code conflict with framework's `Lists.swift`
-- Workaround: Use alternative names like `list-examples.swift`
+- Files named after framework modules cause compilation errors:
+  - `lists.swift` conflicts with framework's `Lists.swift`
+  - `media.swift` conflicts with framework's `Media.swift`
+  - `semantic.swift` conflicts with framework's `Semantic.swift`
+- Workaround: Use alternative names like `list-examples.swift`, `media-elements.swift`, `semantic-html.swift`
 
 ## Key Achievements
 
@@ -211,15 +213,6 @@ Form(action: "/submit", method: .post) {
 4. Create comprehensive documentation site
 5. Add more pre-built components (cards, modals, navigation)
 
-## Known Issues
-
-### Module Name Conflicts
-- Files named after framework modules cause compilation errors (e.g., media.swift conflicts with Media.swift, lists.swift conflicts with Lists.swift)
-
-### Missing Elements
-- **Table Elements**: `ColGroup`, `Col` - not implemented
-- **Form Elements**: `OptGroup` - not implemented  
-- **Text Elements**: `Br`, `S`, `Wbr` - not implemented
 
 ## Notes
 

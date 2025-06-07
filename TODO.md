@@ -30,13 +30,14 @@
 ## 🛠️ Development Tools (Next 2 Weeks)
 
 ### Basic CLI (`swiftlets` command)
-- [ ] Create new executable target `SwiftletsCLI`
-- [ ] Implement commands:
-  - [ ] `swiftlets new <name>` - Create new project
-  - [ ] `swiftlets serve` - Start dev server
-  - [ ] `swiftlets build` - Build for production
-  - [ ] `swiftlets routes` - List all routes
-- [ ] Add to Package.swift products
+- [x] Create new executable target `SwiftletsCLI`
+- [x] Implement commands:
+  - [x] `swiftlets new <name>` - Create new project
+  - [x] `swiftlets serve` - Start dev server
+  - [x] `swiftlets build` - Build for production
+  - [x] `swiftlets init` - Initialize in existing directory
+- [ ] Add `swiftlets routes` - List all routes
+- [x] Add to Package.swift products
 
 ### Auto-Compilation
 - [ ] Detect missing swiftlet executables
@@ -129,12 +130,19 @@
 
 ## 🔧 Framework Issues
 
+### Export Issues
+- [ ] Table elements (Table, THead, TBody, TFoot, TR, TH, TD, Caption) are defined but not exported from Swiftlets module
+
 ### Missing HTML Elements
-- [ ] Media elements (Img, Picture, Source, Video, Audio, IFrame) are defined but not exported from Swiftlets module
 - [ ] Table elements ColGroup and Col not implemented
 - [ ] Form element OptGroup not implemented  
 - [ ] Text formatting elements not implemented: Br, S (strikethrough), Dfn, Ruby, Wbr
-- [ ] Naming conflict: user files named `lists.swift` conflict with framework's `Lists.swift`
+
+### Naming Conflicts
+- [ ] User files named after framework modules cause compilation errors:
+  - `lists.swift` conflicts with framework's `Lists.swift`
+  - `media.swift` conflicts with framework's `Media.swift`
+  - `semantic.swift` conflicts with framework's `Semantic.swift`
 
 ## 💡 Future Ideas
 
@@ -164,4 +172,4 @@
 
 ---
 
-*Last updated: January 2025*
+*Last updated: June 2025*
