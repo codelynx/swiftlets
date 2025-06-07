@@ -21,8 +21,8 @@ endif
 # Binary directory (OUTSIDE web root for security)
 BIN_DIR := bin
 
-# Swift files to compile (subdirectories first to avoid conflicts)
-SWIFT_FILES := $(sort $(wildcard src/**/*.swift)) $(sort $(wildcard src/*.swift))
+# Swift files to compile (find all .swift files recursively)
+SWIFT_FILES := $(shell find src -name "*.swift" -type f | sort)
 
 # Default target
 .PHONY: all

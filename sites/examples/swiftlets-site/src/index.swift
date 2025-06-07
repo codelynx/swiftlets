@@ -154,6 +154,40 @@ struct HomePage {
                 .style("position", "relative")
                 .style("overflow", "hidden")
                 
+                // Development Status Notice
+                Section {
+                    Container(maxWidth: .large) {
+                        Div {
+                            HStack(spacing: 20) {
+                                Text("🚧")
+                                    .style("font-size", "2rem")
+                                VStack(spacing: 10) {
+                                    HStack(spacing: 10) {
+                                        Strong("Development Status:")
+                                        Text("Swiftlets is under active development and not ready for production use.")
+                                    }
+                                    P {
+                                        Text("We're building something special and would love your feedback! ")
+                                        Link(href: "https://github.com/codelynx/swiftlets", "Join us on GitHub")
+                                            .style("color", "#667eea")
+                                            .style("font-weight", "600")
+                                        Text(" to contribute, report issues, or share ideas. Your input shapes the future of Swift on the web.")
+                                    }
+                                    .style("margin", "0")
+                                }
+                                .style("flex", "1")
+                            }
+                            .style("align-items", "center")
+                        }
+                        .style("background", "#fef3c7")
+                        .style("border", "1px solid #fbbf24")
+                        .style("border-radius", "8px")
+                        .style("padding", "1.5rem")
+                        .style("margin", "0 auto")
+                    }
+                }
+                .style("padding", "2rem 0")
+                
                 // Code Example
                 Section {
                     Container(maxWidth: .large) {

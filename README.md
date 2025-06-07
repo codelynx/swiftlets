@@ -6,6 +6,9 @@
 [![Platform](https://img.shields.io/badge/Platform-macOS%20|%20Linux-lightgray.svg)](https://swift.org)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+> [!WARNING]
+> **Development Status**: Swiftlets is under active development and is **NOT ready for production use**. APIs may change, and features may be incomplete. We welcome feedback and contributions to help shape the future of Swift on the web!
+
 ## What is Swiftlets?
 
 Swiftlets is a lightweight, Swift-based web framework that brings the simplicity of file-based routing and the power of type-safe HTML generation to server-side Swift development. Inspired by modern web frameworks, it offers a unique approach where each route is an independent executable module.
@@ -21,7 +24,29 @@ Swiftlets is a lightweight, Swift-based web framework that brings the simplicity
 
 ## 🚀 Quick Start
 
-### Install the CLI (Recommended)
+### Try the Showcase Site First! 🎨
+
+Before creating your own project, explore what Swiftlets can do:
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/swiftlets.git
+cd swiftlets
+
+# Build and run the showcase site
+./smake build sites/examples/swiftlets-site
+./smake run sites/examples/swiftlets-site
+```
+
+Visit `http://localhost:8080` to see:
+- 📚 Interactive documentation
+- 🧩 Component showcases with live examples
+- 🎯 Best practices and patterns
+- 💡 Real-world code examples
+
+### Create Your Own Project
+
+Once you've explored the showcase:
 
 ```bash
 # Install Swiftlets CLI
@@ -35,24 +60,15 @@ cd my-awesome-app
 swiftlets serve
 ```
 
-Visit `http://localhost:8080` to see your app running!
-
-### Manual Installation
+### Alternative: Manual Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/swiftlets.git
-cd swiftlets
-
-# Build everything
+# Build the core framework
 make build
 
-# Run the server with example site
-make run
-
-# Or use the smake wrapper for easier site management
+# Run with different sites
 ./smake run                                    # Run default site
-./smake run sites/examples/swiftlets-site      # Run specific site
+./smake run sites/examples/swiftlets-site      # Run showcase site
 ./smake list                                   # List all available sites
 ```
 
@@ -235,7 +251,8 @@ struct APIHandler {
 
 ## 📚 Documentation
 
-- [**Getting Started**](docs/getting-started.md) - Step-by-step tutorial
+Visit the [showcase site](http://localhost:8080/docs) for interactive documentation, or explore these references:
+
 - [**CLI Reference**](docs/CLI.md) - Complete CLI documentation
 - [**Routing Guide**](docs/ROUTING.md) - Advanced routing patterns
 - [**HTML DSL Reference**](docs/html-elements-reference.md) - All HTML components
@@ -243,19 +260,37 @@ struct APIHandler {
 - [**Architecture**](docs/swiftlet-architecture.md) - How Swiftlets works
 - [**SDK Distribution**](docs/sdk-distribution-plan.md) - Future SDK packaging plans
 
-## 🧪 Examples
+## 🧪 Examples & Showcase
 
-Explore working examples:
+### 🌟 Official Showcase Site
 
-- [**Swiftlets Site**](sites/examples/swiftlets-site/) - Official documentation site
+The best way to learn Swiftlets is by exploring our comprehensive showcase:
+
+```bash
+# Quick start with the showcase
+./smake build sites/examples/swiftlets-site
+./smake run sites/examples/swiftlets-site
+```
+
+The showcase includes:
+- **Component Gallery** - All HTML elements with live examples
+- **Layout Demos** - HStack, VStack, Grid, and responsive layouts
+- **Modifiers Playground** - Styling and customization examples
+- **Interactive Documentation** - Learn by doing
+
+### Other Examples
+
 - [**Test Sites**](sites/tests/) - Testing sites for framework development
 - [**Templates**](templates/) - Project templates for quick start
 
-Run the documentation site:
+### Run Any Example
 
 ```bash
-cd sites/examples/swiftlets-site
-make serve
+# List all available sites
+./smake list
+
+# Run a specific site
+./smake run sites/examples/swiftlets-site
 ```
 
 ## 📁 Project Structure
