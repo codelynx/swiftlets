@@ -114,7 +114,7 @@ serve: build
 .PHONY: run
 run: build
 	@echo "Starting server directly..."
-	@cd ../../.. && SWIFTLETS_SITE=sites/examples/swiftlets-site ./bin/$(OS)/$(ARCH)/swiftlets-server
+	@cd ../../.. && ./bin/$(OS)/$(ARCH)/swiftlets-server sites/examples/swiftlets-site
 
 # Help
 .PHONY: help

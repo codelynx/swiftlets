@@ -55,5 +55,5 @@ fi
 
 echo ""
 echo "Test sites built! You can now run:"
-echo "  SWIFTLETS_SITE=core/sites/test-routing ./core/.build/release/swiftlets-server"
-echo "  SWIFTLETS_SITE=core/sites/test-html ./core/.build/release/swiftlets-server"
+echo "  ./core/.build/release/swiftlets-server core/sites/test-routing"
+echo "  ./core/.build/release/swiftlets-server core/sites/test-html"
