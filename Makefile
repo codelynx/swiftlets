@@ -27,10 +27,18 @@ endif
 # Binary output directory
 BIN_DIR := bin/$(OS)/$(ARCH)
 
+# Default site (can be overridden with SITE=path/to/site)
+SITE ?= sites/examples/swiftlets-site
+
 # Default target
 .PHONY: help
 help:
 	@echo "$(YELLOW)Swiftlets Build System$(NC)"
+	@echo ""
+	@echo "$(GREEN)Quick Usage (with wrapper):$(NC)"
+	@echo "  ./smake run [site-path]     - Run a site"
+	@echo "  ./smake build [site-path]   - Build a site"
+	@echo "  ./smake clean [site-path]   - Clean a site"
 	@echo ""
 	@echo "$(GREEN)Build Commands:$(NC)"
 	@echo "  make build               - Build all components"
@@ -43,8 +51,16 @@ help:
 	@echo "  make run-dev             - Run in development mode"
 	@echo ""
 	@echo "$(GREEN)Site Commands:$(NC)"
+	@echo "  make site                - Build current site (SITE=$(SITE))"
 	@echo "  make sites               - Build all example sites"
-	@echo "  make test-sites          - Build test sites"
+	@echo "  make test-sites          - Build all test sites"
+	@echo "  make list-sites          - List all available sites"
+	@echo ""
+	@echo "$(GREEN)Site Selection:$(NC)"
+	@echo "  make run-path/to/site         - Run specific site (recommended)"
+	@echo "  make build-path/to/site       - Build specific site (recommended)"
+	@echo "  make run SITE=path/to/site    - Alternative syntax"
+	@echo "  make site SITE=path/to/site   - Alternative syntax"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
 	@echo "  make test                - Run all tests"
@@ -95,22 +111,68 @@ build-release:
 .PHONY: run
 run: build-server
 	@echo "$(YELLOW)Starting Swiftlets server...$(NC)"
-	@export SWIFTLETS_SITE=sites/examples/swiftlets-site; \
+	@echo "$(GREEN)Site: $(SITE)$(NC)"
+	@export SWIFTLETS_SITE=$(SITE); \
+	$(BIN_DIR)/swiftlets-server
+
+# Pattern rule for running specific sites
+# Usage: make run-sites/examples/swiftlets-site
+.PHONY: run-%
+run-%: build-server
+	@SITE_PATH="$(subst run-,,$@)"; \
+	echo "$(YELLOW)Starting Swiftlets server...$(NC)"; \
+	echo "$(GREEN)Site: $$SITE_PATH$(NC)"; \
+	export SWIFTLETS_SITE="$$SITE_PATH"; \
 	$(BIN_DIR)/swiftlets-server
 
 # Run in development mode
 .PHONY: run-dev
-run-dev: build-server sites
+run-dev: build-server site
 	@echo "$(YELLOW)Starting server in development mode...$(NC)"
-	@export SWIFTLETS_SITE=sites/examples/swiftlets-site; \
+	@echo "$(GREEN)Site: $(SITE)$(NC)"
+	@export SWIFTLETS_SITE=$(SITE); \
 	$(BIN_DIR)/swiftlets-server
 
-# Build example sites
+# Build current site
+.PHONY: site
+site:
+	@echo "$(YELLOW)Building site: $(SITE)...$(NC)"
+	@if [ -f "$(SITE)/Makefile" ]; then \
+		cd "$(SITE)" && make build; \
+		echo "$(GREEN)Site built successfully$(NC)"; \
+	else \
+		echo "$(RED)Error: No Makefile found in $(SITE)$(NC)"; \
+		exit 1; \
+	fi
+
+# Pattern rule for building specific sites
+# Usage: make build-sites/examples/swiftlets-site
+.PHONY: build-%
+build-%:
+	@SITE_PATH="$(subst build-,,$@)"; \
+	echo "$(YELLOW)Building site: $$SITE_PATH...$(NC)"; \
+	if [ -f "$$SITE_PATH/Makefile" ]; then \
+		cd "$$SITE_PATH" && make build; \
+		echo "$(GREEN)Site built successfully$(NC)"; \
+	elif [ -f "$$SITE_PATH/build.sh" ]; then \
+		cd "$$SITE_PATH" && ./build.sh; \
+		echo "$(GREEN)Site built successfully$(NC)"; \
+	else \
+		echo "$(RED)Error: No Makefile or build.sh found in $$SITE_PATH$(NC)"; \
+		exit 1; \
+	fi
+
+# Build all example sites
 .PHONY: sites
 sites:
-	@echo "$(YELLOW)Building example sites...$(NC)"
-	@cd sites/examples/swiftlets-site && make build
-	@echo "$(GREEN)Sites built successfully$(NC)"
+	@echo "$(YELLOW)Building all example sites...$(NC)"
+	@for site in sites/examples/*/; do \
+		if [ -f "$$site/Makefile" ]; then \
+			echo "Building $$site..."; \
+			cd "$$site" && make build && cd - > /dev/null; \
+		fi \
+	done
+	@echo "$(GREEN)All sites built successfully$(NC)"
 
 # Build test sites
 .PHONY: test-sites
@@ -122,6 +184,26 @@ test-sites:
 			cd "$$site" && make build && cd -; \
 		fi \
 	done
+
+# List available sites
+.PHONY: list-sites
+list-sites:
+	@echo "$(YELLOW)Available sites:$(NC)"
+	@echo ""
+	@echo "$(GREEN)Example sites:$(NC)"
+	@find sites/examples -name Makefile -type f 2>/dev/null | sed 's|/Makefile||' | sort || echo "  (none found)"
+	@echo ""
+	@echo "$(GREEN)Test sites:$(NC)"
+	@find sites/tests \( -name Makefile -o -name build.sh \) -type f 2>/dev/null | sed 's|/Makefile||' | sed 's|/build.sh||' | sort | uniq || echo "  (none found)"
+	@echo ""
+	@echo "$(GREEN)Template sites:$(NC)"
+	@find templates -name Makefile -type f 2>/dev/null | sed 's|/Makefile||' | sort || echo "  (none found)"
+	@echo ""
+	@echo "$(YELLOW)Usage:$(NC)"
+	@echo "  make run-sites/examples/swiftlets-site"
+	@echo "  make build-sites/tests/test-html"
+	@echo ""
+	@echo "$(YELLOW)Default:$(NC) make run → $(SITE)"
 
 # Run tests
 .PHONY: test

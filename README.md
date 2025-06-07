@@ -49,6 +49,11 @@ make build
 
 # Run the server with example site
 make run
+
+# Or use the smake wrapper for easier site management
+./smake run                                    # Run default site
+./smake run sites/examples/swiftlets-site      # Run specific site
+./smake list                                   # List all available sites
 ```
 
 ## 📝 Your First Swiftlet

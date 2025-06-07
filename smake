@@ -1,0 +1,3 @@
+#!/bin/bash
+# Shorthand for swiftlets-make
+exec ./swiftlets-make "$@"

@@ -178,6 +178,32 @@ The CLI works on both macOS and Linux:
 
 The CLI automatically detects the platform and finds the appropriate server binary.
 
+## Using the `smake` Wrapper
+
+For convenience when working from the project root, use the `smake` wrapper:
+
+```bash
+# List all available sites
+./smake list
+
+# Run sites with simple syntax
+./smake run                                    # Run default site
+./smake run sites/examples/swiftlets-site      # Run specific site
+./smake run sites/tests/test-html              # Run test site
+
+# Build sites
+./smake build                                  # Build default site
+./smake build sites/examples/swiftlets-site    # Build specific site
+
+# Clean sites
+./smake clean sites/examples/swiftlets-site    # Clean site artifacts
+
+# Development mode
+./smake dev sites/examples/swiftlets-site      # Run in dev mode
+```
+
+The `smake` wrapper provides positional argument syntax instead of the traditional `make SITE=path` syntax.
+
 ## Development Workflow
 
 ### Basic Workflow

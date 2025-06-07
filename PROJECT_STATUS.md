@@ -25,6 +25,11 @@ Last Updated: June 2025
   - `swiftlets init` - Initialize in existing directory
   - `swiftlets serve` - Development server with configuration
   - `swiftlets build` - Build swiftlets with options
+- [x] **Site Management** (NEW)
+  - `smake` wrapper for easy site management
+  - `make list-sites` - List all available sites
+  - `make run SITE=path` - Run specific site
+  - Support for both Makefile and build.sh sites
 - [x] **Configurable Web Root** (NEW)
   - `SWIFTLETS_SITE` environment variable
   - `SWIFTLETS_WEB_ROOT` for direct path
@@ -115,6 +120,11 @@ Last Updated: June 2025
   - Created complex dashboard layout example
   - Fixed Grid API usage with proper CSS grid syntax
   - Demonstrated best practices for modifier usage and chaining
+- Improved site management:
+  - Added `smake` wrapper for positional argument syntax
+  - Enhanced `make list-sites` to show all site categories
+  - Added support for test sites using build.sh
+  - Improved default site handling with SITE variable
 
 ## Usage Statistics
 

@@ -1,0 +1,73 @@
+#!/bin/bash
+# Swiftlets Make wrapper - provides positional argument support
+# Usage: ./swiftlets-make <command> [path]
+
+set -e
+
+# Colors
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Get command and path
+COMMAND="${1:-help}"
+SITE_PATH="${2:-sites/examples/swiftlets-site}"
+
+# Handle commands
+case "$COMMAND" in
+    run)
+        echo -e "${YELLOW}Starting server for: ${SITE_PATH}${NC}"
+        make run SITE="$SITE_PATH"
+        ;;
+    build)
+        echo -e "${YELLOW}Building site: ${SITE_PATH}${NC}"
+        if [ -f "$SITE_PATH/Makefile" ]; then
+            make site SITE="$SITE_PATH"
+        elif [ -f "$SITE_PATH/build.sh" ]; then
+            cd "$SITE_PATH" && ./build.sh
+        else
+            echo -e "${RED}No Makefile or build.sh found in $SITE_PATH${NC}"
+            exit 1
+        fi
+        ;;
+    clean)
+        echo -e "${YELLOW}Cleaning site: ${SITE_PATH}${NC}"
+        if [ -f "$SITE_PATH/Makefile" ]; then
+            cd "$SITE_PATH" && make clean
+        else
+            echo -e "${RED}No Makefile found in $SITE_PATH${NC}"
+            exit 1
+        fi
+        ;;
+    dev)
+        echo -e "${YELLOW}Starting dev server for: ${SITE_PATH}${NC}"
+        make run-dev SITE="$SITE_PATH"
+        ;;
+    list)
+        make list-sites
+        ;;
+    help|--help|-h)
+        echo -e "${YELLOW}Swiftlets Make Wrapper${NC}"
+        echo ""
+        echo "Usage: ./swiftlets-make <command> [site-path]"
+        echo ""
+        echo "Commands:"
+        echo "  run [path]    - Run server for site (default: sites/examples/swiftlets-site)"
+        echo "  build [path]  - Build site"
+        echo "  clean [path]  - Clean site build artifacts"
+        echo "  dev [path]    - Run in development mode"
+        echo "  list          - List all available sites"
+        echo "  help          - Show this help"
+        echo ""
+        echo "Examples:"
+        echo "  ./swiftlets-make run"
+        echo "  ./swiftlets-make run sites/tests/test-html"
+        echo "  ./swiftlets-make build sites/examples/swiftlets-site"
+        echo "  ./swiftlets-make clean sites/tests/test-routing"
+        ;;
+    *)
+        # Pass through to make
+        make "$@"
+        ;;
+esac
