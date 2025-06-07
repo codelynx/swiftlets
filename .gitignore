@@ -13,6 +13,7 @@ DerivedData/
 
 # Binaries
 bin/
+*.webbin
 
 # Build artifacts
 *.o

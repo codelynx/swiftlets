@@ -135,6 +135,7 @@ clean:
 	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
 	@swift package clean
 	@rm -rf bin/*/
+	@find . -name "*.webbin" -type f -delete
 	@echo "$(GREEN)Clean complete$(NC)"
 
 # Format code

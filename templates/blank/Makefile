@@ -72,6 +72,7 @@ FORCE:
 clean:
 	@echo "$(YELLOW)Cleaning built executables...$(NC)"
 	@rm -rf $(BIN_DIR)/*
+	@rm -f $(WEB_DIR)/**/*.webbin $(WEB_DIR)/*.webbin
 	@echo "$(GREEN)✓ Clean complete$(NC)"
 
 # List all routes

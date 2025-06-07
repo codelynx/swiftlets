@@ -39,36 +39,54 @@ build: $(BIN_DIR)
 		webbin="web/$${relative%.swift}.webbin"; \
 		outdir=$$(dirname "$$output"); \
 		mkdir -p "$$outdir" 2>/dev/null || true; \
-		echo "  Building $$relative -> $$output"; \
 		if [[ "$$file" == *"Components.swift" ]]; then \
-			echo "    → Skipping Components.swift (included in builds)"; \
 			continue; \
 		fi; \
-		temp_file=".build/temp/$$(basename $$file)"; \
-		sed -e '/^import Swiftlets$$/d' \
-		    -e 's/let request = try/let _ = try/' \
-		    "$$file" > "$$temp_file"; \
-		if swiftc -parse-as-library \
-		      -module-name Swiftlets \
-		      ../../../Sources/Swiftlets/Core/*.swift \
-		      ../../../Sources/Swiftlets/HTML/Core/*.swift \
-		      ../../../Sources/Swiftlets/HTML/Elements/*.swift \
-		      ../../../Sources/Swiftlets/HTML/Helpers/*.swift \
-		      ../../../Sources/Swiftlets/HTML/Layout/*.swift \
-		      ../../../Sources/Swiftlets/HTML/Modifiers/*.swift \
-		      ../../../Sources/Swiftlets/HTML/Builders/*.swift \
-		      src/Components.swift \
-		      "$$temp_file" -o "$$output" 2>&1; then \
-			echo "    ✓ Success"; \
-			if [ -f "$$output" ]; then \
-				MD5=$$(md5 -q "$$output" 2>/dev/null || md5sum "$$output" | cut -d' ' -f1); \
-				echo "$$MD5" > "$$webbin"; \
-				echo "    ✓ Updated $$webbin"; \
+		need_build=0; \
+		if [ ! -f "$$output" ]; then \
+			need_build=1; \
+		else \
+			if [ "$$file" -nt "$$output" ] || [ "src/Components.swift" -nt "$$output" ]; then \
+				need_build=1; \
+			else \
+				for framework_file in ../../../Sources/Swiftlets/**/*.swift; do \
+					if [ "$$framework_file" -nt "$$output" ]; then \
+						need_build=1; \
+						break; \
+					fi; \
+				done; \
+			fi; \
+		fi; \
+		if [ $$need_build -eq 1 ]; then \
+			echo "  Building $$relative -> $$output"; \
+			temp_file=".build/temp/$$(basename $$file)"; \
+			sed -e '/^import Swiftlets$$/d' \
+			    -e 's/let request = try/let _ = try/' \
+			    "$$file" > "$$temp_file"; \
+			if swiftc -parse-as-library \
+			      -module-name Swiftlets \
+			      ../../../Sources/Swiftlets/Core/*.swift \
+			      ../../../Sources/Swiftlets/HTML/Core/*.swift \
+			      ../../../Sources/Swiftlets/HTML/Elements/*.swift \
+			      ../../../Sources/Swiftlets/HTML/Helpers/*.swift \
+			      ../../../Sources/Swiftlets/HTML/Layout/*.swift \
+			      ../../../Sources/Swiftlets/HTML/Modifiers/*.swift \
+			      ../../../Sources/Swiftlets/HTML/Builders/*.swift \
+			      src/Components.swift \
+			      "$$temp_file" -o "$$output" 2>&1; then \
+				echo "    ✓ Success"; \
+				if [ -f "$$output" ]; then \
+					MD5=$$(md5 -q "$$output" 2>/dev/null || md5sum "$$output" | cut -d' ' -f1); \
+					echo "$$MD5" > "$$webbin"; \
+					echo "    ✓ Updated $$webbin"; \
+				fi; \
+			else \
+				echo "    ✗ Failed"; \
+				rm -rf .build/temp; \
+				exit 1; \
 			fi; \
 		else \
-			echo "    ✗ Failed"; \
-			rm -rf .build/temp; \
-			exit 1; \
+			echo "  ✓ $$relative is up to date"; \
 		fi; \
 	done
 	@rm -rf .build/temp
@@ -83,6 +101,7 @@ $(BIN_DIR):
 clean:
 	@echo "Cleaning build artifacts..."
 	@rm -rf bin
+	@rm -f web/**/*.webbin web/*.webbin
 	@echo "Clean complete!"
 
 # Run the site using swiftlets CLI
