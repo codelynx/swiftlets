@@ -39,32 +39,120 @@ struct HomePage {
                 
                 // Hero Section
                 Section {
-                    Container(maxWidth: .large) {
-                        VStack(spacing: 30) {
-                            H1("Build Dynamic Web Apps with Swift")
-                                .style("font-size", "3rem")
-                                .style("text-align", "center")
+                    Container(maxWidth: .xl) {
+                        VStack(spacing: 40) {
+                            // Main headline with gradient
+                            H1 {
+                                Text("Build ")
+                                Span("Dynamic Web Apps")
+                                    .style("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
+                                    .style("-webkit-background-clip", "text")
+                                    .style("-webkit-text-fill-color", "transparent")
+                                    .style("background-clip", "text")
+                                Text(" with Swift")
+                            }
+                            .style("font-size", "clamp(2.5rem, 6vw, 4.5rem)")
+                            .style("font-weight", "800")
+                            .style("text-align", "center")
+                            .style("line-height", "1.1")
+                            .style("margin", "0")
                             
+                            // Subtitle
                             P("A modern web framework that brings SwiftUI-like syntax to server-side development")
-                                .style("font-size", "1.25rem")
+                                .style("font-size", "clamp(1.1rem, 2vw, 1.5rem)")
                                 .style("text-align", "center")
-                                .style("color", "#6c757d")
+                                .style("color", "#4a5568")
+                                .style("max-width", "650px")
+                                .style("margin", "0 auto")
+                                .style("line-height", "1.6")
                             
-                            HStack(spacing: 20) {
+                            // CTA Buttons
+                            HStack(spacing: 24) {
                                 Link(href: "/docs/getting-started") {
-                                    Button("Get Started")
-                                        .class("btn-primary")
+                                    Button {
+                                        HStack(spacing: 8) {
+                                            Text("Get Started")
+                                            Text("→")
+                                        }
+                                    }
+                                    .style("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
+                                    .style("color", "white")
+                                    .style("padding", "14px 32px")
+                                    .style("border", "none")
+                                    .style("border-radius", "8px")
+                                    .style("font-size", "1.1rem")
+                                    .style("font-weight", "600")
+                                    .style("cursor", "pointer")
+                                    .style("transition", "all 0.3s ease")
+                                    .style("box-shadow", "0 4px 15px rgba(102, 126, 234, 0.3)")
+                                    .class("hero-btn-primary")
                                 }
                                 Link(href: "/showcase") {
-                                    Button("View Examples")
-                                        .class("btn-secondary")
+                                    Button {
+                                        HStack(spacing: 8) {
+                                            Text("View Examples")
+                                            Text("✨")
+                                        }
+                                    }
+                                    .style("background", "transparent")
+                                    .style("color", "#667eea")
+                                    .style("padding", "14px 32px")
+                                    .style("border", "2px solid #667eea")
+                                    .style("border-radius", "8px")
+                                    .style("font-size", "1.1rem")
+                                    .style("font-weight", "600")
+                                    .style("cursor", "pointer")
+                                    .style("transition", "all 0.3s ease")
+                                    .class("hero-btn-secondary")
                                 }
                             }
                             .style("justify-content", "center")
+                            .style("flex-wrap", "wrap")
+                            
+                            // Quick stats
+                            HStack(spacing: 40) {
+                                VStack(spacing: 4) {
+                                    Text("60+")
+                                        .style("font-size", "2rem")
+                                        .style("font-weight", "700")
+                                        .style("color", "#667eea")
+                                    Text("HTML Elements")
+                                        .style("color", "#718096")
+                                        .style("font-size", "0.9rem")
+                                }
+                                
+                                VStack(spacing: 4) {
+                                    Text("100%")
+                                        .style("font-size", "2rem")
+                                        .style("font-weight", "700")
+                                        .style("color", "#764ba2")
+                                    Text("Type Safe")
+                                        .style("color", "#718096")
+                                        .style("font-size", "0.9rem")
+                                }
+                                
+                                VStack(spacing: 4) {
+                                    Text("Zero")
+                                        .style("font-size", "2rem")
+                                        .style("font-weight", "700")
+                                        .style("color", "#667eea")
+                                    Text("JavaScript Required")
+                                        .style("color", "#718096")
+                                        .style("font-size", "0.9rem")
+                                }
+                            }
+                            .style("justify-content", "center")
+                            .style("margin-top", "2rem")
+                            .style("flex-wrap", "wrap")
+                            .style("gap", "2rem")
                         }
                     }
                 }
-                .style("padding", "5rem 0")
+                .class("hero-section")
+                .style("padding", "clamp(4rem, 10vw, 8rem) 0")
+                .style("background", "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)")
+                .style("position", "relative")
+                .style("overflow", "hidden")
                 
                 // Code Example
                 Section {
