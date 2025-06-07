@@ -42,6 +42,17 @@ Last Updated: June 2025
 
 ## In Progress 🚧
 
+### HTML Showcase
+- [x] Basic Elements showcase
+- [x] Text Formatting showcase  
+- [x] Lists showcase
+- [x] Forms showcase
+- [x] Media showcase (images, picture, video, audio, iframe)
+- [ ] Tables showcase (blocked: ColGroup/Col not implemented)
+- [ ] Semantic HTML showcase
+- [ ] Layout Components showcase
+- [ ] Modifiers showcase
+
 ### Automatic Compilation
 - [ ] Compile swiftlets on first request
 - [ ] File watching for changes
@@ -65,6 +76,10 @@ Last Updated: June 2025
 2. Query parameters not parsed from URLs
 3. No hot reload for development
 4. Basic error pages (no custom 404/500)
+5. **Missing HTML Elements**: `ColGroup`, `Col`, `OptGroup`, `Br`, `S`, `Wbr` are not implemented
+6. **Module Name Conflicts**: Files named after framework modules cause compilation errors
+   - `lists.swift` conflicts with `Lists.swift`
+   - `media.swift` conflicts with `Media.swift`
 
 ## Platform Support Matrix
 

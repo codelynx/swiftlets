@@ -64,10 +64,10 @@ See `TODO.md` for the current task list and priorities.
   - Document structure: Html, Head, Body, Title, Meta, Script, Style, Link
   - Text elements: Headings (H1-H6), Paragraph, Text, Span
   - Lists: UL, OL, LI, DL, DT, DD
-  - Tables: Table, THead, TBody, TFoot, TR, TH, TD, Caption
+  - Tables: Table, THead, TBody, TFoot, TR, TH, TD, Caption (defined but not exported)
   - Forms: Form, Input (all types), TextArea, Select, Option, Button, Label, FieldSet
   - Semantic: Header, Footer, Nav, Main, Article, Section, Aside, Figure
-  - Media: Img, Picture, Video, Audio, IFrame
+  - Media: Img, Picture, Video, Audio, IFrame (defined but not exported)
   - Inline: Strong, Em, Code, Pre, BlockQuote, Small, Mark
   - And many more...
 - **Layout Components** with SwiftUI-like syntax:
@@ -85,8 +85,17 @@ See `TODO.md` for the current task list and priorities.
 - Result builder (@HTMLBuilder) for composable UI
 - Request/Response now support JSON encoding/decoding
 - Server updated to parse JSON responses from swiftlets
-- Working showcase at `/layout` demonstrating all components
+- **HTML Showcase**: Comprehensive examples site at `/showcase/` demonstrating:
+  - Basic elements (headings, paragraphs, text)
+  - Text formatting (strong, em, code, etc.)
+  - Lists (ordered, unordered, definition)
+  - Forms (all input types, validation)
+  - Media elements (images, picture, video, audio, iframe)
 - **Single import**: Just `import Swiftlets` for all functionality
+
+## Known Issues
+- Missing elements: Br, S, Dfn, Ruby, Wbr, ColGroup, Col, OptGroup
+- Naming conflicts: Files can't be named after framework modules (e.g., `lists.swift` conflicts with `Lists.swift`, `media.swift` conflicts with `Media.swift`)
 
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)

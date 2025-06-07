@@ -18,9 +18,14 @@
 
 ### Examples
 - Basic "hello world" swiftlet
-- HTML DSL showcase
+- HTML DSL showcase with multiple pages:
+  - Basic Elements (headings, paragraphs, text)
+  - Text Formatting (strong, em, code, etc.)
+  - Lists (ul, ol, dl with styling)
+  - Forms (all input types, validation)
+  - Media (images, picture, video, audio, iframe - all working!)
 - Layout components demo
-- Form examples
+- Components system for reusable UI
 
 ## ⚠️ Partially Working
 
@@ -72,6 +77,11 @@
 3. **Binary Management**: Executables must be manually placed in bin/ directory
 4. **Error Handling**: Poor error messages when swiftlets fail
 5. **Performance**: Creates new process for every request
+6. **Missing HTML Elements**: Some elements are not implemented:
+   - Table elements: ColGroup, Col
+   - Form elements: OptGroup
+   - Text elements: Br, S, Wbr
+7. **Module Name Conflicts**: Files can't be named after framework modules (e.g., lists.swift, media.swift)
 
 ## 📊 Metrics
 

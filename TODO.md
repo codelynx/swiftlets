@@ -127,6 +127,15 @@
 - [ ] No graceful shutdown handling
 - [ ] File handles might leak on errors
 
+## 🔧 Framework Issues
+
+### Missing HTML Elements
+- [ ] Media elements (Img, Picture, Source, Video, Audio, IFrame) are defined but not exported from Swiftlets module
+- [ ] Table elements ColGroup and Col not implemented
+- [ ] Form element OptGroup not implemented  
+- [ ] Text formatting elements not implemented: Br, S (strikethrough), Dfn, Ruby, Wbr
+- [ ] Naming conflict: user files named `lists.swift` conflict with framework's `Lists.swift`
+
 ## 💡 Future Ideas
 
 - [ ] WebSocket support

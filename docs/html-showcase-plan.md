@@ -13,21 +13,23 @@ Create comprehensive HTML examples showing both Swift DSL code and generated HTM
 - Basic Elements showcase page  
 - Text Formatting showcase page
 - Lists showcase page (all list elements working)
-- Tables showcase page
+- Tables showcase page (removed temporarily due to missing elements)
 - Forms showcase page (all form elements and input types)
 - CodeExample and CategoryCard components
 - Clean, responsive CSS styling with enhanced table, list, and form styles
+- Navigation links with card-style category display
 - Proper routing with trailing slash support
 - Security fix: executables moved outside web root
 
 ⚠️ **Resolved Issues:**
 - Lists compilation issue fixed by renaming file from `lists.swift` to `list-examples.swift`
 
-🚧 **In Progress:**
-- Media showcase page (next)
+🔴 **Blocked:**
+- Media showcase page - media elements (Img, Picture, Video, etc.) not exported from framework
+- Tables showcase - had to remove due to missing exports
 
 📋 **Planned:**
-- Remaining 4 showcase categories (media, semantic, layout, modifiers)
+- Remaining showcase categories (semantic, layout, modifiers) once framework issues resolved
 - Advanced examples page
 - Search functionality
 - Copy code buttons
@@ -105,8 +107,9 @@ VStack {
 - Q, Cite
 - Kbd, Samp, Var
 - Data
+- HR (horizontal rule)
 
-**Note:** Some elements like S (strikethrough), Dfn, Ruby, Wbr are not yet implemented in Swiftlets
+**Note:** Some elements like Br, S (strikethrough), Dfn, Ruby, Wbr are not yet implemented in Swiftlets
 
 ### 3. Lists ✅
 **Route:** `/showcase/lists`
@@ -120,10 +123,12 @@ VStack {
 
 **Note:** The showcase file is named `list-examples.swift` to avoid compilation conflicts with the framework's `Lists.swift` file
 
-### 4. Tables ✅
+### 4. Tables ❌ (Temporarily Removed)
 **Route:** `/showcase/tables`
 
-**Implemented elements:**
+**Status:** Removed due to table elements not being exported from Swiftlets framework
+
+**Would include:**
 - Basic table structure
 - Headers and footers (THead, TBody, TFoot)
 - Table rows and cells (TR, TH, TD)
@@ -131,7 +136,9 @@ VStack {
 - Styled tables (striped, bordered, responsive)
 - Complex tables with spanning cells
 
-**Note:** ColGroup and Col elements are not yet implemented in Swiftlets
+**Blocking issues:**
+- Table, THead, TBody, TFoot, TR, TH, TD, Caption elements defined but not exported
+- ColGroup and Col elements are not yet implemented in Swiftlets
 
 ### 5. Forms ✅
 **Route:** `/showcase/forms`
@@ -149,15 +156,21 @@ VStack {
 
 **Note:** OptGroup element not yet implemented in Swiftlets
 
-### 6. Media
+### 6. Media ⚠️ (Placeholder Created)
 **Route:** `/showcase/media`
 
+**Status:** Created placeholder page due to media elements not being exported
+
+**Would include:**
 - Images with attributes
 - Picture element
 - Video controls
 - Audio players
 - IFrames
 - Figure and FigCaption
+
+**Blocking issues:**
+- Img, Picture, Source, Video, Audio, IFrame elements defined but not exported from framework
 
 ### 7. Semantic HTML
 **Route:** `/showcase/semantic`
