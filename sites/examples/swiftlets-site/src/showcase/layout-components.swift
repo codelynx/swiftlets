@@ -899,7 +899,7 @@ Container(maxWidth: .large, padding: 20) {
                     }
                     
                     Div {
-                        Link(href: "/showcase/semantic", "Semantic HTML")
+                        Link(href: "/showcase/semantic-html", "Semantic HTML")
                             .class("nav-button")
                         Link(href: "/showcase/modifiers", "Modifiers")
                             .class("nav-button nav-button-next")

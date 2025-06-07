@@ -40,7 +40,7 @@ Last Updated: June 2025
 - [x] CLI documentation
 - [x] Roadmap and vision
 
-## In Progress 🚧
+## Completed Features (Recent) ✅
 
 ### HTML Showcase
 - [x] Basic Elements showcase
@@ -50,8 +50,9 @@ Last Updated: June 2025
 - [x] Media showcase (images, picture, video, audio, iframe)
 - [x] Semantic HTML showcase (header, footer, nav, article, section, figure, details, progress, meter)
 - [x] Layout Components showcase (HStack, VStack, ZStack, Grid, Container, Spacer)
-- [ ] Tables showcase (blocked: Table elements not exported from framework)
-- [ ] Modifiers showcase
+- [x] Modifiers showcase (classes, styles, attributes, data attributes, chaining)
+
+## In Progress 🚧
 
 ### Automatic Compilation
 - [ ] Compile swiftlets on first request
@@ -107,11 +108,13 @@ Last Updated: June 2025
   - Added Media Elements showcase (Img, Picture, Video, Audio, IFrame)
   - Added Semantic HTML showcase (Header, Footer, Nav, Article, Section, Figure, Details, Progress, Meter)
   - Added Layout Components showcase (HStack, VStack, ZStack, Grid, Container, Spacer)
+  - Added Modifiers showcase (classes, styles, attributes, data attributes, ARIA, chaining)
   - Enhanced navigation with previous/next buttons
   - Fixed module name conflicts by renaming showcase files
   - Improved CSS styling for all showcases
   - Created complex dashboard layout example
   - Fixed Grid API usage with proper CSS grid syntax
+  - Demonstrated best practices for modifier usage and chaining
 
 ## Usage Statistics
 
