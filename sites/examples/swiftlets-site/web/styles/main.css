@@ -669,6 +669,69 @@ label.required::after {
     margin-top: 1rem;
 }
 
+/* Navigation Links */
+.navigation-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.nav-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.nav-button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    text-decoration: none;
+}
+
+.nav-button-next {
+    margin-left: auto;
+}
+
+/* Add arrow indicators */
+.nav-button::before {
+    content: "←";
+    margin-right: 0.5rem;
+}
+
+.nav-button-next::before {
+    content: "";
+}
+
+.nav-button-next::after {
+    content: "→";
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .navigation-links {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .nav-button,
+    .nav-button-next {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+    }
+}
+
 /* Fix for selects and textareas */
 select.form-control,
 textarea.form-control {

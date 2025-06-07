@@ -768,13 +768,12 @@ Form(action: "/contact", method: "POST") {
                             
                             // Navigation
                             Div {
-                                Link(href: "/showcase/tables", "← Tables")
+                                Link(href: "/showcase/tables", "Tables")
                                     .class("nav-button")
-                                Link(href: "/showcase/media", "Media →")
+                                Link(href: "/showcase/media", "Media")
                                     .class("nav-button nav-button-next")
                             }
                             .class("navigation-links")
-                            .style("margin-top", "3rem")
                         }
                         .class("content")
                     }

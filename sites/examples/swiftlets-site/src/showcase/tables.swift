@@ -795,13 +795,12 @@ Table {
                     
                     // Navigation
                     Div {
-                        Link(href: "/showcase/lists", "← Lists")
+                        Link(href: "/showcase/lists", "Lists")
                             .class("nav-button")
-                        Link(href: "/showcase/forms", "Forms →")
+                        Link(href: "/showcase/forms", "Forms")
                             .class("nav-button nav-button-next")
                     }
                     .class("navigation-links")
-                    .style("margin-top", "3rem")
                 }
                 .class("showcase-container")
             }

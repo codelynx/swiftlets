@@ -245,13 +245,12 @@ Div {
                             
                             // Navigation
                             Div {
-                                Link(href: "/showcase/text-formatting", "← Text Formatting")
+                                Link(href: "/showcase/text-formatting", "Text Formatting")
                                     .class("nav-button")
-                                Link(href: "/showcase/tables", "Tables →")
+                                Link(href: "/showcase/tables", "Tables")
                                     .class("nav-button nav-button-next")
                             }
                             .class("navigation-links")
-                            .style("margin-top", "3rem")
                         }
                         .class("content")
                     }

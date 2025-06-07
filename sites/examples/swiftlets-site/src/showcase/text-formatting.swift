@@ -483,13 +483,12 @@ P {
                     
                     // Navigation
                     Div {
-                        Link(href: "/showcase/basic-elements", "← Basic Elements")
+                        Link(href: "/showcase/basic-elements", "Basic Elements")
                             .class("nav-button")
-                        Link(href: "/showcase/lists", "Lists →")
+                        Link(href: "/showcase/lists", "Lists")
                             .class("nav-button nav-button-next")
                     }
                     .class("navigation-links")
-                    .style("margin-top", "3rem")
                 }
                 .class("showcase-container")
             }
