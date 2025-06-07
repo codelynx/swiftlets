@@ -102,7 +102,7 @@ See `TODO.md` for the current task list and priorities.
 - `/sites/test/` - Test sites for framework development
 - `/sites/templates/` - Third-party site templates
 
-Run with: `SWIFTLETS_SITE=sites/core/showcase .build/release/swiftlets-server`
+Run with: `.build/release/swiftlets-server sites/core/showcase`
 
 ## References
 - Ignite framework (in `/external/Ignite/`) - MIT Licensed static site generator by Paul Hudson

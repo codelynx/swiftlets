@@ -1,3 +1,4 @@
+import ArgumentParser
 import Foundation
 import NIO
 import NIOHTTP1
@@ -31,28 +32,42 @@ func detectArchitecture() -> String {
 
 // Configuration
 struct ServerConfig {
-    let webRoot: String
+    let siteRoot: String
     let host: String
     let port: Int
+    let debug: Bool
     
-    static func fromEnvironment() -> ServerConfig {
-        // Get web root from environment or use default
-        let webRoot: String
-        if let site = ProcessInfo.processInfo.environment["SWIFTLETS_SITE"] {
-            webRoot = "\(site)/web"
-        } else if let root = ProcessInfo.processInfo.environment["SWIFTLETS_WEB_ROOT"] {
-            webRoot = root
-        } else {
-            webRoot = "web"
-        }
+    // Computed properties
+    var webRoot: String {
+        "\(siteRoot)/web"
+    }
+    
+    var binRoot: String {
+        "\(siteRoot)/bin"
+    }
+    
+    static func resolve(siteRoot: String, cliHost: String?, cliPort: Int?, debug: Bool) -> ServerConfig {
+        // Host: CLI argument > environment variable > default
+        let host = cliHost 
+            ?? ProcessInfo.processInfo.environment["SWIFTLETS_HOST"] 
+            ?? "127.0.0.1"
+            
+        // Port: CLI argument > environment variable > default
+        let port = cliPort 
+            ?? Int(ProcessInfo.processInfo.environment["SWIFTLETS_PORT"] ?? "") 
+            ?? 8080
         
-        // Get host and port
-        let host = ProcessInfo.processInfo.environment["SWIFTLETS_HOST"] ?? "127.0.0.1"
-        let port = Int(ProcessInfo.processInfo.environment["SWIFTLETS_PORT"] ?? "8080") ?? 8080
-        
-        return ServerConfig(webRoot: webRoot, host: host, port: port)
+        return ServerConfig(
+            siteRoot: siteRoot,
+            host: host,
+            port: port,
+            debug: debug
+        )
     }
 }
+
+// Global debug flag - using nonisolated(unsafe) since it's only set once at startup
+nonisolated(unsafe) var globalDebugEnabled = false
 
 func log(_ level: LogLevel, _ message: String) {
     let timestamp = ISO8601DateFormatter().string(from: Date())
@@ -60,11 +75,10 @@ func log(_ level: LogLevel, _ message: String) {
     
     switch level {
     case .debug:
-        #if DEBUG
+        if !globalDebugEnabled {
+            return
+        }
         prefix = "[DEBUG]"
-        print("\(timestamp) \(prefix) \(message)")
-        #endif
-        return
     case .info:
         prefix = "[INFO]"
     case .warning:
@@ -196,11 +210,8 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         let webbinURL = URL(fileURLWithPath: webbinPath)
         let filename = webbinURL.lastPathComponent.replacingOccurrences(of: ".webbin", with: "")
         
-        // Get the site root (parent of web/)
-        let webRootURL = URL(fileURLWithPath: config.webRoot)
-        let siteRootURL = webRootURL.deletingLastPathComponent()
-        
         // Get relative path from web root
+        let webRootURL = URL(fileURLWithPath: config.webRoot)
         let webbinDirURL = webbinURL.deletingLastPathComponent()
         let relativePath: String
         if webbinDirURL.path == webRootURL.path {
@@ -215,9 +226,9 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         
         let executablePath: String
         if relativePath.isEmpty {
-            executablePath = "\(siteRootURL.path)/bin/\(filename)"
+            executablePath = "\(config.siteRoot)/bin/\(filename)"
         } else {
-            executablePath = "\(siteRootURL.path)/bin/\(relativePath)/\(filename)"
+            executablePath = "\(config.siteRoot)/bin/\(relativePath)/\(filename)"
         }
         
         log(.debug, "Derived executable path: \(executablePath)")
@@ -444,46 +455,84 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
     }
 }
 
-// Main server
-let config = ServerConfig.fromEnvironment()
-
-// Log configuration
-log(.info, "Server Configuration:")
-log(.info, "  Web Root: \(config.webRoot)")
-log(.info, "  Host: \(config.host)")
-log(.info, "  Port: \(config.port)")
-log(.info, "  Platform: \(detectPlatform())/\(detectArchitecture())")
-
-// Check if web root exists
-let fileManager = FileManager.default
-var isDirectory: ObjCBool = false
-if !fileManager.fileExists(atPath: config.webRoot, isDirectory: &isDirectory) || !isDirectory.boolValue {
-    log(.warning, "Web root directory not found: \(config.webRoot)")
-    log(.info, "Creating web root directory...")
-    try? fileManager.createDirectory(atPath: config.webRoot, withIntermediateDirectories: true)
-}
-
-let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-defer {
-    try! group.syncShutdownGracefully()
-}
-
-let bootstrap = ServerBootstrap(group: group)
-    .serverChannelOption(ChannelOptions.backlog, value: 256)
-    .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
-    .childChannelInitializer { channel in
-        channel.pipeline.configureHTTPServerPipeline().flatMap {
-            channel.pipeline.addHandler(SwiftletHTTPHandler(config: config))
+// Main command
+@main
+struct SwiftletsServer: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "swiftlets-server",
+        abstract: "Swiftlets web server with file-based routing",
+        version: "1.0.0"
+    )
+    
+    @Argument(help: "Site root directory containing web/ and bin/ subdirectories")
+    var siteRoot: String?
+    
+    @Option(name: [.short, .customLong("port")], help: "Port to listen on")
+    var port: Int?
+    
+    @Option(name: [.short, .customLong("host")], help: "Host address to bind to")
+    var host: String?
+    
+    @Flag(name: .long, help: "Enable debug logging")
+    var debug: Bool = false
+    
+    func run() throws {
+        // Enable debug logging if requested
+        globalDebugEnabled = debug
+        
+        // Determine site root
+        let sitePath = siteRoot ?? FileManager.default.currentDirectoryPath
+        
+        // Create configuration
+        let config = ServerConfig.resolve(
+            siteRoot: sitePath,
+            cliHost: host,
+            cliPort: port,
+            debug: debug
+        )
+        
+        // Log configuration
+        log(.info, "Server Configuration:")
+        log(.info, "  Site Root: \(config.siteRoot)")
+        log(.info, "  Web Root: \(config.webRoot)")
+        log(.info, "  Host: \(config.host)")
+        log(.info, "  Port: \(config.port)")
+        log(.info, "  Platform: \(detectPlatform())/\(detectArchitecture())")
+        
+        // Check if web root exists
+        let fileManager = FileManager.default
+        var isDirectory: ObjCBool = false
+        if !fileManager.fileExists(atPath: config.webRoot, isDirectory: &isDirectory) || !isDirectory.boolValue {
+            log(.warning, "Web root directory not found: \(config.webRoot)")
+            log(.info, "Creating web root directory...")
+            try? fileManager.createDirectory(atPath: config.webRoot, withIntermediateDirectories: true)
         }
+        
+        
+        // Start server
+        let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+        defer {
+            try! group.syncShutdownGracefully()
+        }
+        
+        let bootstrap = ServerBootstrap(group: group)
+            .serverChannelOption(ChannelOptions.backlog, value: 256)
+            .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+            .childChannelInitializer { channel in
+                channel.pipeline.configureHTTPServerPipeline().flatMap {
+                    channel.pipeline.addHandler(SwiftletHTTPHandler(config: config))
+                }
+            }
+            .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+            .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
+            .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
+        
+        log(.info, "Starting Swiftlets server on \(config.host):\(config.port)")
+        log(.info, "Visit http://\(config.host):\(config.port)/ to test")
+        
+        let channel = try bootstrap.bind(host: config.host, port: config.port).wait()
+        
+        // Wait for server to close
+        try channel.closeFuture.wait()
     }
-    .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
-    .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
-    .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
-
-log(.info, "Starting Swiftlets server on \(config.host):\(config.port)")
-log(.info, "Visit http://\(config.host):\(config.port)/ to test")
-
-let channel = try bootstrap.bind(host: config.host, port: config.port).wait()
-
-// Wait for server to close
-try channel.closeFuture.wait()
+}

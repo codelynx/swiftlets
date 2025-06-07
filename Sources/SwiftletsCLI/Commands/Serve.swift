@@ -21,6 +21,9 @@ struct Serve: ParsableCommand {
     @Flag(name: .long, help: "Suppress server output")
     var quiet: Bool = false
     
+    @Flag(name: .long, help: "Enable debug logging")
+    var debug: Bool = false
+    
     mutating func run() throws {
         // Determine site path
         let sitePath = path ?? FileManager.default.currentDirectoryPath
@@ -36,12 +39,6 @@ struct Serve: ParsableCommand {
         // Find server binary
         let serverPath = try findServerBinary()
         
-        // Set up environment
-        var environment = ProcessInfo.processInfo.environment
-        environment["SWIFTLETS_SITE"] = sitePath
-        environment["SWIFTLETS_HOST"] = host
-        environment["SWIFTLETS_PORT"] = String(port)
-        
         // Print startup message
         if !quiet {
             print("🚀 Starting Swiftlets server")
@@ -50,10 +47,14 @@ struct Serve: ParsableCommand {
             print("\nPress Ctrl+C to stop the server\n")
         }
         
-        // Run server
+        // Run server with CLI arguments
         let process = Process()
         process.executableURL = URL(fileURLWithPath: serverPath)
-        process.environment = environment
+        var arguments = [sitePath, "--port", String(port), "--host", host]
+        if debug {
+            arguments.append("--debug")
+        }
+        process.arguments = arguments
         
         // Forward output unless quiet
         if !quiet {

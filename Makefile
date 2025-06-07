@@ -112,8 +112,7 @@ build-release:
 run: build-server
 	@echo "$(YELLOW)Starting Swiftlets server...$(NC)"
 	@echo "$(GREEN)Site: $(SITE)$(NC)"
-	@export SWIFTLETS_SITE=$(SITE); \
-	$(BIN_DIR)/swiftlets-server
+	@$(BIN_DIR)/swiftlets-server $(SITE)
 
 # Pattern rule for running specific sites
 # Usage: make run-sites/examples/swiftlets-site
@@ -122,16 +121,14 @@ run-%: build-server
 	@SITE_PATH="$(subst run-,,$@)"; \
 	echo "$(YELLOW)Starting Swiftlets server...$(NC)"; \
 	echo "$(GREEN)Site: $$SITE_PATH$(NC)"; \
-	export SWIFTLETS_SITE="$$SITE_PATH"; \
-	$(BIN_DIR)/swiftlets-server
+	$(BIN_DIR)/swiftlets-server $$SITE_PATH
 
 # Run in development mode
 .PHONY: run-dev
 run-dev: build-server site
 	@echo "$(YELLOW)Starting server in development mode...$(NC)"
 	@echo "$(GREEN)Site: $(SITE)$(NC)"
-	@export SWIFTLETS_SITE=$(SITE); \
-	$(BIN_DIR)/swiftlets-server
+	@$(BIN_DIR)/swiftlets-server $(SITE) --debug
 
 # Build current site
 .PHONY: site

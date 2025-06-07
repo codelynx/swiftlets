@@ -94,6 +94,7 @@ swiftlets serve [path] [options]
 - `-h, --host <host>` - Host to bind to (default: 127.0.0.1)
 - `--release` - Use release build of server
 - `--quiet` - Suppress server output
+- `--debug` - Enable debug logging
 
 **Examples:**
 ```bash
@@ -108,6 +109,9 @@ swiftlets serve --port 3000
 
 # Bind to all interfaces
 swiftlets serve --host 0.0.0.0
+
+# Enable debug logging
+swiftlets serve --debug
 ```
 
 ### `swiftlets build`
@@ -161,13 +165,9 @@ my-project/
         └── about      # Executable from about.swift
 ```
 
-## Environment Integration
+## Server Integration
 
-The CLI automatically sets environment variables for the server:
-
-- `SWIFTLETS_SITE` - Site directory path
-- `SWIFTLETS_HOST` - Server host
-- `SWIFTLETS_PORT` - Server port
+The CLI automatically configures the server with the appropriate site root and options using command-line arguments.
 
 ## Platform Support
 
