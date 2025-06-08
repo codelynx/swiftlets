@@ -190,6 +190,12 @@ build_site() {
         echo -e "Swift files to process:"
         echo "$swift_files" | sed 's/^/  /'
     fi
+    
+    # Debug: Show if swift_files is empty
+    if [ -z "$swift_files" ]; then
+        echo -e "${RED}Error: No Swift files found in $SITE_ROOT/src${NC}"
+        exit 1
+    fi
     echo
     
     # Check for Components.swift
@@ -213,9 +219,14 @@ build_site() {
     local skipped=0
     local failed=0
     
-    # Use while read to handle files with spaces properly
+    # Convert newline-separated list to array
+    local files_array=()
     while IFS= read -r file; do
-        [ -z "$file" ] && continue
+        [ -n "$file" ] && files_array+=("$file")
+    done <<< "$swift_files"
+    
+    # Process each file
+    for file in "${files_array[@]}"; do
         # Skip Components.swift
         if [[ "$file" == *"Components.swift" ]]; then
             continue
@@ -336,7 +347,7 @@ build_site() {
             [ "$VERBOSE" = true ] && echo -e "  ${GREEN}✓${NC} Up to date: $relative"
             ((skipped++))
         fi
-    done <<< "$swift_files"
+    done
     
     # Cleanup
     rm -rf "$SITE_ROOT/.build/temp"
