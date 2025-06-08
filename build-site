@@ -217,17 +217,14 @@ build_site() {
     local skipped=0
     local failed=0
     
-    # Save current directory
-    local current_dir=$(pwd)
+    # Create temporary file for the file list
+    local tmpfile=$(mktemp)
+    find "$SITE_ROOT/src" -name "*.swift" -type f | sort > "$tmpfile"
     
-    # Change to source directory and use for loop with glob
-    cd "$SITE_ROOT/src"
-    
-    # Process all Swift files using shell globbing
-    shopt -s globstar nullglob
-    for file in **/*.swift; do
-        # Convert relative path to absolute
-        file="$SITE_ROOT/src/$file"
+    # Process each file from the temporary file
+    while IFS= read -r file; do
+        # Skip empty lines
+        [ -z "$file" ] && continue
         
         # Skip Components.swift
         if [[ "$file" == *"Components.swift" ]]; then
@@ -241,9 +238,17 @@ build_site() {
         local outdir=$(dirname "$output")
         local webbindir=$(dirname "$webbin")
         
-        # Create output directory
-        mkdir -p "$outdir" 2>/dev/null || true
-        mkdir -p "$webbindir" 2>/dev/null || true
+        # Create output directories (with better error handling)
+        if ! mkdir -p "$outdir" 2>/dev/null; then
+            echo -e "    ${RED}Failed to create directory: $outdir${NC}"
+            ((failed++))
+            continue
+        fi
+        if ! mkdir -p "$webbindir" 2>/dev/null; then
+            echo -e "    ${RED}Failed to create directory: $webbindir${NC}"
+            ((failed++))
+            continue
+        fi
         
         # Check if rebuild needed
         local need_build=0
@@ -354,11 +359,10 @@ build_site() {
             [ "$VERBOSE" = true ] && echo -e "  ${GREEN}✓${NC} Up to date: $relative"
             ((skipped++))
         fi
-    done
+    done < "$tmpfile"
     
-    # Restore directory
-    cd "$current_dir"
-    shopt -u globstar nullglob
+    # Clean up temp file
+    rm -f "$tmpfile"
     
     # Cleanup
     rm -rf "$SITE_ROOT/.build/temp"
