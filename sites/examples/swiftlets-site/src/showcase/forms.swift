@@ -9,7 +9,6 @@ struct FormsShowcase {
                 Head {
                     Title("Forms - Swiftlets Showcase")
                     LinkElement(rel: "stylesheet", href: "/styles/main.css")
-                    LinkElement(rel: "stylesheet", href: "/styles/prism.css")
                 }
                 Body {
                     // Navigation
@@ -779,7 +778,6 @@ Form(action: "/contact", method: "POST") {
                     }
                     .class("container")
                     
-                    Script(src: "/scripts/prism.js")
                 }
             }
         

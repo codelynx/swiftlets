@@ -9,7 +9,6 @@ struct ShowcaseListsPage {
                 Head {
                     Title("Lists - Swiftlets Showcase")
                     LinkElement(rel: "stylesheet", href: "/styles/main.css")
-                    LinkElement(rel: "stylesheet", href: "/styles/prism.css")
                 }
                 Body {
                     // Navigation
@@ -256,7 +255,6 @@ Div {
                     }
                     .class("container")
                     
-                    Script(src: "/scripts/prism.js")
                 }
             }
         

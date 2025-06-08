@@ -100,14 +100,14 @@ struct ShowcasePage {
                                 CategoryCard(
                                     title: "Semantic HTML",
                                     description: "Header, footer, nav, article, section, and more",
-                                    href: "/showcase/semantic",
+                                    href: "/showcase/semantic-html",
                                     icon: "🏗️"
                                 ).render()
                                 
                                 CategoryCard(
                                     title: "Layout Components",
                                     description: "HStack, VStack, Grid, Container, and spacing",
-                                    href: "/showcase/layout",
+                                    href: "/showcase/layout-components",
                                     icon: "📐"
                                 ).render()
                                 

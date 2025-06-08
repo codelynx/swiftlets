@@ -10,7 +10,6 @@ struct BasicElementsShowcase {
                 Head {
                     Title("Basic HTML Elements - Swiftlets Showcase")
                     LinkElement(rel: "stylesheet", href: "/styles/main.css")
-                    LinkElement(rel: "stylesheet", href: "/styles/prism.css")
                 }
                 Body {
                     // Navigation
@@ -292,7 +291,6 @@ Link(href: "/products") {
                     }
                     .class("showcase-container")
                     
-                    Script(src: "/scripts/prism.js")
                 }
             }
         
