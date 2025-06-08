@@ -1,0 +1,11 @@
+{
+    "siteName": "Resource Test Site",
+    "theme": {
+        "primaryColor": "#007bff",
+        "fontFamily": "Arial, sans-serif"
+    },
+    "features": {
+        "enableComments": true,
+        "enableSearch": false
+    }
+}

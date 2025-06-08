@@ -117,6 +117,7 @@ struct ShowcasePage {
                                     href: "/showcase/modifiers",
                                     icon: "🎨"
                                 ).render()
+                                
                             }
                         }
                         
