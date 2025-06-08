@@ -2,79 +2,75 @@
 
 ## Overview
 
-Swiftlets supports multiple sites within a single project. This document explains how to manage and run different sites from the project root.
+Swiftlets supports multiple sites within a single project. This document explains how to manage and run different sites using the build scripts.
 
-## Quick Start with `smake`
+## Quick Start with Build Scripts
 
-The `smake` wrapper provides the easiest way to work with sites:
+The project provides three main scripts for working with sites:
 
 ```bash
-# List all available sites
-./smake list
-
-# Run a site
-./smake run                                    # Run default site
-./smake run sites/examples/swiftlets-site      # Run specific site
-./smake run sites/tests/test-html              # Run test site
+# Build the server (one time)
+./build-server
 
 # Build a site
-./smake build                                  # Build default site
-./smake build sites/examples/swiftlets-site    # Build specific site
+./build-site sites/examples/swiftlets-site
 
-# Clean a site
-./smake clean sites/examples/swiftlets-site    # Clean site artifacts
+# Run a site
+./run-site sites/examples/swiftlets-site
 
-# Development mode
-./smake dev sites/examples/swiftlets-site      # Run in dev mode
+# Or combine build and run
+./run-site sites/examples/swiftlets-site --build
+
+# Clean site artifacts
+./build-site sites/examples/swiftlets-site --clean
+
+# Force rebuild
+./build-site sites/examples/swiftlets-site --force
 ```
 
-## Traditional Make Commands
+## Building Multiple Sites
 
-The underlying Makefile has been enhanced to support site selection:
+To build multiple sites, use shell commands:
 
 ```bash
-# Default site is sites/examples/swiftlets-site
-make run
-make site
-make run-dev
+# Build all example sites
+for site in sites/examples/*; do
+    [ -d "$site/src" ] && ./build-site "$site"
+done
 
-# Specify a different site
-make run SITE=sites/tests/test-html
-make site SITE=sites/tests/test-html
-make run-dev SITE=sites/examples/swiftlets-site
+# Build all test sites
+for site in sites/tests/*; do
+    [ -d "$site/src" ] && ./build-site "$site"
+done
 
 # List available sites
-make list-sites
-
-# Build all example sites
-make sites
-
-# Build all test sites  
-make test-sites
+find sites -name "src" -type d | while read src; do
+    echo "$(dirname "$src")"
+done
 ```
 
 ## Alternative Methods
 
 ### Method 1: Direct Server Execution
 ```bash
-# Build server first
-make build-server
+# Build server first (if not already built)
+./build-server
 
 # Run with specific site
-SWIFTLETS_SITE=sites/core/hello ./bin/darwin/arm64/swiftlets-server
+./bin/darwin/arm64/swiftlets-server sites/examples/swiftlets-site
 ```
 
 ### Method 2: From Site Directory
 ```bash
-# Navigate to site and use its Makefile
+# Navigate to site and build/run from there
 cd sites/examples/swiftlets-site
-make build
-make serve  # or make run
+../../../build-site .
+../../../run-site .
 ```
 
 ### Method 3: Using CLI Tool
 ```bash
-# Use swiftlets CLI
+# Use swiftlets CLI (if installed)
 swiftlets serve --site sites/examples/swiftlets-site
 ```
 
@@ -94,38 +90,46 @@ sites/
 
 ## What's New
 
-The site management system has been enhanced with:
+The site management system now uses dedicated scripts:
 
-1. **`smake` wrapper** - Simple command syntax without `SITE=` prefix
-2. **`make list-sites`** - Shows all available sites across categories
-3. **Default site configuration** - `SITE` variable in Makefile
-4. **Support for build.sh** - Test sites using shell scripts are recognized
-5. **Improved help** - `make help` shows site-specific commands
+1. **`build-site`** - Universal site builder (no Makefile needed)
+2. **`run-site`** - Cross-platform server launcher
+3. **No per-site Makefiles** - Sites just need `src/` and `web/` directories
+4. **Incremental builds** - Only rebuilds changed files
+5. **Platform detection** - Automatically uses correct binaries
 
 ## Best Practices
 
 1. **Development**: Work from the site directory for faster iteration
    ```bash
    cd sites/examples/my-site
-   make build && make run
+   ../../../build-site .
+   ../../../run-site . --debug
    ```
 
-2. **Testing Multiple Sites**: Use environment variables
+2. **Testing Multiple Sites**: Run on different ports
    ```bash
-   SWIFTLETS_SITE=sites/core/hello make run
+   ./run-site sites/core/hello --port 8080 &
+   ./run-site sites/core/showcase --port 8081 &
    ```
 
-3. **Production**: Use explicit paths
+3. **Production**: Use release build and explicit host
    ```bash
-   swiftlets serve --site /path/to/production/site
+   ./build-server --release
+   ./build-site /path/to/production/site --force
+   ./run-site /path/to/production/site --host 0.0.0.0
    ```
 
 ## Configuration Files
 
-Each site can have its own configuration:
-- `Makefile` - Build configuration
-- `Package.swift` (future) - Dependencies
-- `swiftlets.yml` (future) - Site settings
+Each site needs only:
+- `src/` - Swift source files
+- `web/` - Static files and generated `.webbin` markers
+- `bin/` - (Generated) Compiled executables
+
+Future configuration options:
+- `Package.swift` - Dependencies
+- `swiftlets.yml` - Site settings
 
 ## Environment Variables
 
@@ -137,7 +141,7 @@ Each site can have its own configuration:
 ## Troubleshooting
 
 ### "No route found" Errors
-- Ensure the site is built: `cd sites/your-site && make build`
+- Ensure the site is built: `./build-site sites/your-site`
 - Check webbin files exist: `ls sites/your-site/web/**/*.webbin`
 - Verify executable permissions: `ls -la sites/your-site/bin/`
 
@@ -147,6 +151,7 @@ Each site can have its own configuration:
 - Clear any cached environment variables
 
 ### Build Errors
-- Each site builds independently with its own Makefile
-- Check site-specific dependencies and imports
-- Ensure framework is built: `swift build` from project root
+- Check for Swift syntax errors in source files
+- Ensure Components.swift is valid if present
+- Use `--verbose` flag for detailed output: `./build-site sites/your-site --verbose`
+- Ensure framework source files exist in `Sources/Swiftlets/`
