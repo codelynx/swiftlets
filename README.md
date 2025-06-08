@@ -22,96 +22,161 @@ Swiftlets is a lightweight, Swift-based web framework that brings the simplicity
 - **♻️ Hot Reload** - Automatic compilation and reloading during development
 - **🌍 Cross-Platform** - Works on macOS (Intel/Apple Silicon) and Linux (x86_64/ARM64)
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
-### Try the Showcase Site First! 🎨
+Get up and running with Swiftlets in just a few minutes. This guide will walk you through installation, creating your first project, and understanding the basics.
 
-Before creating your own project, explore what Swiftlets can do:
+### 1. Clone and Build
+
+First, ensure you have Swift installed (5.7 or later), then clone the Swiftlets repository and build the server:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/swiftlets.git
+git clone https://github.com/codelynx/swiftlets.git
 cd swiftlets
 
-# Build and run the showcase site
-./build-site sites/examples/swiftlets-site
-./run-site sites/examples/swiftlets-site
+# Build the server (one time setup)
+./build-server
 ```
 
-Visit `http://localhost:8080` to see:
-- 📚 Interactive documentation
-- 🧩 Component showcases with live examples
-- 🎯 Best practices and patterns
-- 💡 Real-world code examples
+This builds the server binary and places it in the platform-specific directory (e.g., `bin/darwin/arm64/`).
 
-### Create Your Own Project
+### 2. Try the Showcase Site
 
-Once you've explored the showcase:
+Before creating your own project, let's explore what Swiftlets can do! The repository includes a complete example site with documentation and component showcases - all built with Swiftlets.
+
+Build and run the example site:
 
 ```bash
-# Build the server first
-./build-server
-
-# Create a new project
-swiftlets new my-awesome-app
-cd my-awesome-app
-
-# Build and run your site
-../build-site .
-../run-site .
-```
-
-### Running Existing Sites
-
-```bash
-# Build the server (one time)
-./build-server
-
-# Build and run any site
+# Build the site
 ./build-site sites/examples/swiftlets-site
+
+# Run the site
 ./run-site sites/examples/swiftlets-site
 
 # Or combine build and run
 ./run-site sites/examples/swiftlets-site --build
 ```
 
-## 📝 Your First Swiftlet
+Visit `http://localhost:8080` and explore:
+- **`/showcase`** - See all HTML components in action
+- **`/docs`** - Read documentation (also built with Swiftlets!)
+- **View source** - Check `sites/examples/swiftlets-site/src/` to see how it's built
+
+> 💡 **Tip**: The entire documentation site you're reading is built with Swiftlets! Check out the source code to see real-world examples.
+
+### 3. Understanding the Architecture
+
+Swiftlets uses a unique architecture where each route is a standalone executable:
+
+```
+sites/examples/swiftlets-site/
+├── src/              # Swift source files
+│   ├── index.swift   # Homepage route
+│   ├── about.swift   # About page route
+│   └── docs/
+│       └── index.swift  # Docs index route
+├── web/              # Static files + .webbin markers
+│   ├── styles/       # CSS files
+│   ├── *.webbin      # Route markers (generated)
+│   └── images/       # Static assets
+└── bin/              # Compiled executables (generated)
+    ├── index         # Executable for /
+    ├── about         # Executable for /about
+    └── docs/
+        └── index     # Executable for /docs
+```
+
+Key concepts:
+- **File-based routing:** Your file structure defines your routes
+- **Independent executables:** Each route compiles to its own binary
+- **No Makefiles needed:** The build-site script handles everything
+- **Hot reload ready:** Executables can be rebuilt without restarting the server
+
+### 4. Working with Sites
+
+The build scripts make it easy to work with any site:
+
+```bash
+# Build a site (incremental - only changed files)
+./build-site path/to/site
+
+# Force rebuild all files
+./build-site path/to/site --force
+
+# Clean build artifacts
+./build-site path/to/site --clean
+
+# Run a site
+./run-site path/to/site
+
+# Run with custom port
+./run-site path/to/site --port 3000
+
+# Build and run in one command
+./run-site path/to/site --build
+```
+
+> 💡 **Tip**: The scripts automatically detect your platform (macOS/Linux) and architecture (x86_64/arm64).
+
+### Next Steps
+
+- **[Component Showcase](/showcase)** - See all available components
+- **[Study the Source](https://github.com/codelynx/swiftlets/tree/main/sites/examples/swiftlets-site)** - Learn from real examples
+- **[HTML DSL Guide](/docs)** - Master the SwiftUI-like syntax
+
+## 📝 Create Your First Page
 
 Create a simple page using the Swiftlets HTML DSL:
 
 ```swift
 // src/index.swift
+import Foundation
 import Swiftlets
 
 @main
 struct HomePage {
-    static func main() {
+    static func main() async throws {
+        // Parse the request from stdin
+        let request = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
+        
         let html = Html {
             Head {
                 Title("Welcome to Swiftlets!")
-                Meta(.charset("UTF-8"))
-                Meta(.viewport("width=device-width, initial-scale=1.0"))
+                Meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
             }
             Body {
-                Container {
-                    H1("Hello, Swiftlets! 👋")
-                        .classes("text-center", "mt-5")
-                    
-                    Paragraph("Build modern web apps with Swift")
-                        .classes("lead", "text-muted")
-                    
-                    HStack(spacing: .medium) {
-                        Button("Get Started")
-                            .classes("btn", "btn-primary")
-                        Button("Learn More")
-                            .classes("btn", "btn-outline-secondary")
+                Container(maxWidth: .large) {
+                    VStack(spacing: 40) {
+                        H1("Hello, Swiftlets! 👋")
+                            .style("text-align", "center")
+                            .style("margin-top", "3rem")
+                        
+                        P("Build modern web apps with Swift")
+                            .style("font-size", "1.25rem")
+                            .style("text-align", "center")
+                            .style("color", "#6c757d")
+                        
+                        HStack(spacing: 20) {
+                            Link(href: "/docs/getting-started", "Get Started")
+                                .class("btn btn-primary")
+                            Link(href: "/showcase", "See Examples")
+                                .class("btn btn-outline-secondary")
+                        }
+                        .style("justify-content", "center")
                     }
-                    .classes("mt-4")
                 }
+                .style("padding", "3rem 0")
             }
         }
         
-        print(html.render())
+        let response = Response(
+            status: 200,
+            headers: ["Content-Type": "text/html; charset=utf-8"],
+            body: html.render()
+        )
+        
+        print(try JSONEncoder().encode(response).base64EncodedString())
     }
 }
 ```
@@ -120,53 +185,28 @@ Build and access your page:
 
 ```bash
 # From your project directory
-../build-site .
-../run-site .
+./build-site my-site
+./run-site my-site
+
 # Your page is now available at http://localhost:8080/
 ```
 
 ## 📂 Project Structure
 
 ```
-my-app/
+my-site/
 ├── src/                    # Swift source files
 │   ├── index.swift         # Home page (/)
 │   ├── about.swift         # About page (/about)
 │   └── api/
 │       └── users.swift     # API endpoint (/api/users)
 ├── web/                    # Public web root
-│   ├── *.webbin           # Compiled route files
+│   ├── *.webbin           # Route markers (generated)
 │   ├── styles/            # CSS files
 │   ├── scripts/           # JavaScript files
 │   └── images/            # Static assets
-├── bin/                    # Compiled executables
-└── Package.swift          # Swift package manifest
-```
-
-## 🛠 CLI Commands
-
-| Command | Description |
-|---------|-------------|
-| `swiftlets new <name>` | Create a new project |
-| `swiftlets init` | Initialize in current directory |
-| `swiftlets serve` | Start development server |
-| `swiftlets build` | Build all swiftlets |
-| `swiftlets build <target>` | Build specific swiftlet |
-
-### Examples
-
-```bash
-# Create project with template
-swiftlets new blog --template blog
-
-# Serve on different port
-swiftlets serve --port 3000
-
-# Production build
-swiftlets build --release
-
-# Clean and rebuild
-swiftlets build --clean
+├── bin/                    # Compiled executables (generated)
+└── Components.swift       # Shared components (optional)
 ```
 
 ## 🎯 Core Concepts
@@ -243,9 +283,11 @@ struct APIHandler {
 
 ### Cross-Platform Scripts
 
+All build scripts work identically on macOS and Linux. See [Ubuntu Scripting Issue](docs/ubuntu-scripting-issue.md) for platform-specific considerations.
+
 ```bash
 # Build for current platform
-./build.sh
+./build-server
 
 # Check Ubuntu prerequisites
 ./check-ubuntu-prerequisites.sh
@@ -334,6 +376,16 @@ See our [detailed roadmap](docs/roadmap.md) for more information.
 ## 📄 License
 
 Swiftlets is released under the MIT License. See [LICENSE](LICENSE) for details.
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+- **Only one file builds on Linux**: This is a known bash loop issue. See [Ubuntu Scripting Issue](docs/ubuntu-scripting-issue.md) for details.
+- **MD5 command not found**: The scripts automatically handle differences between macOS (md5) and Linux (md5sum).
+- **Build errors**: Use `--verbose` flag for detailed output: `./build-site sites/your-site --verbose`
+
+For more troubleshooting help, see the [documentation](docs/).
 
 ## 🙏 Acknowledgments
 

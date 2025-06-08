@@ -176,9 +176,6 @@ build_site() {
     echo -e "${YELLOW}Building site: $SITE_ROOT${NC}"
     echo -e "Platform: ${BLUE}$OS/$ARCH${NC}"
     
-    # Set error trap for debugging
-    trap 'echo -e "${RED}Error occurred at line $LINENO${NC}"' ERR
-    
     # Create directories
     mkdir -p "$SITE_ROOT/bin"
     mkdir -p "$SITE_ROOT/.build/temp"

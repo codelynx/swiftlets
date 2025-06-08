@@ -155,3 +155,7 @@ Future configuration options:
 - Ensure Components.swift is valid if present
 - Use `--verbose` flag for detailed output: `./build-site sites/your-site --verbose`
 - Ensure framework source files exist in `Sources/Swiftlets/`
+
+### Platform-Specific Issues
+- **Linux/Ubuntu**: If only one file builds, see [Ubuntu Scripting Issue](ubuntu-scripting-issue.md)
+- **MD5 differences**: Script handles md5/md5sum automatically across platforms
