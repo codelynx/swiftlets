@@ -55,9 +55,9 @@ struct GettingStartedPage {
                         
                         // Installation
                         Section {
-                            H2("1. Installation")
+                            H2("1. Clone and Build")
                             
-                            P("First, ensure you have Swift installed (5.7 or later), then clone the Swiftlets repository:")
+                            P("First, ensure you have Swift installed (5.7 or later), then clone the Swiftlets repository and build the server:")
                             
                             Pre {
                                 Code("""
@@ -65,13 +65,13 @@ struct GettingStartedPage {
                                 git clone https://github.com/codelynx/swiftlets.git
                                 cd swiftlets
                                 
-                                # Install the CLI
-                                ./install-cli.sh
+                                # Build the server (one time setup)
+                                ./build-server
                                 """)
                             }
                             .class("code-block")
                             
-                            P("The installer will build the CLI and add it to your PATH.")
+                            P("This builds the server binary and places it in the platform-specific directory (e.g., bin/darwin/arm64/).")
                         }
                         
                         // Try the Showcase
@@ -84,13 +84,14 @@ struct GettingStartedPage {
                             
                             Pre {
                                 Code("""
-                                # From the Swiftlets root directory
-                                ./smake build sites/examples/swiftlets-site
-                                ./smake run sites/examples/swiftlets-site
+                                # Build the site
+                                ./build-site sites/examples/swiftlets-site
                                 
-                                # Or using traditional make
-                                make build SITE=sites/examples/swiftlets-site
-                                make run SITE=sites/examples/swiftlets-site
+                                # Run the site
+                                ./run-site sites/examples/swiftlets-site
+                                
+                                # Or combine build and run
+                                ./run-site sites/examples/swiftlets-site --build
                                 """)
                             }
                             .class("code-block")
@@ -123,162 +124,90 @@ struct GettingStartedPage {
                             .style("margin", "1rem 0")
                         }
                         
-                        // Hello World
+                        // Understanding Swiftlets
                         Section {
-                            H2("3. Your First Swiftlet")
+                            H2("3. Understanding the Architecture")
                             
-                            P("Let's create a simple page using the Swiftlets HTML DSL. Replace the contents of src/index.swift:")
+                            P("Swiftlets uses a unique architecture where each route is a standalone executable:")
                             
                             Pre {
                                 Code("""
-                                import Foundation
-                                import Swiftlets
-                                
-                                @main
-                                struct HomePage {
-                                    static func main() async throws {
-                                        // Swiftlets passes request data via stdin
-                                        let request = try JSONDecoder().decode(Request.self, 
-                                            from: FileHandle.standardInput.readDataToEndOfFile())
-                                        
-                                        // Build your page using SwiftUI-like syntax
-                                        let html = Html {
-                                            Head {
-                                                Title("My First Swiftlets App")
-                                                Meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
-                                            }
-                                            Body {
-                                                Container {
-                                                    VStack(spacing: 30) {
-                                                        // Dynamic content based on time
-                                                        H1(greeting())
-                                                            .style("color", "#667eea")
-                                                        
-                                                        P("This page was built with Swift!")
-                                                            .style("font-size", "1.25rem")
-                                                        
-                                                        // Show request path
-                                                        P("You're visiting: \\(request.path)")
-                                                            .style("color", "#6c757d")
-                                                        
-                                                        HStack(spacing: 20) {
-                                                            Link(href: "/about") {
-                                                                Button("About")
-                                                                    .style("padding", "10px 20px")
-                                                            }
-                                                            Link(href: "/docs") {
-                                                                Button("Documentation")
-                                                                    .style("padding", "10px 20px")
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                .style("padding", "3rem 0")
-                                                .style("text-align", "center")
-                                            }
-                                        }
-                                        
-                                        // Send response back to server
-                                        let response = Response(
-                                            status: 200,
-                                            headers: ["Content-Type": "text/html; charset=utf-8"],
-                                            body: html.render()
-                                        )
-                                        
-                                        print(try JSONEncoder().encode(response).base64EncodedString())
-                                    }
-                                    
-                                    static func greeting() -> String {
-                                        let hour = Calendar.current.component(.hour, from: Date())
-                                        switch hour {
-                                        case 0..<12: return "Good morning! ☀️"
-                                        case 12..<17: return "Good afternoon! 🌤"
-                                        default: return "Good evening! 🌙"
-                                        }
-                                    }
-                                }
+                                sites/examples/swiftlets-site/
+                                ├── src/              # Swift source files
+                                │   ├── index.swift   # Homepage route
+                                │   ├── about.swift   # About page route
+                                │   └── docs/
+                                │       └── index.swift  # Docs index route
+                                ├── web/              # Static files + .webbin markers
+                                │   ├── styles/       # CSS files
+                                │   ├── *.webbin      # Route markers (generated)
+                                │   └── images/       # Static assets
+                                └── bin/              # Compiled executables (generated)
+                                    ├── index         # Executable for /
+                                    ├── about         # Executable for /about
+                                    └── docs/
+                                        └── index     # Executable for /docs
                                 """)
                             }
                             .class("code-block")
                             
-                            P("This example demonstrates:")
+                            P("Key concepts:")
                             UL {
-                                LI("SwiftUI-like declarative syntax with result builders")
-                                LI("Dynamic content generation (time-based greeting)")
-                                LI("Access to request data (showing the path)")
-                                LI("Navigation with Links and styled Buttons")
-                                LI("Type-safe HTML generation with proper escaping")
-                                LI("Familiar layout components (Container, VStack, HStack)")
+                                LI {
+                                    Strong("File-based routing:")
+                                    Text(" Your file structure defines your routes")
+                                }
+                                LI {
+                                    Strong("Independent executables:")
+                                    Text(" Each route compiles to its own binary")
+                                }
+                                LI {
+                                    Strong("No Makefiles needed:")
+                                    Text(" The build-site script handles everything")
+                                }
+                                LI {
+                                    Strong("Hot reload ready:")
+                                    Text(" Executables can be rebuilt without restarting the server")
+                                }
                             }
                         }
                         
-                        // Build and Run
+                        // Working with Sites
                         Section {
-                            H2("4. Build and Run")
+                            H2("4. Working with Sites")
                             
-                            P("First, build your swiftlet:")
-                            
-                            Pre {
-                                Code("""
-                                swiftlets build
-                                # or
-                                make build
-                                """)
-                            }
-                            .class("code-block")
-                            
-                            P("Then start the development server:")
+                            P("The build scripts make it easy to work with any site:")
                             
                             Pre {
                                 Code("""
-                                swiftlets serve
-                                # Server starts at http://localhost:8080
+                                # Build a site (incremental - only changed files)
+                                ./build-site path/to/site
+                                
+                                # Force rebuild all files
+                                ./build-site path/to/site --force
+                                
+                                # Clean build artifacts
+                                ./build-site path/to/site --clean
+                                
+                                # Run a site
+                                ./run-site path/to/site
+                                
+                                # Run with custom port
+                                ./run-site path/to/site --port 3000
+                                
+                                # Build and run in one command
+                                ./run-site path/to/site --build
                                 """)
                             }
                             .class("code-block")
-                            
-                            P("Visit http://localhost:8080 to see your app running!")
                             
                             Div {
-                                P("💡 Tip: The server will automatically route requests to your compiled swiftlets based on the URL path.")
+                                P("💡 Tip: The scripts automatically detect your platform (macOS/Linux) and architecture (x86_64/arm64).")
                             }
                             .style("background", "#f0f9ff")
                             .style("border-left", "4px solid #3b82f6")
                             .style("padding", "1rem")
                             .style("margin", "1rem 0")
-                        }
-                        
-                        // Create Your Own Project
-                        Section {
-                            H2("5. Create Your Own Project")
-                            
-                            P("After exploring the showcase, you're ready to create your own project!")
-                            
-                            Div {
-                                P("🚧 Note: The `swiftlets new` command is coming soon. For now, you can:")
-                                UL {
-                                    LI("Copy the `templates/blank` directory as a starting point")
-                                    LI("Or work directly in the cloned repository")
-                                    LI("Study the showcase source code for patterns")
-                                }
-                            }
-                            .style("background", "#fef3c7")
-                            .style("border-left", "4px solid #f59e0b")
-                            .style("padding", "1rem")
-                            .style("margin", "1rem 0")
-                            
-                            P("A basic Swiftlets project structure:")
-                            
-                            Pre {
-                                Code("""
-                                my-app/
-                                ├── Makefile          # Build commands
-                                ├── src/              # Your swiftlet source files
-                                │   └── index.swift   # Homepage
-                                └── web/              # Static files (CSS, images)
-                                """)
-                            }
-                            .class("code-block")
                         }
                         
                         // Next Steps
