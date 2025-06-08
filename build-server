@@ -1,0 +1,155 @@
+#!/bin/bash
+# build-server - Build Swiftlets server binary
+# Cross-platform script for macOS and Linux
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script configuration
+SCRIPT_NAME=$(basename "$0")
+SWIFTLETS_ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+# Platform detection
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
+# Normalize OS names
+case "$OS" in
+    darwin*) OS="darwin" ;;
+    linux*) OS="linux" ;;
+    *) echo -e "${RED}Unsupported OS: $OS${NC}"; exit 1 ;;
+esac
+
+# Normalize architecture names
+case "$ARCH" in
+    x86_64) ARCH="x86_64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+    *) echo -e "${RED}Unsupported architecture: $ARCH${NC}"; exit 1 ;;
+esac
+
+# Flags
+RELEASE=false
+CLEAN=false
+
+# Usage function
+usage() {
+    cat << EOF
+Usage: $SCRIPT_NAME [options]
+
+Build the Swiftlets server binary and install to bin/$OS/$ARCH/
+
+Options:
+  --release         Build in release mode (optimized)
+  --clean           Clean build artifacts before building
+  --help            Show this help message
+
+Examples:
+  $SCRIPT_NAME                    # Debug build
+  $SCRIPT_NAME --release          # Release build
+  $SCRIPT_NAME --clean --release  # Clean and rebuild in release mode
+
+Platform: $OS/$ARCH
+Output: bin/$OS/$ARCH/swiftlets-server
+EOF
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --release)
+            RELEASE=true
+            shift
+            ;;
+        --clean)
+            CLEAN=true
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+# Clean if requested
+if [ "$CLEAN" = true ]; then
+    echo -e "${YELLOW}Cleaning build artifacts...${NC}"
+    swift package clean
+    echo -e "${GREEN}✓ Clean complete${NC}"
+    echo
+fi
+
+# Determine build configuration
+if [ "$RELEASE" = true ]; then
+    BUILD_CONFIG="release"
+    BUILD_FLAGS="-c release"
+    echo -e "${YELLOW}Building server in release mode...${NC}"
+else
+    BUILD_CONFIG="debug"
+    BUILD_FLAGS=""
+    echo -e "${YELLOW}Building server in debug mode...${NC}"
+fi
+
+echo -e "Platform: ${BLUE}$OS/$ARCH${NC}"
+echo
+
+# Build the server
+if swift build --product swiftlets-server $BUILD_FLAGS; then
+    echo -e "${GREEN}✓ Build successful${NC}"
+    
+    # Show binary location
+    BINARY_PATH=".build/$BUILD_CONFIG/swiftlets-server"
+    BINARY_SIZE=$(ls -lh "$BINARY_PATH" | awk '{print $5}')
+    echo -e "Built: ${BLUE}$BINARY_PATH${NC} (${BINARY_SIZE})"
+    
+    # Always install to platform directory
+    echo
+    echo -e "${YELLOW}Installing server...${NC}"
+    
+    # Create platform directory
+    INSTALL_DIR="$SWIFTLETS_ROOT/bin/$OS/$ARCH"
+    mkdir -p "$INSTALL_DIR"
+    
+    # Copy binary
+    cp "$BINARY_PATH" "$INSTALL_DIR/"
+    chmod +x "$INSTALL_DIR/swiftlets-server"
+    
+    echo -e "${GREEN}✓ Installed to: $INSTALL_DIR/swiftlets-server${NC}"
+    
+    # Also build CLI if in debug mode
+    if [ "$RELEASE" = false ]; then
+        echo
+        echo -e "${YELLOW}Building CLI...${NC}"
+        if swift build --product swiftlets $BUILD_FLAGS; then
+            echo -e "${GREEN}✓ CLI build successful${NC}"
+            
+            cp ".build/$BUILD_CONFIG/swiftlets" "$INSTALL_DIR/"
+            chmod +x "$INSTALL_DIR/swiftlets"
+            echo -e "${GREEN}✓ CLI installed to: $INSTALL_DIR/swiftlets${NC}"
+        fi
+    fi
+    
+else
+    echo -e "${RED}✗ Build failed${NC}"
+    exit 1
+fi
+
+echo
+echo -e "${GREEN}Build complete!${NC}"
+
+# Show next steps
+echo
+echo "Next steps:"
+echo -e "  Run server: ${BLUE}./run-site <site-path>${NC}"
+echo -e "  Or directly: ${BLUE}$INSTALL_DIR/swiftlets-server <site-path>${NC}"

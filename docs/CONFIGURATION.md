@@ -20,19 +20,29 @@ swiftlets-server <site-root> [options]
 
 ## Usage Examples
 
-### Running a Site
+### Using the Scripts (Recommended)
 ```bash
-# Run the example site
-./swiftlets-server sites/examples/swiftlets-site
+# Build and run a site
+./build-site sites/examples/swiftlets-site
+./run-site sites/examples/swiftlets-site
 
 # Run on a different port
-./swiftlets-server sites/examples/swiftlets-site --port 3000
+./run-site sites/examples/swiftlets-site --port 3000
 
 # Listen on all interfaces
-./swiftlets-server sites/examples/swiftlets-site --host 0.0.0.0 --port 8080
+./run-site sites/examples/swiftlets-site --host 0.0.0.0 --port 8080
 
 # Enable debug logging
-./swiftlets-server sites/examples/swiftlets-site --debug
+./run-site sites/examples/swiftlets-site --debug
+```
+
+### Direct Server Usage
+```bash
+# Run the server directly
+./bin/darwin/arm64/swiftlets-server sites/examples/swiftlets-site
+
+# With options
+./bin/darwin/arm64/swiftlets-server sites/examples/swiftlets-site --port 3000 --debug
 ```
 
 ### Running from Current Directory
@@ -108,20 +118,20 @@ site-root/                 # <-- This is what you specify
 │   ├── *.webbin          # Route markers
 │   ├── styles/           # CSS files
 │   └── images/           # Static assets
-├── bin/                   # Compiled executables
-└── Makefile              # Build configuration
+└── bin/                   # Compiled executables
 ```
 
-## Using with Make
+## Using the Build Scripts
 
-The project Makefile has been updated to use CLI arguments:
+The project now uses dedicated scripts instead of Makefiles:
 
 ```bash
-# Run default site
-make run
+# Build and run a site
+./build-site sites/examples/swiftlets-site
+./run-site sites/examples/swiftlets-site
 
-# Run specific site
-make run SITE=sites/examples/swiftlets-site
+# Or combine build and run
+./run-site sites/examples/swiftlets-site --build
 ```
 
 ## Using with swiftlets CLI

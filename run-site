@@ -1,0 +1,218 @@
+#!/bin/bash
+# run-site - Launch Swiftlets server with a site
+# Cross-platform script for macOS and Linux
+
+set -e
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script configuration
+SCRIPT_NAME=$(basename "$0")
+SWIFTLETS_ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+# Platform detection
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
+# Normalize OS names
+case "$OS" in
+    darwin*) OS="darwin" ;;
+    linux*) OS="linux" ;;
+    *) echo -e "${RED}Unsupported OS: $OS${NC}"; exit 1 ;;
+esac
+
+# Normalize architecture names
+case "$ARCH" in
+    x86_64) ARCH="x86_64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+    *) echo -e "${RED}Unsupported architecture: $ARCH${NC}"; exit 1 ;;
+esac
+
+# Default values
+DEFAULT_HOST="127.0.0.1"
+DEFAULT_PORT="8080"
+
+# Usage function
+usage() {
+    cat << EOF
+Usage: $SCRIPT_NAME <site-root> [options]
+
+Launch Swiftlets server with the specified site
+
+Arguments:
+  site-root         Path to the site directory (containing web/ and bin/)
+
+Options:
+  --host <addr>     Host address to bind to (default: $DEFAULT_HOST)
+  --port <port>     Port to listen on (default: $DEFAULT_PORT)
+  --debug           Enable debug logging
+  --build           Build the site before running
+  --help            Show this help message
+
+Examples:
+  $SCRIPT_NAME sites/examples/swiftlets-site
+  $SCRIPT_NAME sites/examples/swiftlets-site --port 3000
+  $SCRIPT_NAME sites/examples/swiftlets-site --host 0.0.0.0 --port 8080
+  $SCRIPT_NAME sites/examples/swiftlets-site --build --debug
+
+Platform: $OS/$ARCH
+EOF
+}
+
+# Parse arguments
+SITE_ROOT=""
+HOST=""
+PORT=""
+DEBUG=""
+BUILD_FIRST=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --host)
+            HOST="$2"
+            shift 2
+            ;;
+        --port)
+            PORT="$2"
+            shift 2
+            ;;
+        --debug)
+            DEBUG="--debug"
+            shift
+            ;;
+        --build)
+            BUILD_FIRST=true
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo -e "${RED}Unknown option: $1${NC}"
+            usage
+            exit 1
+            ;;
+        *)
+            if [ -z "$SITE_ROOT" ]; then
+                SITE_ROOT="$1"
+            else
+                echo -e "${RED}Multiple site roots specified${NC}"
+                usage
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Validate site root
+if [ -z "$SITE_ROOT" ]; then
+    echo -e "${RED}Site root not specified${NC}"
+    usage
+    exit 1
+fi
+
+# Convert to absolute path
+SITE_ROOT=$(cd "$SITE_ROOT" 2>/dev/null && pwd || echo "$SITE_ROOT")
+
+# Check if site root exists
+if [ ! -d "$SITE_ROOT" ]; then
+    echo -e "${RED}Site root does not exist: $SITE_ROOT${NC}"
+    exit 1
+fi
+
+# Check for web directory
+if [ ! -d "$SITE_ROOT/web" ]; then
+    echo -e "${RED}No web/ directory found in: $SITE_ROOT${NC}"
+    echo -e "Create it with: mkdir -p $SITE_ROOT/web"
+    exit 1
+fi
+
+# Build site if requested
+if [ "$BUILD_FIRST" = true ]; then
+    echo -e "${YELLOW}Building site first...${NC}"
+    if [ -x "$SWIFTLETS_ROOT/build-site" ]; then
+        "$SWIFTLETS_ROOT/build-site" "$SITE_ROOT"
+        echo
+    else
+        echo -e "${RED}build-site script not found${NC}"
+        exit 1
+    fi
+fi
+
+# Find server binary
+SERVER_BINARY=""
+
+# Check platform-specific binary
+PLATFORM_BINARY="$SWIFTLETS_ROOT/bin/$OS/$ARCH/swiftlets-server"
+if [ -x "$PLATFORM_BINARY" ]; then
+    SERVER_BINARY="$PLATFORM_BINARY"
+fi
+
+# Check debug build
+if [ -z "$SERVER_BINARY" ] && [ -x "$SWIFTLETS_ROOT/.build/debug/swiftlets-server" ]; then
+    SERVER_BINARY="$SWIFTLETS_ROOT/.build/debug/swiftlets-server"
+fi
+
+# Check release build
+if [ -z "$SERVER_BINARY" ] && [ -x "$SWIFTLETS_ROOT/.build/release/swiftlets-server" ]; then
+    SERVER_BINARY="$SWIFTLETS_ROOT/.build/release/swiftlets-server"
+fi
+
+# If no binary found, try to build it
+if [ -z "$SERVER_BINARY" ]; then
+    echo -e "${YELLOW}Server binary not found. Building...${NC}"
+    echo -e "Run: ${BLUE}swift build --product swiftlets-server${NC}"
+    
+    (cd "$SWIFTLETS_ROOT" && swift build --product swiftlets-server)
+    
+    if [ -x "$SWIFTLETS_ROOT/.build/debug/swiftlets-server" ]; then
+        SERVER_BINARY="$SWIFTLETS_ROOT/.build/debug/swiftlets-server"
+    else
+        echo -e "${RED}Failed to build server${NC}"
+        exit 1
+    fi
+fi
+
+# Build command
+CMD="$SERVER_BINARY $SITE_ROOT"
+
+# Add host if specified
+if [ -n "$HOST" ]; then
+    CMD="$CMD --host $HOST"
+fi
+
+# Add port if specified
+if [ -n "$PORT" ]; then
+    CMD="$CMD --port $PORT"
+fi
+
+# Add debug flag
+if [ -n "$DEBUG" ]; then
+    CMD="$CMD $DEBUG"
+fi
+
+# Display startup info
+echo -e "${GREEN}Starting Swiftlets server${NC}"
+echo -e "Site: ${BLUE}$SITE_ROOT${NC}"
+echo -e "Server: ${BLUE}$SERVER_BINARY${NC}"
+echo -e "Host: ${BLUE}${HOST:-$DEFAULT_HOST}${NC}"
+echo -e "Port: ${BLUE}${PORT:-$DEFAULT_PORT}${NC}"
+
+if [ -n "$DEBUG" ]; then
+    echo -e "Debug: ${YELLOW}Enabled${NC}"
+fi
+
+echo
+echo -e "Visit ${GREEN}http://${HOST:-$DEFAULT_HOST}:${PORT:-$DEFAULT_PORT}/${NC} to view your site"
+echo -e "Press ${YELLOW}Ctrl+C${NC} to stop the server"
+echo
+
+# Run the server
+exec $CMD

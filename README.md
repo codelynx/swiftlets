@@ -34,8 +34,8 @@ git clone https://github.com/yourusername/swiftlets.git
 cd swiftlets
 
 # Build and run the showcase site
-./smake build sites/examples/swiftlets-site
-./smake run sites/examples/swiftlets-site
+./build-site sites/examples/swiftlets-site
+./run-site sites/examples/swiftlets-site
 ```
 
 Visit `http://localhost:8080` to see:
@@ -49,27 +49,30 @@ Visit `http://localhost:8080` to see:
 Once you've explored the showcase:
 
 ```bash
-# Install Swiftlets CLI
-./tools/install-cli.sh
+# Build the server first
+./build-server
 
 # Create a new project
 swiftlets new my-awesome-app
 cd my-awesome-app
 
-# Start developing
-swiftlets serve
+# Build and run your site
+../build-site .
+../run-site .
 ```
 
-### Alternative: Manual Setup
+### Running Existing Sites
 
 ```bash
-# Build the core framework
-make build
+# Build the server (one time)
+./build-server
 
-# Run with different sites
-./smake run                                    # Run default site
-./smake run sites/examples/swiftlets-site      # Run showcase site
-./smake list                                   # List all available sites
+# Build and run any site
+./build-site sites/examples/swiftlets-site
+./run-site sites/examples/swiftlets-site
+
+# Or combine build and run
+./run-site sites/examples/swiftlets-site --build
 ```
 
 ## 📝 Your First Swiftlet
@@ -116,7 +119,9 @@ struct HomePage {
 Build and access your page:
 
 ```bash
-swiftlets build
+# From your project directory
+../build-site .
+../run-site .
 # Your page is now available at http://localhost:8080/
 ```
 
