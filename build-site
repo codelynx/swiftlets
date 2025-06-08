@@ -176,6 +176,9 @@ build_site() {
     echo -e "${YELLOW}Building site: $SITE_ROOT${NC}"
     echo -e "Platform: ${BLUE}$OS/$ARCH${NC}"
     
+    # Set error trap for debugging
+    trap 'echo -e "${RED}Error occurred at line $LINENO${NC}"' ERR
+    
     # Create directories
     mkdir -p "$SITE_ROOT/bin"
     mkdir -p "$SITE_ROOT/.build/temp"
@@ -221,8 +224,19 @@ build_site() {
     local tmpfile=$(mktemp)
     find "$SITE_ROOT/src" -name "*.swift" -type f | sort > "$tmpfile"
     
+    # Debug: show temp file content
+    if [ "$VERBOSE" = true ]; then
+        echo -e "${YELLOW}Temp file: $tmpfile${NC}"
+        echo -e "${YELLOW}File count in temp: $(wc -l < "$tmpfile")${NC}"
+    fi
+    
     # Process each file from the temporary file
     while IFS= read -r file; do
+        # Debug each iteration
+        if [ "$VERBOSE" = true ]; then
+            echo -e "${YELLOW}Processing: $file${NC}"
+        fi
+        
         # Skip empty lines
         [ -z "$file" ] && continue
         
@@ -339,11 +353,12 @@ build_site() {
                     [ "$VERBOSE" = true ] && echo -e "    ${GREEN}✓ Created webbin${NC}: $webbin"
                 fi
                 
-                ((built++))
+                built=$((built + 1))
                 
-                # Debug: show progress
+                # Debug: show progress and continue status
                 if [ "$VERBOSE" = true ]; then
                     echo -e "    ${YELLOW}Progress: built=$built, skipped=$skipped, failed=$failed${NC}"
+                    echo -e "    ${YELLOW}Continuing to next file...${NC}"
                 fi
             else
                 echo -e "    ${RED}✗ Failed${NC}"
@@ -351,15 +366,26 @@ build_site() {
                     echo -e "    ${RED}Error output:${NC}"
                     echo "$build_output" | sed 's/^/        /'
                 fi
-                ((failed++))
-                rm -rf "$SITE_ROOT/.build/temp"
-                exit 1
+                failed=$((failed + 1))
+                # Don't exit on first failure, continue with other files
+                echo -e "    ${YELLOW}Continuing despite failure...${NC}"
             fi
         else
             [ "$VERBOSE" = true ] && echo -e "  ${GREEN}✓${NC} Up to date: $relative"
-            ((skipped++))
+            skipped=$((skipped + 1))
+        fi
+        
+        # Debug: show we finished this iteration
+        if [ "$VERBOSE" = true ]; then
+            echo -e "${YELLOW}Finished processing: $file${NC}"
+            echo
         fi
     done < "$tmpfile"
+    
+    # Debug: show loop completed
+    if [ "$VERBOSE" = true ]; then
+        echo -e "${YELLOW}Loop completed. Cleaning up...${NC}"
+    fi
     
     # Clean up temp file
     rm -f "$tmpfile"
