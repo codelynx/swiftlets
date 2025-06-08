@@ -217,8 +217,18 @@ build_site() {
     local skipped=0
     local failed=0
     
-    # Process files directly without subshell
-    while IFS= read -r file; do
+    # Save current directory
+    local current_dir=$(pwd)
+    
+    # Change to source directory and use for loop with glob
+    cd "$SITE_ROOT/src"
+    
+    # Process all Swift files using shell globbing
+    shopt -s globstar nullglob
+    for file in **/*.swift; do
+        # Convert relative path to absolute
+        file="$SITE_ROOT/src/$file"
+        
         # Skip Components.swift
         if [[ "$file" == *"Components.swift" ]]; then
             continue
@@ -325,6 +335,11 @@ build_site() {
                 fi
                 
                 ((built++))
+                
+                # Debug: show progress
+                if [ "$VERBOSE" = true ]; then
+                    echo -e "    ${YELLOW}Progress: built=$built, skipped=$skipped, failed=$failed${NC}"
+                fi
             else
                 echo -e "    ${RED}✗ Failed${NC}"
                 if [ -n "$build_output" ]; then
@@ -339,7 +354,11 @@ build_site() {
             [ "$VERBOSE" = true ] && echo -e "  ${GREEN}✓${NC} Up to date: $relative"
             ((skipped++))
         fi
-    done < <(find "$SITE_ROOT/src" -name "*.swift" -type f | sort)
+    done
+    
+    # Restore directory
+    cd "$current_dir"
+    shopt -u globstar nullglob
     
     # Cleanup
     rm -rf "$SITE_ROOT/.build/temp"
