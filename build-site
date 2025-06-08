@@ -283,12 +283,22 @@ build_site() {
                 echo -e "    ${YELLOW}$build_cmd${NC}"
             fi
             
-            if eval $build_cmd 2>&1; then
+            # Capture output and errors
+            local build_output
+            build_output=$(eval $build_cmd 2>&1)
+            local build_status=$?
+            
+            if [ $build_status -eq 0 ]; then
                 echo -e "    ${GREEN}✓ Success${NC}"
                 
                 # Generate MD5 and create webbin
                 if [ -f "$output" ]; then
-                    local md5=$(eval $MD5_CMD "$output")
+                    local md5
+                    if [[ "$OS" == "darwin" ]]; then
+                        md5=$(md5 -q "$output")
+                    else
+                        md5=$(md5sum "$output" | cut -d' ' -f1)
+                    fi
                     echo "$md5" > "$webbin"
                     [ "$VERBOSE" = true ] && echo -e "    ${GREEN}✓ Created webbin${NC}: $webbin"
                 fi
@@ -296,6 +306,10 @@ build_site() {
                 ((built++))
             else
                 echo -e "    ${RED}✗ Failed${NC}"
+                if [ -n "$build_output" ]; then
+                    echo -e "    ${RED}Error output:${NC}"
+                    echo "$build_output" | sed 's/^/        /'
+                fi
                 ((failed++))
                 rm -rf "$SITE_ROOT/.build/temp"
                 exit 1
