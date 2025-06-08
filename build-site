@@ -182,9 +182,14 @@ build_site() {
     
     # Find all Swift files
     local swift_files=$(find "$SITE_ROOT/src" -name "*.swift" -type f | sort)
-    local total_files=$(echo "$swift_files" | wc -l | tr -d ' ')
+    local total_files=$(echo "$swift_files" | grep -c "\.swift$" || echo "0")
     
     echo -e "Found ${BLUE}$total_files${NC} Swift files"
+    
+    if [ "$VERBOSE" = true ]; then
+        echo -e "Swift files to process:"
+        echo "$swift_files" | sed 's/^/  /'
+    fi
     echo
     
     # Check for Components.swift
@@ -208,7 +213,9 @@ build_site() {
     local skipped=0
     local failed=0
     
-    for file in $swift_files; do
+    # Use while read to handle files with spaces properly
+    while IFS= read -r file; do
+        [ -z "$file" ] && continue
         # Skip Components.swift
         if [[ "$file" == *"Components.swift" ]]; then
             continue
@@ -243,9 +250,20 @@ build_site() {
                 need_build=1
                 [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}🔧${NC} Components changed: $relative"
             else
-                # Check framework files
-                for framework_file in $framework_sources; do
-                    if [ -f "$framework_file" ] && [ "$framework_file" -nt "$output" ]; then
+                # Check framework files (only check first file of each directory for performance)
+                local framework_dirs=(
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/Core"
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Core"
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Elements"
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Helpers"
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Layout"
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Modifiers"
+                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Builders"
+                )
+                
+                for dir in "${framework_dirs[@]}"; do
+                    local newest_file=$(find "$dir" -name "*.swift" -type f -print0 2>/dev/null | xargs -0 ls -t 2>/dev/null | head -1)
+                    if [ -n "$newest_file" ] && [ -f "$newest_file" ] && [ "$newest_file" -nt "$output" ]; then
                         need_build=1
                         [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}📦${NC} Framework changed: $relative"
                         break
@@ -318,7 +336,7 @@ build_site() {
             [ "$VERBOSE" = true ] && echo -e "  ${GREEN}✓${NC} Up to date: $relative"
             ((skipped++))
         fi
-    done
+    done <<< "$swift_files"
     
     # Cleanup
     rm -rf "$SITE_ROOT/.build/temp"
