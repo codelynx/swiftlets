@@ -92,10 +92,42 @@ See `TODO.md` for the current task list and priorities.
   - Forms (all input types, validation)
   - Media elements (images, picture, video, audio, iframe)
 - **Single import**: Just `import Swiftlets` for all functionality
+- **Resources & Storage** (in development):
+  - SwiftletContext API for accessing resources (.res/) and storage (var/)
+  - Hierarchical resource lookup system
+  - See `/docs/resources-programming-guide.md` for detailed documentation
+  - Currently disabled in showcase due to build complexity issues
 
 ## Known Issues
 - Missing elements: Br, S, Dfn, Ruby, Wbr, ColGroup, Col, OptGroup
 - Naming conflicts: Files can't be named after framework modules (e.g., `lists.swift` conflicts with `Lists.swift`, `media.swift` conflicts with `Media.swift`)
+- **Expression complexity**: Complex HTML structures can cause "expression too complex" compiler errors or build hangs. See `/docs/troubleshooting-complex-expressions.md` for solutions.
+- **Build issues with certain swiftlets**:
+  - `resources-demo.swift` and `resources-storage.swift` have been temporarily disabled (renamed to `.bak`) due to compilation hangs
+  - These files demonstrate the new Resources & Storage APIs but exceed Swift's type-checking complexity limits
+  - The APIs themselves work correctly; only the showcase examples are affected
+
+## Troubleshooting
+
+### Build Hangs or "Expression Too Complex" Errors
+When building sites with complex HTML structures, you may encounter compilation hangs. The solution is to break down complex views into smaller functions:
+
+```swift
+// Use @HTMLBuilder functions that return `some HTML`
+@HTMLBuilder
+static func navigation() -> some HTML {
+    Nav { /* ... */ }
+}
+
+// Then use in main body
+Body {
+    navigation()
+    content()
+    footer()
+}
+```
+
+See `/docs/troubleshooting-complex-expressions.md` for detailed patterns and examples.
 
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)

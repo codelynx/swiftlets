@@ -104,7 +104,7 @@ struct DocsIndex {
                             .style("color", "inherit")
                             
                             // Components
-                            Link(href: "/docs/components") {
+                            Link(href: "/showcase") {
                                 Div {
                                     VStack(spacing: 15) {
                                         Text("🧩")

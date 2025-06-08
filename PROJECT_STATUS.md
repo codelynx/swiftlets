@@ -59,6 +59,15 @@ Last Updated: June 2025
 
 ## In Progress 🚧
 
+### Resources & Storage System
+- [x] SwiftletContext protocol design
+- [x] DefaultSwiftletContext implementation
+- [x] Resources (.res/) hierarchical lookup
+- [x] Storage (var/) directory management
+- [x] Integration with Request/Response
+- [ ] Complete testing and documentation
+- [ ] Fix showcase build complexity issues
+
 ### Automatic Compilation
 - [ ] Compile swiftlets on first request
 - [ ] File watching for changes
@@ -89,6 +98,10 @@ Last Updated: June 2025
    - `media.swift` conflicts with `Media.swift`  
    - `semantic.swift` conflicts with `Semantic.swift`
 8. **Routing Mismatches**: Showcase routes expect specific names (e.g., `/showcase/semantic` expects `semantic` binary)
+9. **Build Complexity Issues**: Some swiftlets with complex HTML structures cause compilation hangs
+   - `resources-demo.swift` and `resources-storage.swift` temporarily disabled (.bak files)
+   - Swift type-checker limitations with deeply nested result builders
+   - Workaround: break complex HTML into smaller functions (see troubleshooting guide)
 
 ## Platform Support Matrix
 

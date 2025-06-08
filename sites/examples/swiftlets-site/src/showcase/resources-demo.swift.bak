@@ -1,0 +1,217 @@
+import Foundation
+import Swiftlets
+
+@main
+struct ResourcesDemo {
+    static func main() async throws {
+        let request = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
+        _ = DefaultSwiftletContext(from: request.context!)
+        
+        let html = Html {
+            Head {
+                Title("Resources & Storage Demo - Swiftlets")
+                Meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
+                LinkElement(rel: "stylesheet", href: "/styles/main.css")
+            }
+            Body {
+                // Navigation
+                Nav {
+                    Container(maxWidth: .xl) {
+                        HStack {
+                            Link(href: "/") {
+                                H1("Swiftlets").style("margin", "0")
+                            }
+                            Spacer()
+                            HStack(spacing: 20) {
+                                Link(href: "/docs", "Documentation")
+                                Link(href: "/showcase", "Showcase").class("active")
+                                Link(href: "/about", "About")
+                                Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
+                                    .attribute("target", "_blank")
+                            }
+                        }
+                        .style("align-items", "center")
+                    }
+                }
+                .style("background", "#f8f9fa")
+                .style("padding", "1rem 0")
+                .style("border-bottom", "1px solid #dee2e6")
+                
+                // Content
+                Container(maxWidth: .large) {
+                    VStack(spacing: 40) {
+                        // Breadcrumb
+                        HStack(spacing: 10) {
+                            Link(href: "/showcase", "Showcase")
+                            Text("→")
+                            Text("Resources & Storage Demo")
+                        }
+                        .style("color", "#6c757d")
+                        
+                        H1("Resources & Storage Demo")
+                        
+                        // Demo Info
+                        Div {
+                            P {
+                                Strong("This demo shows:")
+                                UL {
+                                    LI("Reading configuration from resources (.res/)")
+                                    LI("Fallback to default config if resource not found")
+                                    LI("Uploading files to storage (var/)")
+                                    LI("Managing file metadata")
+                                    LI("Directory operations in storage")
+                                }
+                            }
+                        }
+                        .style("background", "#e7f3ff")
+                        .style("border", "1px solid #b3d9ff")
+                        .style("padding", "1rem")
+                        .style("border-radius", "4px")
+                        .style("margin-bottom", "2rem")
+                        
+                        // Resources Example
+                        Section {
+                            H2("📁 Resources Example")
+                            
+                            P("This page tries to load configuration from:")
+                            Code("showcase/.res/gallery-config.json")
+                            
+                            Div {
+                                P("If the config file exists, you'll see custom settings. Otherwise, default values are used.")
+                            }
+                            .style("background", "#fff3cd")
+                            .style("border", "1px solid #ffeeba")
+                            .style("padding", "1rem")
+                            .style("border-radius", "4px")
+                            
+                            Pre {
+                                Code("""
+                                // Code example:
+                                do {
+                                    let configData = try context.resources.read(named: "gallery-config.json")
+                                    config = try configData.json(as: GalleryConfig.self)
+                                } catch {
+                                    // Use default config
+                                    config = GalleryConfig(
+                                        title: "My Image Gallery",
+                                        maxImages: 10,
+                                        allowedFormats: ["jpg", "png", "gif"]
+                                    )
+                                }
+                                """)
+                            }
+                            .style("background", "#f8f9fa")
+                            .style("padding", "1rem")
+                            .style("border-radius", "4px")
+                        }
+                        
+                        // Storage Example
+                        Section {
+                            H2("💾 Storage Example")
+                            
+                            P("Storage allows reading and writing files in the var/ directory:")
+                            
+                            Pre {
+                                Code("""
+                                // Save data
+                                let data = try JSONEncoder().encode(myObject)
+                                try context.storage.write(data, to: "data/file.json")
+                                
+                                // Read data
+                                let savedData = try context.storage.read(from: "data/file.json")
+                                let object = try JSONDecoder().decode(MyType.self, from: savedData)
+                                
+                                // Check if file exists
+                                if context.storage.exists("data/file.json") {
+                                    // File exists
+                                }
+                                
+                                // Create directory
+                                try context.storage.createDirectory(at: "uploads")
+                                
+                                // List directory contents
+                                let files = try context.storage.contentsOfDirectory(at: "uploads")
+                                """)
+                            }
+                            .style("background", "#f8f9fa")
+                            .style("padding", "1rem")
+                            .style("border-radius", "4px")
+                            
+                            H3("Storage Structure")
+                            Pre {
+                                Code("""
+                                sites/my-site/
+                                └── var/
+                                    └── showcase/
+                                        └── resources-demo/
+                                            └── gallery/
+                                                ├── img_1234567890.jpg
+                                                ├── img_1234567890.jpg.meta
+                                                └── ...
+                                """)
+                            }
+                            .style("background", "#f8f9fa")
+                            .style("padding", "1rem")
+                            .style("border-radius", "4px")
+                        }
+                        
+                        // Note about actual implementation
+                        Div {
+                            P {
+                                Strong("Note:")
+                                Text(" This is a demonstration of the resources and storage API. ")
+                                Text("In a real application, you would implement actual file upload handling and display uploaded images.")
+                            }
+                        }
+                        .style("background", "#d4edda")
+                        .style("border", "1px solid #c3e6cb")
+                        .style("color", "#155724")
+                        .style("padding", "1rem")
+                        .style("border-radius", "4px")
+                        
+                        // Link to docs
+                        Div {
+                            P("Learn more:")
+                            Link(href: "/docs/concepts/resources-storage", "Read the Full Documentation →")
+                                .style("display", "inline-block")
+                                .style("padding", "0.75rem 1.5rem")
+                                .style("background", "#007bff")
+                                .style("color", "white")
+                                .style("text-decoration", "none")
+                                .style("border-radius", "4px")
+                        }
+                        .style("text-align", "center")
+                        .style("margin-top", "2rem")
+                    }
+                }
+                .style("padding", "3rem 0")
+                
+                // Footer
+                Footer {
+                    Container(maxWidth: .large) {
+                        HStack {
+                            P("© 2025 Swiftlets Project")
+                            Spacer()
+                            HStack(spacing: 20) {
+                                Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
+                                Link(href: "/docs", "Docs")
+                                Link(href: "/showcase", "Examples")
+                            }
+                        }
+                        .style("align-items", "center")
+                    }
+                }
+                .style("padding", "2rem 0")
+                .style("border-top", "1px solid #dee2e6")
+            }
+        }
+        
+        let response = Response(
+            status: 200,
+            headers: ["Content-Type": "text/html; charset=utf-8"],
+            body: html.render()
+        )
+        
+        print(try JSONEncoder().encode(response).base64EncodedString())
+    }
+}

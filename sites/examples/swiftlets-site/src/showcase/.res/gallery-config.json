@@ -1,0 +1,5 @@
+{
+    "title": "Swiftlets Image Gallery Demo",
+    "maxImages": 10,
+    "allowedFormats": ["jpg", "png", "gif", "webp"]
+}

@@ -287,6 +287,19 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         
         log(.debug, "Executing swiftlet: \(executablePath)")
         
+        // Build context information
+        let routePath = originalPath.replacingOccurrences(of: ".webbin", with: "")
+        let contextData = buildSwiftletContext(routePath: routePath)
+        
+        // Create var directory
+        let varPath = "\(config.siteRoot)/var\(routePath)"
+        do {
+            try fileManager.createDirectory(atPath: varPath, withIntermediateDirectories: true, attributes: nil)
+            log(.debug, "Created/verified var directory: \(varPath)")
+        } catch {
+            log(.error, "Failed to create var directory: \(error)")
+        }
+        
         // Prepare environment variables
         var environment = ProcessInfo.processInfo.environment
         environment["REQUEST_METHOD"] = request.method.rawValue
@@ -307,6 +320,7 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executablePath)
         process.environment = environment
+        process.currentDirectoryURL = URL(fileURLWithPath: varPath)
         
         // Setup pipes
         let outputPipe = Pipe()
@@ -317,12 +331,17 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         process.standardError = errorPipe
         process.standardInput = inputPipe
         
-        // Create Request JSON
+        // Create Request JSON with context
         var requestDict: [String: Any] = [
             "method": request.method.rawValue,
             "path": request.uri,
             "headers": headers,
-            "queryParameters": [:] // TODO: Parse query parameters
+            "queryParameters": [:], // TODO: Parse query parameters
+            "context": [
+                "routePath": contextData.routePath,
+                "resourcePaths": contextData.resourcePaths,
+                "storagePath": contextData.storagePath
+            ]
         ]
         
         if !body.isEmpty {
@@ -452,6 +471,31 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         context.write(wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
         
         context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: nil)
+    }
+    
+    private func buildSwiftletContext(routePath: String) -> (routePath: String, resourcePaths: [String], storagePath: String) {
+        // Build resource paths with hierarchical lookup
+        var resourcePaths: [String] = []
+        
+        // Start with the most specific path
+        let components = routePath.split(separator: "/").map(String.init)
+        
+        // Add paths from most specific to least specific
+        // For /blog/tutorial, we want:
+        // 1. src/blog/tutorial/.res/
+        // 2. src/blog/.res/
+        // 3. src/.res/
+        
+        for i in (0...components.count).reversed() {
+            let path = components.prefix(i).joined(separator: "/")
+            let resPath = "\(config.siteRoot)/src\(path.isEmpty ? "" : "/")\(path)/.res/"
+            resourcePaths.append(resPath)
+        }
+        
+        // Storage path is relative (working directory will be changed)
+        let storagePath = "."
+        
+        return (routePath: routePath, resourcePaths: resourcePaths, storagePath: storagePath)
     }
 }
 

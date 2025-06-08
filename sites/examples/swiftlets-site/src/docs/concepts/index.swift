@@ -129,6 +129,26 @@ struct ConceptsIndex {
                             }
                             .style("text-decoration", "none")
                             .style("color", "inherit")
+                            
+                            // Resources & Storage - temporarily disabled
+                            // Link(href: "/docs/concepts/resources-storage") {
+                            //     Div {
+                            //         VStack(spacing: 15) {
+                            //             Text("📁")
+                            //                 .style("font-size", "3rem")
+                            //             H3("Resources & Storage")
+                            //                 .style("margin", "0")
+                            //             P("Read configuration files and manage dynamic content with resources and storage.")
+                            //                 .style("color", "#6c757d")
+                            //                 .style("margin", "0")
+                            //         }
+                            //     }
+                            //     .class("doc-card")
+                            //     .style("padding", "2rem")
+                            //     .style("height", "100%")
+                            // }
+                            // .style("text-decoration", "none")
+                            // .style("color", "inherit")
                         }
                         
                         // Quick Overview
