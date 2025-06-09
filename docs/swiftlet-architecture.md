@@ -213,7 +213,7 @@ X-Custom-Header: value
 
 ## Swiftlet Implementation
 
-### Basic Swiftlet (index.swift)
+### Traditional Swiftlet (index.swift)
 ```swift
 import SwiftletCore
 
@@ -235,24 +235,76 @@ struct GetStartedIndex: Swiftlet {
 }
 ```
 
-### API Swiftlet (users/detail.swift)
+### SwiftUI-Style Swiftlet (NEW!)
 ```swift
-import SwiftletCore
+import Swiftlets
 
 @main
-struct UserDetail: Swiftlet {
-    func handle(_ request: Request) -> Response {
-        guard let userId = request.params["id"] else {
-            return Response(status: 400, body: "Missing user ID")
+struct GetStartedIndex: SwiftletMain {
+    @Query("name") var userName: String?
+    @Cookie("theme") var theme: String?
+    
+    var title = "Getting Started"
+    var meta = ["description": "Welcome to Swiftlets"]
+    
+    var body: some HTMLElement {
+        VStack {
+            H1("Welcome to Swiftlets, \(userName ?? "Friend")!")
+            P("Each page is a separate executable!")
+            
+            if let theme = theme {
+                P("Your preferred theme: \(theme)")
+            }
         }
-        
-        // Fetch user from database
-        let user = fetchUser(id: userId)
-        
-        return Response(json: user)
     }
 }
 ```
+
+### API Swiftlet with SwiftUI-Style
+```swift
+import Swiftlets
+
+@main
+struct UserDetail: SwiftletMain {
+    @Query("id") var userId: String?
+    @JSONBody<UserUpdate>() var updateData: UserUpdate?
+    @Environment(.storage) var storage: Storage
+    
+    var title = "User Detail"
+    
+    var body: ResponseBuilder {
+        guard let userId = userId else {
+            return ResponseWith {
+                P("Missing user ID")
+            }.status(400)
+        }
+        
+        if let update = updateData {
+            // Handle update
+            let updatedUser = updateUser(id: userId, data: update)
+            return ResponseWith {
+                Pre(try! JSONEncoder().encode(updatedUser).string())
+            }
+            .contentType("application/json")
+            .status(200)
+        } else {
+            // Fetch user
+            let user = fetchUser(id: userId)
+            return ResponseWith {
+                Pre(try! JSONEncoder().encode(user).string())
+            }
+            .contentType("application/json")
+        }
+    }
+}
+```
+
+### Property Wrappers Available
+- `@Query` - Access URL query parameters
+- `@FormValue` - Access form POST data
+- `@JSONBody` - Parse JSON request bodies
+- `@Cookie` - Read HTTP cookies
+- `@Environment` - Access context (request, storage, resources)
 
 ## Build System
 

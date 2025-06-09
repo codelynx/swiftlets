@@ -1,305 +1,245 @@
-import Foundation
 import Swiftlets
 
 @main
-struct BasicElementsShowcase {
-    static func main() async throws {
-        let request = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
-        
-        let html = Html {
-                Head {
-                    Title("Basic HTML Elements - Swiftlets Showcase")
-                    LinkElement(rel: "stylesheet", href: "/styles/main.css")
-                }
-                Body {
-                    // Navigation
-                    Div {
-                        Div {
-                            Link(href: "/", "Swiftlets")
-                                .class("nav-brand")
-                            Div {
-                                Link(href: "/docs", "Documentation")
-                                Link(href: "/showcase", "Showcase")
-                                    .class("active")
-                                Link(href: "/about", "About")
+struct BasicElementsShowcase: SwiftletMain {
+    var title = "Basic HTML Elements - Swiftlets Showcase"
+    var meta = ["description": "Examples of basic HTML elements in Swiftlets"]
+    
+    var body: some HTMLElement {
+        Div {
+            // Navigation
+            NavigationBar()
+            
+            // Header
+            Container(maxWidth: .large) {
+                VStack(spacing: 30) {
+                    H1("Basic HTML Elements")
+                        .style("margin-top", "2rem")
+                    
+                    P("Examples of fundamental HTML elements with their Swiftlets syntax")
+                        .style("font-size", "1.25rem")
+                        .style("color", "#6c757d")
+                    
+                    // Headings Section
+                    ShowcaseSection(title: "Headings") {
+                        VStack(spacing: 20) {
+                            ShowcaseExample(
+                                title: "All Heading Levels",
+                                code: """
+                                H1("Heading Level 1")
+                                H2("Heading Level 2")
+                                H3("Heading Level 3")
+                                H4("Heading Level 4")
+                                H5("Heading Level 5")
+                                H6("Heading Level 6")
+                                """
+                            ) {
+                                VStack(spacing: 10) {
+                                    H1("Heading Level 1")
+                                    H2("Heading Level 2")
+                                    H3("Heading Level 3")
+                                    H4("Heading Level 4")
+                                    H5("Heading Level 5")
+                                    H6("Heading Level 6")
+                                }
                             }
-                            .class("nav-links")
                         }
-                        .class("nav-content")
                     }
-                    .class("nav-container")
                     
-                    // Header
-                    Div {
-                        Div {
-                            H1("Basic HTML Elements")
-                            P("Examples of fundamental HTML elements in Swiftlets")
-                                .style("font-size", "1.25rem")
-                                .style("color", "#6c757d")
+                    // Paragraphs Section
+                    ShowcaseSection(title: "Paragraphs & Text") {
+                        VStack(spacing: 20) {
+                            ShowcaseExample(
+                                title: "Basic Paragraph",
+                                code: """
+                                P("This is a paragraph with some text content.")
+                                """
+                            ) {
+                                P("This is a paragraph with some text content.")
+                            }
+                            
+                            ShowcaseExample(
+                                title: "Multiple Paragraphs",
+                                code: """
+                                P("First paragraph with some introductory text.")
+                                P("Second paragraph that continues the narrative.")
+                                """
+                            ) {
+                                VStack(spacing: 10) {
+                                    P("First paragraph with some introductory text.")
+                                    P("Second paragraph that continues the narrative.")
+                                }
+                            }
                         }
-                        .class("showcase-container")
                     }
-                    .class("showcase-header")
                     
-                    // Main content
-                    Div {
-                        // Breadcrumb
-                        Div {
-                            Link(href: "/showcase", "← Back to Showcase")
-                                .style("color", "#007bff")
+                    // Links Section
+                    ShowcaseSection(title: "Links") {
+                        VStack(spacing: 20) {
+                            ShowcaseExample(
+                                title: "Basic Link",
+                                code: """
+                                Link(href: "https://example.com", "Visit Example")
+                                """
+                            ) {
+                                Link(href: "https://example.com", "Visit Example")
+                            }
+                            
+                            ShowcaseExample(
+                                title: "Link with Target",
+                                code: """
+                                Link(href: "https://github.com", "Open GitHub")
+                                    .attr("target", "_blank")
+                                """
+                            ) {
+                                Link(href: "https://github.com", "Open GitHub")
+                                    .attr("target", "_blank")
+                            }
                         }
-                        .style("margin-bottom", "2rem")
-                        
-                        // Headings Example
-                        CodeExample(
-                            title: "Headings (H1-H6)",
-                            swift: """
-H1("Main Heading")
-H2("Section Heading")
-H3("Subsection Heading")
-H4("Sub-subsection Heading")
-H5("Minor Heading")
-H6("Smallest Heading")
-""",
-                            html: """
-<h1>Main Heading</h1>
-<h2>Section Heading</h2>
-<h3>Subsection Heading</h3>
-<h4>Sub-subsection Heading</h4>
-<h5>Minor Heading</h5>
-<h6>Smallest Heading</h6>
-""",
-                            preview: {
-                                Fragment {
-                                    H1("Main Heading")
-                                    H2("Section Heading")
-                                    H3("Subsection Heading")
-                                    H4("Sub-subsection Heading")
-                                    H5("Minor Heading")
-                                    H6("Smallest Heading")
-                                }
-                            },
-                            description: "Headings are used to create a hierarchical structure in your content."
-                        ).render()
-                        
-                        // Paragraph Example
-                        CodeExample(
-                            title: "Paragraphs",
-                            swift: """
-P("This is a paragraph with regular text.")
-
-P {
-    Text("Paragraphs can also contain ")
-    Strong("bold text")
-    Text(", ")
-    Em("italic text")
-    Text(", and other inline elements.")
-}
-""",
-                            html: """
-<p>This is a paragraph with regular text.</p>
-
-<p>Paragraphs can also contain <strong>bold text</strong>, <em>italic text</em>, and other inline elements.</p>
-""",
-                            preview: {
-                                Fragment {
-                                    P("This is a paragraph with regular text.")
-                                    P {
-                                        Text("Paragraphs can also contain ")
-                                        Strong("bold text")
-                                        Text(", ")
-                                        Em("italic text")
-                                        Text(", and other inline elements.")
-                                    }
-                                }
-                            },
-                            description: "Paragraphs are the basic building blocks for text content."
-                        ).render()
-                        
-                        // Div Example
-                        CodeExample(
-                            title: "Div Containers",
-                            swift: """
-Div {
-    H3("Container Section")
-    P("Content inside a div container.")
-    Div {
-        P("Nested div with its own content.")
-    }
-    .class("nested-box")
-    .style("padding", "10px")
-    .style("border", "1px solid #ddd")
-}
-.class("container-box")
-.style("background-color", "#f5f5f5")
-.style("padding", "20px")
-""",
-                            html: """
-<div class="container-box" style="background-color: #f5f5f5; padding: 20px;">
-    <h3>Container Section</h3>
-    <p>Content inside a div container.</p>
-    <div class="nested-box" style="padding: 10px; border: 1px solid #ddd;">
-        <p>Nested div with its own content.</p>
-    </div>
-</div>
-""",
-                            preview: {
+                    }
+                    
+                    // Divs and Spans Section
+                    ShowcaseSection(title: "Containers") {
+                        VStack(spacing: 20) {
+                            ShowcaseExample(
+                                title: "Div Container",
+                                code: """
                                 Div {
-                                    H3("Container Section")
-                                    P("Content inside a div container.")
-                                    Div {
-                                        P("Nested div with its own content.")
-                                    }
-                                    .class("nested-box")
-                                    .style("padding", "10px")
-                                    .style("border", "1px solid #ddd")
+                                    H3("Inside a Div")
+                                    P("Content within a div container")
                                 }
-                                .class("container-box")
-                                .style("background-color", "#f5f5f5")
-                                .style("padding", "20px")
-                            },
-                            description: "Div elements are generic containers for grouping content."
-                        ).render()
-                        
-                        // Span Example
-                        CodeExample(
-                            title: "Inline Spans",
-                            swift: """
-P {
-    Text("This paragraph contains ")
-    Span("highlighted text")
-        .style("background-color", "yellow")
-    Text(" and ")
-    Span("colored text")
-        .style("color", "blue")
-        .style("font-weight", "bold")
-    Text(".")
-}
-""",
-                            html: """
-<p>This paragraph contains <span style="background-color: yellow;">highlighted text</span> and <span style="color: blue; font-weight: bold;">colored text</span>.</p>
-""",
-                            preview: {
+                                .style("padding", "1rem")
+                                .style("background", "#f8f9fa")
+                                """
+                            ) {
+                                Div {
+                                    H3("Inside a Div")
+                                    P("Content within a div container")
+                                }
+                                .style("padding", "1rem")
+                                .style("background", "#f8f9fa")
+                                .style("border-radius", "0.5rem")
+                            }
+                            
+                            ShowcaseExample(
+                                title: "Inline Span",
+                                code: """
                                 P {
-                                    Text("This paragraph contains ")
-                                    Span("highlighted text")
-                                        .style("background-color", "yellow")
-                                    Text(" and ")
-                                    Span("colored text")
-                                        .style("color", "blue")
+                                    Text("This is ")
+                                    Span("highlighted")
+                                        .style("color", "#007bff")
                                         .style("font-weight", "bold")
-                                    Text(".")
+                                    Text(" text.")
                                 }
-                            },
-                            description: "Span elements are inline containers for styling portions of text."
-                        ).render()
-                        
-                        // Links Example
-                        CodeExample(
-                            title: "Links",
-                            swift: """
-// Simple link
-Link(href: "https://swiftlets.dev", "Visit Swiftlets")
-
-// Link with attributes
-Link(href: "https://example.com", "Open in new tab")
-    .attribute("target", "_blank")
-    .attribute("rel", "noopener noreferrer")
-
-// Link with custom styling
-Link(href: "#", "Styled Link")
-    .class("btn btn-primary")
-    .style("text-decoration", "none")
-    .style("padding", "10px 20px")
-
-// Link containing multiple elements
-Link(href: "/products") {
-    Div {
-        H4("Product Card")
-        P("Click to view details")
-    }
-    .class("card-link")
-}
-""",
-                            html: """
-<!-- Simple link -->
-<a href="https://swiftlets.dev">Visit Swiftlets</a>
-
-<!-- Link with attributes -->
-<a href="https://example.com" target="_blank" rel="noopener noreferrer">Open in new tab</a>
-
-<!-- Link with custom styling -->
-<a href="#" class="btn btn-primary" style="text-decoration: none; padding: 10px 20px;">Styled Link</a>
-
-<!-- Link containing multiple elements -->
-<a href="/products">
-    <div class="card-link">
-        <h4>Product Card</h4>
-        <p>Click to view details</p>
-    </div>
-</a>
-""",
-                            preview: {
-                                Fragment {
-                                    Div {
-                                        Text("Simple link: ")
-                                        Link(href: "https://swiftlets.dev", "Visit Swiftlets")
-                                    }
-                                    Div {
-                                        Text("Link with attributes: ")
-                                        Link(href: "https://example.com", "Open in new tab")
-                                            .attribute("target", "_blank")
-                                            .attribute("rel", "noopener noreferrer")
-                                    }
-                                    Div {
-                                        Text("Styled link: ")
-                                        Link(href: "#", "Styled Link")
-                                            .class("btn btn-primary")
-                                            .style("text-decoration", "none")
-                                            .style("padding", "10px 20px")
-                                            .style("background", "#007bff")
-                                            .style("color", "white")
-                                            .style("border-radius", "4px")
-                                            .style("display", "inline-block")
-                                    }
-                                    Div {
-                                        Text("Link with content: ")
-                                        Link(href: "/products") {
-                                            Div {
-                                                H4("Product Card")
-                                                P("Click to view details")
-                                            }
-                                            .class("card-link")
-                                            .style("border", "1px solid #ddd")
-                                            .style("padding", "10px")
-                                            .style("border-radius", "4px")
-                                        }
-                                    }
+                                """
+                            ) {
+                                P {
+                                    Text("This is ")
+                                    Span("highlighted")
+                                        .style("color", "#007bff")
+                                        .style("font-weight", "bold")
+                                    Text(" text.")
                                 }
-                            },
-                            description: "Links connect pages and resources together."
-                        ).render()
-                        
-                        // Navigation
-                        Div {
-                            Link(href: "/showcase", "Showcase Index")
-                                .class("nav-button")
-                            Link(href: "/showcase/text-formatting", "Text Formatting")
-                                .class("nav-button nav-button-next")
+                            }
                         }
-                        .class("navigation-links")
                     }
-                    .class("showcase-container")
+                }
+                .style("padding-bottom", "4rem")
+            }
+        }
+    }
+}
+
+// Reusable Components
+struct NavigationBar: HTMLComponent {
+    var body: some HTMLElement {
+        Div {
+            Div {
+                Link(href: "/", "Swiftlets")
+                    .class("nav-brand")
+                Div {
+                    Link(href: "/docs", "Documentation")
+                    Link(href: "/showcase", "Showcase")
+                        .class("active")
+                    Link(href: "/about", "About")
+                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        .attribute("target", "_blank")
+                }
+                .class("nav-links")
+            }
+            .class("nav-content")
+        }
+        .class("nav-container")
+    }
+}
+
+struct ShowcaseSection<Content: HTMLElement>: HTMLComponent {
+    let title: String
+    let content: Content
+    
+    init(title: String, @HTMLBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+    
+    var body: some HTMLElement {
+        Section {
+            VStack(spacing: 20) {
+                H2(title)
+                    .style("margin-top", "3rem")
+                content
+            }
+        }
+    }
+}
+
+struct ShowcaseExample<DemoContent: HTMLElement>: HTMLComponent {
+    let title: String
+    let code: String
+    let demo: DemoContent
+    
+    init(title: String, code: String, @HTMLBuilder demo: () -> DemoContent) {
+        self.title = title
+        self.code = code
+        self.demo = demo()
+    }
+    
+    var body: some HTMLElement {
+        Div {
+            VStack(spacing: 15) {
+                H4(title)
+                
+                Grid(columns: .count(2), spacing: 20) {
+                    Div {
+                        H5("Code")
+                            .style("margin-bottom", "0.5rem")
+                            .style("color", "#6c757d")
+                        Pre {
+                            Code(code)
+                        }
+                        .class("language-swift")
+                        .style("margin", "0")
+                    }
                     
+                    Div {
+                        H5("Result")
+                            .style("margin-bottom", "0.5rem")
+                            .style("color", "#6c757d")
+                        Div {
+                            demo
+                        }
+                        .style("padding", "1rem")
+                        .style("background", "#f8f9fa")
+                        .style("border", "1px solid #dee2e6")
+                        .style("border-radius", "0.375rem")
+                    }
                 }
             }
-        
-        let response = Response(
-            status: 200,
-            headers: ["Content-Type": "text/html; charset=utf-8"],
-            body: html.render()
-        )
-        
-        print(try JSONEncoder().encode(response).base64EncodedString())
+        }
+        .style("padding", "1.5rem")
+        .style("background", "white")
+        .style("border", "1px solid #e2e8f0")
+        .style("border-radius", "0.5rem")
+        .style("margin-bottom", "1rem")
     }
 }

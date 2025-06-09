@@ -17,6 +17,7 @@ Swiftlets is a lightweight, Swift-based web framework that brings the simplicity
 
 - **🗂 File-Based Routing** - Your file structure defines your routes (`.webbin` files)
 - **🏗 Declarative HTML DSL** - SwiftUI-like syntax for type-safe HTML generation
+- **🎯 SwiftUI-Style API** - Property wrappers (`@Query`, `@Cookie`, `@Environment`) for easy data access
 - **🔧 Zero Configuration** - No complex routing tables or configuration files
 - **🔒 Security First** - Source files stay outside the web root, MD5 integrity checks
 - **♻️ Hot Reload** - Automatic compilation and reloading during development
@@ -127,6 +128,8 @@ The build scripts make it easy to work with any site:
 
 ## 📝 Create Your First Page
 
+### Traditional Approach
+
 Create a simple page using the Swiftlets HTML DSL:
 
 ```swift
@@ -177,6 +180,48 @@ struct HomePage {
         )
         
         print(try JSONEncoder().encode(response).base64EncodedString())
+    }
+}
+```
+
+### SwiftUI-Style Approach (NEW!)
+
+Or use the new SwiftUI-inspired API with property wrappers:
+
+```swift
+// src/index.swift
+import Swiftlets
+
+@main
+struct HomePage: SwiftletMain {
+    @Query("name") var userName: String?
+    @Cookie("theme") var theme: String?
+    
+    var title = "Welcome to Swiftlets!"
+    var meta = ["viewport": "width=device-width, initial-scale=1.0"]
+    
+    var body: some HTMLElement {
+        Container(maxWidth: .large) {
+            VStack(spacing: 40) {
+                H1("Hello, \(userName ?? "Swiftlets")! 👋")
+                    .style("text-align", "center")
+                    .style("margin-top", "3rem")
+                
+                P("Build modern web apps with Swift")
+                    .style("font-size", "1.25rem")
+                    .style("text-align", "center")
+                    .style("color", theme == "dark" ? "#adb5bd" : "#6c757d")
+                
+                HStack(spacing: 20) {
+                    Link(href: "/docs/getting-started", "Get Started")
+                        .class("btn btn-primary")
+                    Link(href: "/showcase", "See Examples")
+                        .class("btn btn-outline-secondary")
+                }
+                .style("justify-content", "center")
+            }
+        }
+        .style("padding", "3rem 0")
     }
 }
 ```
@@ -244,28 +289,73 @@ VStack(alignment: .center, spacing: .large) {
 
 ### Request/Response Handling
 
-Handle dynamic requests with ease:
+Handle dynamic requests with ease using property wrappers:
 
 ```swift
 import Swiftlets
 
 @main
-struct APIHandler {
-    static func main() {
-        let request = Request.parse()
-        
-        let users = [
-            ["id": 1, "name": "Alice"],
-            ["id": 2, "name": "Bob"]
-        ]
-        
-        let response = Response(
-            statusCode: 200,
-            headers: ["Content-Type": "application/json"],
-            body: users
+struct APIHandler: SwiftletMain {
+    @Query("limit", default: "10") var limit: String?
+    @Query("offset", default: "0") var offset: String?
+    @JSONBody<UserFilter>() var filter: UserFilter?
+    
+    var title = "User API"
+    
+    var body: ResponseBuilder {
+        let users = fetchUsers(
+            limit: Int(limit ?? "10") ?? 10,
+            offset: Int(offset ?? "0") ?? 0,
+            filter: filter
         )
         
-        response.send()
+        return ResponseWith {
+            Pre(try! JSONEncoder().encode(users).string())
+        }
+        .contentType("application/json")
+        .header("X-Total-Count", value: "\(users.count)")
+    }
+}
+```
+
+Or handle cookies and form data:
+
+```swift
+@main
+struct LoginHandler: SwiftletMain {
+    @FormValue("username") var username: String?
+    @FormValue("password") var password: String?
+    @Cookie("session") var existingSession: String?
+    
+    var title = "Login"
+    
+    var body: ResponseBuilder {
+        // Check existing session
+        if let session = existingSession, validateSession(session) {
+            return ResponseWith {
+                Div { H1("Already logged in!") }
+            }
+        }
+        
+        // Handle login
+        if let user = username, let pass = password {
+            if authenticate(user, pass) {
+                let sessionId = createSession(for: user)
+                return ResponseWith {
+                    Div { H1("Welcome, \(user)!") }
+                }
+                .cookie("session", value: sessionId, httpOnly: true)
+            }
+        }
+        
+        // Show login form
+        return ResponseWith {
+            Form(action: "/login", method: "POST") {
+                Input(type: "text", name: "username", placeholder: "Username")
+                Input(type: "password", name: "password", placeholder: "Password")
+                Button("Login", type: "submit")
+            }
+        }
     }
 }
 ```
@@ -300,11 +390,18 @@ All build scripts work identically on macOS and Linux. See [Ubuntu Scripting Iss
 
 Visit the [showcase site](http://localhost:8080/docs) for interactive documentation, or explore these references:
 
+### Core Documentation
 - [**CLI Reference**](docs/CLI.md) - Complete CLI documentation
 - [**Routing Guide**](docs/ROUTING.md) - Advanced routing patterns
-- [**HTML DSL Reference**](docs/html-elements-reference.md) - All HTML components
 - [**Configuration**](docs/CONFIGURATION.md) - Server configuration
 - [**Architecture**](docs/swiftlet-architecture.md) - How Swiftlets works
+
+### SwiftUI-Style API (NEW!)
+- [**SwiftUI API Implementation**](docs/SWIFTUI-API-IMPLEMENTATION.md) - Complete guide with examples
+- [**SwiftUI API Reference**](docs/SWIFTUI-API-REFERENCE.md) - All property wrappers and protocols
+
+### HTML DSL
+- [**HTML DSL Reference**](docs/html-elements-reference.md) - All HTML components
 - [**SDK Distribution**](docs/sdk-distribution-plan.md) - Future SDK packaging plans
 
 ## 🧪 Examples & Showcase

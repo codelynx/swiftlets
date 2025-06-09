@@ -1,6 +1,6 @@
 # Swiftlets Project Status
 
-Last Updated: June 2025
+Last Updated: June 8, 2025
 
 ## Completed Features ✅
 
@@ -20,7 +20,13 @@ Last Updated: June 2025
 - [x] Comprehensive test coverage
 
 ### Developer Experience
-- [x] **CLI Tool** (NEW)
+- [x] **SwiftUI-Style API** (NEW!)
+  - `@main` attribute for entry point
+  - Property wrappers: `@Query`, `@FormValue`, `@JSONBody`, `@Cookie`, `@Environment`
+  - Automatic JSON request/response handling
+  - ~90% reduction in boilerplate code
+  - Full backward compatibility with traditional API
+- [x] **CLI Tool**
   - `swiftlets new` - Create projects from templates
   - `swiftlets init` - Initialize in existing directory
   - `swiftlets serve` - Development server with configuration
@@ -88,20 +94,24 @@ Last Updated: June 2025
 ## Known Issues 🐛
 
 1. ~Server must run from directory containing `web/` folder~ ✅ Fixed with configurable web root
-2. Query parameters not parsed from URLs
+2. ~Query parameters not parsed from URLs~ ✅ Fixed with @Query property wrapper
 3. No hot reload for development
 4. Basic error pages (no custom 404/500)
 5. **Table Elements Not Exported**: `Table`, `THead`, `TBody`, `TFoot`, `TR`, `TH`, `TD`, `Caption` defined but not accessible
 6. **Missing HTML Elements**: `ColGroup`, `Col`, `OptGroup`, `Br`, `S`, `Wbr` are not implemented
-7. **Module Name Conflicts**: Files named after framework modules cause compilation errors
+7. **Missing UI Components**: Referenced but not implemented:
+   - `Container` component (use Div with max-width styling)
+   - `Grid`, `Row`, `Column` components (use Div with CSS grid)
+   - `Card` component (use Div with styling)
+8. **Module Name Conflicts**: Files named after framework modules cause compilation errors
    - `lists.swift` conflicts with `Lists.swift`
    - `media.swift` conflicts with `Media.swift`  
    - `semantic.swift` conflicts with `Semantic.swift`
-8. **Routing Mismatches**: Showcase routes expect specific names (e.g., `/showcase/semantic` expects `semantic` binary)
-9. **Build Complexity Issues**: Some swiftlets with complex HTML structures cause compilation hangs
-   - `resources-demo.swift` and `resources-storage.swift` temporarily disabled (.bak files)
-   - Swift type-checker limitations with deeply nested result builders
-   - Workaround: break complex HTML into smaller functions (see troubleshooting guide)
+9. **Routing Mismatches**: Showcase routes expect specific names (e.g., `/showcase/semantic` expects `semantic` binary)
+10. **Build Complexity Issues**: Some swiftlets with complex HTML structures cause compilation hangs
+    - Swift type-checker limitations with deeply nested result builders
+    - Workaround: break complex HTML into smaller functions (see `/docs/BUILD-TROUBLESHOOTING.md`)
+    - Function decomposition pattern documented in `/docs/troubleshooting-complex-expressions.md`
 
 ## Platform Support Matrix
 
@@ -114,7 +124,25 @@ Last Updated: June 2025
 
 ## Recent Changes
 
-### June 2025
+### June 8, 2025
+- **Implemented SwiftUI-Style API**:
+  - Created `SwiftletMain` protocol with `@main` support
+  - Added property wrappers: `@Query`, `@FormValue`, `@JSONBody`, `@Cookie`, `@Environment`
+  - Automatic JSON request/response handling
+  - Task Local Storage for thread-safe context access
+  - Converted entire showcase site to new API
+  - Created comprehensive documentation suite
+  - Added migration guide and troubleshooting documentation
+- **Fixed Compilation Performance Issues**:
+  - Identified Swift compiler limitations with complex nested HTML
+  - Implemented function decomposition pattern
+  - Created troubleshooting guide for build issues
+  - Documented workarounds for "expression too complex" errors
+- **Identified Missing Components**:
+  - Container, Grid, Row, Column, Card components referenced but not implemented
+  - Documented workarounds using basic HTML elements
+
+### June 2025 (Earlier)
 - Added CLI tool with project management commands
 - Implemented configurable web root support
 - Fixed Ubuntu ARM64 compilation issues

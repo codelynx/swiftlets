@@ -1,52 +1,47 @@
-import Foundation
+import Swiftlets
 
 @main
-struct ShowcaseListsPage {
-    static func main() async throws {
-        let request = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
-        
-        let html = Html {
-                Head {
-                    Title("Lists - Swiftlets Showcase")
-                    LinkElement(rel: "stylesheet", href: "/styles/main.css")
+struct ShowcaseListsPage: SwiftletMain {
+    var title = "Lists - Swiftlets Showcase"
+    
+    var body: some HTMLElement {
+        Fragment {
+            // Navigation
+            Div {
+            Div {
+                Link(href: "/", "Swiftlets")
+                    .class("nav-brand")
+                Div {
+                    Link(href: "/docs", "Documentation")
+                    Link(href: "/showcase", "Showcase")
+                        .class("active")
+                    Link(href: "/about", "About")
                 }
-                Body {
-                    // Navigation
-                    Div {
-                        Div {
-                            Link(href: "/", "Swiftlets")
-                                .class("nav-brand")
-                            Div {
-                                Link(href: "/docs", "Documentation")
-                                Link(href: "/showcase", "Showcase")
-                                    .class("active")
-                                Link(href: "/about", "About")
-                            }
-                            .class("nav-links")
-                        }
-                        .class("nav-content")
-                    }
-                    .class("navbar")
-                    
-                    // Content
-                    Div {
-                        Div {
-                            // Breadcrumb
-                            Div {
-                                Link(href: "/showcase", "Showcase")
-                                Text(" → ")
-                                Text("Lists")
-                            }
-                            .class("breadcrumb")
-                            
-                            H1("Lists")
-                            P("Examples of HTML list elements including unordered lists, ordered lists, and definition lists.")
-                            
-                            
-                            // Example 1: Unordered List
-                            CodeExample(
-                                title: "Unordered List",
-                                swift: """
+                .class("nav-links")
+            }
+            .class("nav-content")
+            }
+            .class("navbar")
+            
+            // Content
+            Div {
+            Div {
+                // Breadcrumb
+                Div {
+                    Link(href: "/showcase", "Showcase")
+                    Text(" → ")
+                    Text("Lists")
+                }
+                .class("breadcrumb")
+                
+                H1("Lists")
+                P("Examples of HTML list elements including unordered lists, ordered lists, and definition lists.")
+                
+                
+                // Example 1: Unordered List
+                CodeExample(
+                    title: "Unordered List",
+                    swift: """
 UL {
     LI("First item")
     LI("Second item")
@@ -58,7 +53,7 @@ UL {
     }
 }
 """,
-                                html: """
+                    html: """
 <ul>
     <li>First item</li>
     <li>Second item</li>
@@ -70,25 +65,25 @@ UL {
     </li>
 </ul>
 """,
-                                preview: {
-                                    UL {
-                                        LI("First item")
-                                        LI("Second item")
-                                        LI {
-                                            Text("Third item with nested list")
-                                            UL {
-                                                LI("Nested item 1")
-                                                LI("Nested item 2")
-                                            }
-                                        }
-                                    }
+                    preview: {
+                        UL {
+                            LI("First item")
+                            LI("Second item")
+                            LI {
+                                Text("Third item with nested list")
+                                UL {
+                                    LI("Nested item 1")
+                                    LI("Nested item 2")
                                 }
-                            ).render()
-                            
-                            // Example 2: Ordered List
-                            CodeExample(
-                                title: "Ordered List",
-                                swift: """
+                            }
+                        }
+                    }
+                ).render()
+                
+                // Example 2: Ordered List
+                CodeExample(
+                    title: "Ordered List",
+                    swift: """
 OL {
     LI("First step")
     LI("Second step")
@@ -97,7 +92,7 @@ OL {
 }
 .class("custom-numbered")
 """,
-                                html: """
+                    html: """
 <ol class="custom-numbered">
     <li>First step</li>
     <li>Second step</li>
@@ -105,21 +100,21 @@ OL {
     <li>Fourth step</li>
 </ol>
 """,
-                                preview: {
-                                    OL {
-                                        LI("First step")
-                                        LI("Second step")
-                                        LI("Third step")
-                                        LI("Fourth step")
-                                    }
-                                    .class("custom-numbered")
-                                }
-                            ).render()
-                            
-                            // Example 3: Definition List
-                            CodeExample(
-                                title: "Definition List",
-                                swift: """
+                    preview: {
+                        OL {
+                            LI("First step")
+                            LI("Second step")
+                            LI("Third step")
+                            LI("Fourth step")
+                        }
+                        .class("custom-numbered")
+                    }
+                ).render()
+                
+                // Example 3: Definition List
+                CodeExample(
+                    title: "Definition List",
+                    swift: """
 DL {
     DT("HTML")
     DD("HyperText Markup Language - the standard markup language for web pages")
@@ -132,7 +127,7 @@ DL {
 }
 .class("styled-dl")
 """,
-                                html: """
+                    html: """
 <dl class="styled-dl">
     <dt>HTML</dt>
     <dd>HyperText Markup Language - the standard markup language for web pages</dd>
@@ -144,25 +139,25 @@ DL {
     <dd>A programming language that enables interactive web pages</dd>
 </dl>
 """,
-                                preview: {
-                                    DL {
-                                        DT("HTML")
-                                        DD("HyperText Markup Language - the standard markup language for web pages")
-                                        
-                                        DT("CSS")
-                                        DD("Cascading Style Sheets - describes how HTML elements are displayed")
-                                        
-                                        DT("JavaScript")
-                                        DD("A programming language that enables interactive web pages")
-                                    }
-                                    .class("styled-dl")
-                                }
-                            ).render()
+                    preview: {
+                        DL {
+                            DT("HTML")
+                            DD("HyperText Markup Language - the standard markup language for web pages")
                             
-                            // Example 4: Styled List
-                            CodeExample(
-                                title: "Styled List",
-                                swift: """
+                            DT("CSS")
+                            DD("Cascading Style Sheets - describes how HTML elements are displayed")
+                            
+                            DT("JavaScript")
+                            DD("A programming language that enables interactive web pages")
+                        }
+                        .class("styled-dl")
+                    }
+                ).render()
+                
+                // Example 4: Styled List
+                CodeExample(
+                    title: "Styled List",
+                    swift: """
 UL {
     LI("Featured item with custom styling")
     LI("Another styled item")
@@ -170,27 +165,27 @@ UL {
 }
 .class("styled-list")
 """,
-                                html: """
+                    html: """
 <ul class="styled-list">
     <li>Featured item with custom styling</li>
     <li>Another styled item</li>
     <li>Third styled item</li>
 </ul>
 """,
-                                preview: {
-                                    UL {
-                                        LI("Featured item with custom styling")
-                                        LI("Another styled item")
-                                        LI("Third styled item")
-                                    }
-                                    .class("styled-list")
-                                }
-                            ).render()
-                            
-                            // Example 5: Mixed List Types
-                            CodeExample(
-                                title: "Mixed List Types",
-                                swift: """
+                    preview: {
+                        UL {
+                            LI("Featured item with custom styling")
+                            LI("Another styled item")
+                            LI("Third styled item")
+                        }
+                        .class("styled-list")
+                    }
+                ).render()
+                
+                // Example 5: Mixed List Types
+                CodeExample(
+                    title: "Mixed List Types",
+                    swift: """
 Div {
     H3("Recipe Instructions")
     OL {
@@ -206,7 +201,7 @@ Div {
     }
 }
 """,
-                                html: """
+                    html: """
 <div>
     <h3>Recipe Instructions</h3>
     <ol>
@@ -222,49 +217,40 @@ Div {
     </ol>
 </div>
 """,
-                                preview: {
-                                    Div {
-                                        H3("Recipe Instructions")
-                                        OL {
-                                            LI {
-                                                Text("Gather ingredients:")
-                                                UL {
-                                                    LI("2 cups flour")
-                                                    LI("1 cup sugar")
-                                                    LI("3 eggs")
-                                                }
-                                            }
-                                            LI("Mix dry ingredients")
-                                            LI("Add wet ingredients")
-                                            LI("Bake at 350°F for 30 minutes")
-                                        }
+                    preview: {
+                        Div {
+                            H3("Recipe Instructions")
+                            OL {
+                                LI {
+                                    Text("Gather ingredients:")
+                                    UL {
+                                        LI("2 cups flour")
+                                        LI("1 cup sugar")
+                                        LI("3 eggs")
                                     }
                                 }
-                            ).render()
-                            
-                            // Navigation
-                            Div {
-                                Link(href: "/showcase/text-formatting", "Text Formatting")
-                                    .class("nav-button")
-                                Link(href: "/showcase/tables", "Tables")
-                                    .class("nav-button nav-button-next")
+                                LI("Mix dry ingredients")
+                                LI("Add wet ingredients")
+                                LI("Bake at 350°F for 30 minutes")
                             }
-                            .class("navigation-links")
                         }
-                        .class("content")
                     }
-                    .class("container")
-                    
+                ).render()
+                
+                // Navigation
+                Div {
+                    Link(href: "/showcase/text-formatting", "Text Formatting")
+                        .class("nav-button")
+                    Link(href: "/showcase/tables", "Tables")
+                        .class("nav-button nav-button-next")
                 }
+                .class("navigation-links")
             }
-        
-        let response = Response(
-            status: 200,
-            headers: ["Content-Type": "text/html"],
-            body: html.render()
-        )
-        
-        let responseData = try JSONEncoder().encode(response)
-        FileHandle.standardOutput.write(responseData)
+            .class("content")
+            }
+            .class("container")
+            
+            
+        }
     }
 }

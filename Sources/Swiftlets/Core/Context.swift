@@ -1,7 +1,10 @@
 import Foundation
 
 /// Context provided to swiftlets for accessing resources and storage
-public protocol SwiftletContext {
+public protocol SwiftletContext: Sendable {
+    /// The current HTTP request
+    var request: Request { get }
+    
     /// Access read-only resources with hierarchical lookup
     var resources: Resources { get }
     
@@ -12,8 +15,29 @@ public protocol SwiftletContext {
     var routePath: String { get }
 }
 
+// MARK: - Task Local Storage for SwiftletContext
+
+public enum SwiftletContextKey {
+    @TaskLocal
+    public static var current: SwiftletContext?
+}
+
+public extension SwiftletContext {
+    /// Current context from Task Local Storage
+    static var current: SwiftletContext? {
+        SwiftletContextKey.current
+    }
+    
+    /// Run a closure with the given context
+    static func run<T>(with context: SwiftletContext, operation: () async throws -> T) async rethrows -> T {
+        try await SwiftletContextKey.$current.withValue(context) {
+            try await operation()
+        }
+    }
+}
+
 /// Read-only resources with hierarchical lookup
-public struct Resources {
+public struct Resources: Sendable {
     private let resourcePaths: [String]
     
     init(resourcePaths: [String]) {
@@ -35,7 +59,7 @@ public struct Resources {
 }
 
 /// Writable storage with working directory already set
-public struct Storage {
+public struct Storage: Sendable {
     // Working directory is already set to var/{route}/ by server
     
     public func write(_ data: Foundation.Data, to path: String) throws {
