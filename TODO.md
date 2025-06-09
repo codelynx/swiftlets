@@ -1,19 +1,47 @@
 # Swiftlets TODO List
 
+## ✅ Recently Completed (June 8, 2025)
+
+### SwiftUI-Style API
+- [x] Design zero-boilerplate SwiftUI-style API
+- [x] Implement core protocols (HTMLComponent, HTMLHeader, SwiftletMain)
+- [x] Create property wrappers (@Query, @FormValue, @JSONBody, @Cookie, @Environment)
+- [x] Implement ResponseBuilder for headers/cookies
+- [x] Add Task Local Storage for context
+- [x] Create comprehensive documentation
+- [x] Add migration guide
+- [x] Convert entire showcase site to new API
+- [x] Fix compilation performance issues with function decomposition
+- [x] Create troubleshooting guides
+
 ## 🚨 Critical Fixes (Do First)
 
-- [x] Fix `Sendable` protocol warning in `SwiftletHTTPHandler` (main.swift:243)
-- [x] Remove debug `print` statements from server
-- [x] Add newline at end of Package.swift
-- [x] Fix server to properly discover swiftlets without hardcoded paths
+### Missing UI Components
+- [ ] Implement Container component with responsive breakpoints
+- [ ] Implement Grid component with CSS Grid support
+- [ ] Implement Row and Column components
+- [ ] Implement Card component for content grouping
+- [ ] Update showcase examples to use proper components
+
+### Build System
+- [ ] Fix build-site hanging on complex files
+- [ ] Add better error reporting for compilation failures
+- [ ] Implement incremental compilation
+- [ ] Add build caching
+
+- [ ] Update server to auto-detect SwiftUI-style vs traditional swiftlets
 
 ## 🎯 High Priority (This Week)
 
-### Static File Serving
-- [ ] Add static file middleware to server
-- [ ] Support common MIME types (css, js, images, fonts)
+### Static File Serving (Partially Complete)
+- [x] Basic static file serving implemented
+- [x] Support common MIME types (css, js, images, fonts) - ✅ Already done
 - [ ] Add caching headers (ETag, Last-Modified)
-- [ ] Create `public/` directory structure
+- [ ] Add gzip compression support
+- [ ] Add range request support for large files
+- [ ] Create `public/` directory as alternative to `web/`
+- [ ] Add security headers (X-Content-Type-Options, etc.)
+- [ ] Directory listing (optional, with config flag)
 
 ### Query Parameters
 - [ ] Parse query strings in server
@@ -138,11 +166,23 @@
 - [ ] Form element OptGroup not implemented  
 - [ ] Text formatting elements not implemented: Br, S (strikethrough), Dfn, Ruby, Wbr
 
+### Missing UI Components (Referenced but not implemented)
+- [ ] Container component - Used throughout showcase
+- [ ] Grid component - Used for layouts
+- [ ] Row and Column components - Used in grid layouts
+- [ ] Card component - Used for content grouping
+
 ### Naming Conflicts
 - [ ] User files named after framework modules cause compilation errors:
   - `lists.swift` conflicts with framework's `Lists.swift`
   - `media.swift` conflicts with framework's `Media.swift`
   - `semantic.swift` conflicts with framework's `Semantic.swift`
+
+### Compilation Performance
+- [x] Complex nested HTML causes "expression too complex" errors
+- [x] Workaround documented: break into smaller functions
+- [ ] Investigate Swift compiler optimization flags
+- [ ] Consider alternative result builder approaches
 
 ## 💡 Future Ideas
 
@@ -172,4 +212,4 @@
 
 ---
 
-*Last updated: June 2025*
+*Last updated: June 8, 2025*

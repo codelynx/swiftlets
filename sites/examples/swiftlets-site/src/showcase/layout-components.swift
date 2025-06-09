@@ -1,53 +1,45 @@
-import Foundation
 import Swiftlets
 
 @main
-struct LayoutShowcase {
-    static func main() async throws {
-        let request = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
-        
-        let html = Html {
-            Head {
-                Title("Layout Components - Swiftlets Showcase")
-                Meta(charset: "utf-8")
-                Meta(name: "viewport", content: "width=device-width, initial-scale=1")
-                LinkElement(rel: "stylesheet", href: "/styles/main.css")
+struct LayoutShowcase: SwiftletMain {
+    var title = "Layout Components - Swiftlets Showcase"
+    
+    var body: some HTMLElement {
+        Fragment {
+            Nav {
+            Div {
+            Link(href: "/", "Swiftlets")
+                .class("nav-brand")
+            
+            Div {
+                Link(href: "/", "Home")
+                Link(href: "/docs", "Docs")
+                Link(href: "/showcase", "Showcase")
+                    .class("active")
             }
-            Body {
-                Nav {
-                    Div {
-                        Link(href: "/", "Swiftlets")
-                            .class("nav-brand")
-                        
-                        Div {
-                            Link(href: "/", "Home")
-                            Link(href: "/docs", "Docs")
-                            Link(href: "/showcase", "Showcase")
-                                .class("active")
-                        }
-                        .class("nav-links")
-                    }
-                    .class("nav-content")
-                }
-                .class("nav-container")
-                
-                Div {
-                    H1("Layout Components")
-                    
-                    Div {
-                        Link(href: "/showcase", "← Back to Showcase")
-                            .style("display", "inline-block")
-                            .style("margin-bottom", "1rem")
-                            .style("color", "#007bff")
-                    }
-                    
-                    P("SwiftUI-inspired layout components for building responsive web interfaces.")
-                    
-                    // HStack Examples
-                    Section {
-                        CodeExample(
-                            title: "HStack - Horizontal Stack",
-                            swift: """
+            .class("nav-links")
+            }
+            .class("nav-content")
+            }
+            .class("nav-container")
+            
+            Div {
+            H1("Layout Components")
+            
+            Div {
+            Link(href: "/showcase", "← Back to Showcase")
+                .style("display", "inline-block")
+                .style("margin-bottom", "1rem")
+                .style("color", "#007bff")
+            }
+            
+            P("SwiftUI-inspired layout components for building responsive web interfaces.")
+            
+            // HStack Examples
+            Section {
+            CodeExample(
+                title: "HStack - Horizontal Stack",
+                swift: """
 // Basic HStack
 HStack {
     Button("Previous")
@@ -70,7 +62,7 @@ HStack(alignment: .top) {
     Div { Text("Aligned") }.style("height", "60px").style("background", "#e0e0e0")
 }
 """,
-                            html: """
+                html: """
 <div style="display: flex; flex-direction: row; align-items: center;">
     <button>Previous</button>
     <button>Next</button>
@@ -90,96 +82,96 @@ HStack(alignment: .top) {
     <div style="height: 60px; background: #e0e0e0;">Aligned</div>
 </div>
 """,
-                            preview: {
-                                VStack(spacing: 30) {
-                                    // Basic HStack
-                                    Div {
-                                        P("Basic HStack:")
-                                        HStack {
-                                            Button("Previous")
-                                                .style("padding", "0.5rem 1rem")
-                                                .style("background", "#007bff")
-                                                .style("color", "white")
-                                                .style("border", "none")
-                                                .style("border-radius", "4px")
-                                            Button("Next")
-                                                .style("padding", "0.5rem 1rem")
-                                                .style("background", "#28a745")
-                                                .style("color", "white")
-                                                .style("border", "none")
-                                                .style("border-radius", "4px")
-                                        }
-                                    }
-                                    
-                                    // With spacing
-                                    Div {
-                                        P("With spacing and alignment:")
-                                        HStack(alignment: .center, spacing: 20) {
-                                            Div {
-                                                Text("🎯")
-                                                    .style("font-size", "2rem")
-                                            }
-                                            .style("width", "40px")
-                                            .style("height", "40px")
-                                            Text("User Profile")
-                                                .style("font-weight", "600")
-                                            Spacer()
-                                            Button("Edit")
-                                                .style("padding", "0.25rem 0.75rem")
-                                                .style("background", "#6c757d")
-                                                .style("color", "white")
-                                                .style("border", "none")
-                                                .style("border-radius", "4px")
-                                        }
-                                        .style("background", "#f8f9fa")
-                                        .style("padding", "1rem")
-                                        .style("border-radius", "0.5rem")
-                                        .style("width", "100%")
-                                    }
-                                    
-                                    // Different alignments
-                                    Div {
-                                        P("Different alignments (top):")
-                                        HStack(alignment: .top, spacing: 10) {
-                                            Div { 
-                                                Text("Tall Box")
-                                                    .style("padding", "1rem")
-                                            }
-                                            .style("height", "100px")
-                                            .style("background", "#e3f2fd")
-                                            .style("display", "flex")
-                                            .style("align-items", "center")
-                                            
-                                            Div { 
-                                                Text("Short Box")
-                                                    .style("padding", "1rem")
-                                            }
-                                            .style("height", "60px")
-                                            .style("background", "#f3e5f5")
-                                            .style("display", "flex")
-                                            .style("align-items", "center")
-                                            
-                                            Div { 
-                                                Text("Medium Box")
-                                                    .style("padding", "1rem")
-                                            }
-                                            .style("height", "80px")
-                                            .style("background", "#e8f5e9")
-                                            .style("display", "flex")
-                                            .style("align-items", "center")
-                                        }
-                                    }
+                preview: {
+                    VStack(spacing: 30) {
+                        // Basic HStack
+                        Div {
+                            P("Basic HStack:")
+                            HStack {
+                                Button("Previous")
+                                    .style("padding", "0.5rem 1rem")
+                                    .style("background", "#007bff")
+                                    .style("color", "white")
+                                    .style("border", "none")
+                                    .style("border-radius", "4px")
+                                Button("Next")
+                                    .style("padding", "0.5rem 1rem")
+                                    .style("background", "#28a745")
+                                    .style("color", "white")
+                                    .style("border", "none")
+                                    .style("border-radius", "4px")
+                            }
+                        }
+                        
+                        // With spacing
+                        Div {
+                            P("With spacing and alignment:")
+                            HStack(alignment: .center, spacing: 20) {
+                                Div {
+                                    Text("🎯")
+                                        .style("font-size", "2rem")
                                 }
-                            },
-                            description: "Arrange elements horizontally with customizable alignment and spacing."
-                        ).render()
+                                .style("width", "40px")
+                                .style("height", "40px")
+                                Text("User Profile")
+                                    .style("font-weight", "600")
+                                Spacer()
+                                Button("Edit")
+                                    .style("padding", "0.25rem 0.75rem")
+                                    .style("background", "#6c757d")
+                                    .style("color", "white")
+                                    .style("border", "none")
+                                    .style("border-radius", "4px")
+                            }
+                            .style("background", "#f8f9fa")
+                            .style("padding", "1rem")
+                            .style("border-radius", "0.5rem")
+                            .style("width", "100%")
+                        }
+                        
+                        // Different alignments
+                        Div {
+                            P("Different alignments (top):")
+                            HStack(alignment: .top, spacing: 10) {
+                                Div { 
+                                    Text("Tall Box")
+                                        .style("padding", "1rem")
+                                }
+                                .style("height", "100px")
+                                .style("background", "#e3f2fd")
+                                .style("display", "flex")
+                                .style("align-items", "center")
+                                
+                                Div { 
+                                    Text("Short Box")
+                                        .style("padding", "1rem")
+                                }
+                                .style("height", "60px")
+                                .style("background", "#f3e5f5")
+                                .style("display", "flex")
+                                .style("align-items", "center")
+                                
+                                Div { 
+                                    Text("Medium Box")
+                                        .style("padding", "1rem")
+                                }
+                                .style("height", "80px")
+                                .style("background", "#e8f5e9")
+                                .style("display", "flex")
+                                .style("align-items", "center")
+                            }
+                        }
                     }
-                    
-                    // VStack Examples
-                    Section {
-                        CodeExample(
-                            title: "VStack - Vertical Stack",
-                            swift: """
+                },
+                description: "Arrange elements horizontally with customizable alignment and spacing."
+            ).render()
+            }
+            
+            // VStack Examples
+            Section {
+            CodeExample(
+                title: "VStack - Vertical Stack",
+                swift: """
 // Basic VStack
 VStack {
     H3("Settings")
@@ -202,7 +194,7 @@ VStack(alignment: .center, spacing: 24) {
     P("Sign in to continue")
 }
 """,
-                            html: """
+                html: """
 <div style="display: flex; flex-direction: column;">
     <h3>Settings</h3>
     <p>Configure your preferences</p>
@@ -224,65 +216,65 @@ VStack(alignment: .center, spacing: 24) {
     <p>Sign in to continue</p>
 </div>
 """,
-                            preview: {
-                                HStack(spacing: 30) {
-                                    // Basic VStack
-                                    Div {
-                                        P("Basic VStack:")
-                                        VStack {
-                                            H3("Settings")
-                                            P("Configure your preferences")
-                                        }
-                                        .style("background", "#f8f9fa")
-                                        .style("padding", "1rem")
-                                        .style("border-radius", "0.5rem")
-                                    }
-                                    .style("flex", "1")
-                                    
-                                    // With form elements
-                                    Div {
-                                        P("Form with VStack:")
-                                        VStack(alignment: .leading, spacing: 12) {
-                                            Label("Username")
-                                                .style("font-weight", "600")
-                                            Input(type: "text", name: "username")
-                                                .style("width", "100%")
-                                                .style("padding", "0.5rem")
-                                                .style("border", "1px solid #ced4da")
-                                                .style("border-radius", "4px")
-                                            
-                                            Label("Email")
-                                                .style("font-weight", "600")
-                                            Input(type: "email", name: "email")
-                                                .style("width", "100%")
-                                                .style("padding", "0.5rem")
-                                                .style("border", "1px solid #ced4da")
-                                                .style("border-radius", "4px")
-                                            
-                                            Button("Save Changes")
-                                                .style("padding", "0.5rem 1rem")
-                                                .style("background", "#007bff")
-                                                .style("color", "white")
-                                                .style("border", "none")
-                                                .style("border-radius", "4px")
-                                                .style("margin-top", "0.5rem")
-                                        }
-                                        .style("background", "#e7f3ff")
-                                        .style("padding", "1.5rem")
-                                        .style("border-radius", "0.5rem")
-                                    }
-                                    .style("flex", "1")
-                                }
-                            },
-                            description: "Arrange elements vertically with customizable alignment and spacing."
-                        ).render()
+                preview: {
+                    HStack(spacing: 30) {
+                        // Basic VStack
+                        Div {
+                            P("Basic VStack:")
+                            VStack {
+                                H3("Settings")
+                                P("Configure your preferences")
+                            }
+                            .style("background", "#f8f9fa")
+                            .style("padding", "1rem")
+                            .style("border-radius", "0.5rem")
+                        }
+                        .style("flex", "1")
+                        
+                        // With form elements
+                        Div {
+                            P("Form with VStack:")
+                            VStack(alignment: .leading, spacing: 12) {
+                                Label("Username")
+                                    .style("font-weight", "600")
+                                Input(type: "text", name: "username")
+                                    .style("width", "100%")
+                                    .style("padding", "0.5rem")
+                                    .style("border", "1px solid #ced4da")
+                                    .style("border-radius", "4px")
+                                
+                                Label("Email")
+                                    .style("font-weight", "600")
+                                Input(type: "email", name: "email")
+                                    .style("width", "100%")
+                                    .style("padding", "0.5rem")
+                                    .style("border", "1px solid #ced4da")
+                                    .style("border-radius", "4px")
+                                
+                                Button("Save Changes")
+                                    .style("padding", "0.5rem 1rem")
+                                    .style("background", "#007bff")
+                                    .style("color", "white")
+                                    .style("border", "none")
+                                    .style("border-radius", "4px")
+                                    .style("margin-top", "0.5rem")
+                            }
+                            .style("background", "#e7f3ff")
+                            .style("padding", "1.5rem")
+                            .style("border-radius", "0.5rem")
+                        }
+                        .style("flex", "1")
                     }
-                    
-                    // ZStack Examples
-                    Section {
-                        CodeExample(
-                            title: "ZStack - Layered Stack",
-                            swift: """
+                },
+                description: "Arrange elements vertically with customizable alignment and spacing."
+            ).render()
+            }
+            
+            // ZStack Examples
+            Section {
+            CodeExample(
+                title: "ZStack - Layered Stack",
+                swift: """
 // Card with overlay badge
 ZStack(alignment: .topTrailing) {
     Div {
@@ -310,7 +302,7 @@ ZStack(alignment: .center) {
     .style("color", "white")
 }
 """,
-                            html: """
+                html: """
 <div style="position: relative;">
     <div class="card">
         <img src="/product.jpg" alt="Product">
@@ -329,81 +321,81 @@ ZStack(alignment: .center) {
     </div>
 </div>
 """,
-                            preview: {
-                                HStack(spacing: 30) {
-                                    // Card with badge
+                preview: {
+                    HStack(spacing: 30) {
+                        // Card with badge
+                        Div {
+                            P("Card with overlay badge:")
+                            ZStack(alignment: .topTrailing) {
+                                Div {
                                     Div {
-                                        P("Card with overlay badge:")
-                                        ZStack(alignment: .topTrailing) {
-                                            Div {
-                                                Div {
-                                                    Text("📦")
-                                                        .style("font-size", "4rem")
-                                                        .style("text-align", "center")
-                                                        .style("margin", "1rem 0")
-                                                }
-                                                H4("Premium Package")
-                                                    .style("margin", "0.5rem 0")
-                                                P("$99/month")
-                                                    .style("color", "#6c757d")
-                                                    .style("margin", "0")
-                                            }
-                                            .style("background", "white")
-                                            .style("border", "1px solid #dee2e6")
-                                            .style("border-radius", "0.5rem")
-                                            .style("padding", "2rem")
+                                        Text("📦")
+                                            .style("font-size", "4rem")
                                             .style("text-align", "center")
-                                            .style("width", "200px")
-                                            
-                                            Span("NEW")
-                                                .style("background", "#dc3545")
-                                                .style("color", "white")
-                                                .style("padding", "0.25rem 0.5rem")
-                                                .style("border-radius", "0.25rem")
-                                                .style("font-size", "0.75rem")
-                                                .style("font-weight", "bold")
-                                                .style("margin", "10px")
-                                        }
+                                            .style("margin", "1rem 0")
                                     }
-                                    
-                                    // Hero with centered content
-                                    Div {
-                                        P("Hero with centered overlay:")
-                                        ZStack(alignment: .center) {
-                                            Div {
-                                                Text("")
-                                            }
-                                            .style("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
-                                            .style("width", "100%")
-                                            .style("height", "200px")
-                                            .style("border-radius", "0.5rem")
-                                            
-                                            VStack(spacing: 16) {
-                                                H2("Welcome")
-                                                    .style("color", "white")
-                                                    .style("margin", "0")
-                                                Button("Get Started")
-                                                    .style("background", "white")
-                                                    .style("color", "#667eea")
-                                                    .style("padding", "0.5rem 1.5rem")
-                                                    .style("border", "none")
-                                                    .style("border-radius", "2rem")
-                                                    .style("font-weight", "600")
-                                            }
-                                        }
-                                    }
-                                    .style("flex", "1")
+                                    H4("Premium Package")
+                                        .style("margin", "0.5rem 0")
+                                    P("$99/month")
+                                        .style("color", "#6c757d")
+                                        .style("margin", "0")
                                 }
-                            },
-                            description: "Layer elements on top of each other with 9-point alignment system."
-                        ).render()
+                                .style("background", "white")
+                                .style("border", "1px solid #dee2e6")
+                                .style("border-radius", "0.5rem")
+                                .style("padding", "2rem")
+                                .style("text-align", "center")
+                                .style("width", "200px")
+                                
+                                Span("NEW")
+                                    .style("background", "#dc3545")
+                                    .style("color", "white")
+                                    .style("padding", "0.25rem 0.5rem")
+                                    .style("border-radius", "0.25rem")
+                                    .style("font-size", "0.75rem")
+                                    .style("font-weight", "bold")
+                                    .style("margin", "10px")
+                            }
+                        }
+                        
+                        // Hero with centered content
+                        Div {
+                            P("Hero with centered overlay:")
+                            ZStack(alignment: .center) {
+                                Div {
+                                    Text("")
+                                }
+                                .style("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
+                                .style("width", "100%")
+                                .style("height", "200px")
+                                .style("border-radius", "0.5rem")
+                                
+                                VStack(spacing: 16) {
+                                    H2("Welcome")
+                                        .style("color", "white")
+                                        .style("margin", "0")
+                                    Button("Get Started")
+                                        .style("background", "white")
+                                        .style("color", "#667eea")
+                                        .style("padding", "0.5rem 1.5rem")
+                                        .style("border", "none")
+                                        .style("border-radius", "2rem")
+                                        .style("font-weight", "600")
+                                }
+                            }
+                        }
+                        .style("flex", "1")
                     }
-                    
-                    // Grid Examples
-                    Section {
-                        CodeExample(
-                            title: "Grid Layout",
-                            swift: """
+                },
+                description: "Layer elements on top of each other with 9-point alignment system."
+            ).render()
+            }
+            
+            // Grid Examples
+            Section {
+            CodeExample(
+                title: "Grid Layout",
+                swift: """
 // Fixed column count
 Grid(columns: .count(3), spacing: 20) {
     ForEach(1...6) { i in
@@ -429,7 +421,7 @@ Grid(
     Ads()
 }
 """,
-                            html: """
+                html: """
 <!-- Fixed column count -->
 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
     <div>Card 1</div>
@@ -454,57 +446,57 @@ Grid(
     <div>Ads</div>
 </div>
 """,
-                            preview: {
-                                VStack(spacing: 30) {
-                                    // Fixed columns
+                preview: {
+                    VStack(spacing: 30) {
+                        // Fixed columns
+                        Div {
+                            P("Fixed 3-column grid:")
+                            Grid(columns: .count(3), spacing: 15) {
+                                ForEach(1...6) { i in
                                     Div {
-                                        P("Fixed 3-column grid:")
-                                        Grid(columns: .count(3), spacing: 15) {
-                                            ForEach(1...6) { i in
-                                                Div {
-                                                    Text("Card \(i)")
-                                                        .style("text-align", "center")
-                                                        .style("font-weight", "600")
-                                                }
-                                                .style("background", "#f8f9fa")
-                                                .style("padding", "2rem 1rem")
-                                                .style("border", "1px solid #dee2e6")
-                                                .style("border-radius", "0.5rem")
-                                            }
-                                        }
+                                        Text("Card \(i)")
+                                            .style("text-align", "center")
+                                            .style("font-weight", "600")
                                     }
-                                    
-                                    // Flexible columns
-                                    Div {
-                                        P("Flexible columns (resize window to see responsiveness):")
-                                        Grid(columns: .custom("repeat(auto-fit, minmax(150px, 1fr))"), spacing: 12) {
-                                            ForEach(["Primary", "Success", "Warning", "Danger", "Info"]) { type in
-                                                Div {
-                                                    Text(type)
-                                                        .style("text-align", "center")
-                                                        .style("color", "white")
-                                                        .style("font-weight", "600")
-                                                }
-                                                .style("background", type == "Primary" ? "#007bff" : 
-                                                                   type == "Success" ? "#28a745" :
-                                                                   type == "Warning" ? "#ffc107" :
-                                                                   type == "Danger" ? "#dc3545" : "#17a2b8")
-                                                .style("padding", "1.5rem")
-                                                .style("border-radius", "0.5rem")
-                                            }
-                                        }
-                                    }
+                                    .style("background", "#f8f9fa")
+                                    .style("padding", "2rem 1rem")
+                                    .style("border", "1px solid #dee2e6")
+                                    .style("border-radius", "0.5rem")
                                 }
-                            },
-                            description: "Create responsive grid layouts with flexible column definitions."
-                        ).render()
+                            }
+                        }
+                        
+                        // Flexible columns
+                        Div {
+                            P("Flexible columns (resize window to see responsiveness):")
+                            Grid(columns: .custom("repeat(auto-fit, minmax(150px, 1fr))"), spacing: 12) {
+                                ForEach(["Primary", "Success", "Warning", "Danger", "Info"]) { type in
+                                    Div {
+                                        Text(type)
+                                            .style("text-align", "center")
+                                            .style("color", "white")
+                                            .style("font-weight", "600")
+                                    }
+                                    .style("background", type == "Primary" ? "#007bff" : 
+                                                       type == "Success" ? "#28a745" :
+                                                       type == "Warning" ? "#ffc107" :
+                                                       type == "Danger" ? "#dc3545" : "#17a2b8")
+                                    .style("padding", "1.5rem")
+                                    .style("border-radius", "0.5rem")
+                                }
+                            }
+                        }
                     }
-                    
-                    // Container Examples
-                    Section {
-                        CodeExample(
-                            title: "Container",
-                            swift: """
+                },
+                description: "Create responsive grid layouts with flexible column definitions."
+            ).render()
+            }
+            
+            // Container Examples
+            Section {
+            CodeExample(
+                title: "Container",
+                swift: """
 // Small container (max-width: 576px)
 Container(maxWidth: .small) {
     H2("Narrow Content")
@@ -527,7 +519,7 @@ Section {
 }
 .style("background", "#f8f9fa")
 """,
-                            html: """
+                html: """
 <!-- Small container -->
 <div style="max-width: 576px; margin: 0 auto;">
     <h2>Narrow Content</h2>
@@ -551,38 +543,38 @@ Section {
     </div>
 </section>
 """,
-                            preview: {
-                                VStack(spacing: 30) {
-                                    // Different container sizes
-                                    ForEach([
-                                        ("small", "576px", "#e3f2fd"),
-                                        ("medium", "768px", "#f3e5f5"),
-                                        ("large", "1140px", "#e8f5e9")
-                                    ]) { size, maxWidth, color in
-                                        Div {
-                                            P("Container.\(size) (max-width: \(maxWidth)):")
-                                            Div {
-                                                Container(maxWidth: size == "small" ? .small : 
-                                                                  size == "medium" ? .medium : .large,
-                                                         padding: 20) {
-                                                    Text("This content is contained within a \(maxWidth) max-width container. Resize your window to see how it behaves.")
-                                                }
-                                            }
-                                            .style("background", color)
-                                            .style("padding", "1rem 0")
-                                        }
+                preview: {
+                    VStack(spacing: 30) {
+                        // Different container sizes
+                        ForEach([
+                            ("small", "576px", "#e3f2fd"),
+                            ("medium", "768px", "#f3e5f5"),
+                            ("large", "1140px", "#e8f5e9")
+                        ]) { size, maxWidth, color in
+                            Div {
+                                P("Container.\(size) (max-width: \(maxWidth)):")
+                                Div {
+                                    Container(maxWidth: size == "small" ? .small : 
+                                                      size == "medium" ? .medium : .large,
+                                             padding: 20) {
+                                        Text("This content is contained within a \(maxWidth) max-width container. Resize your window to see how it behaves.")
                                     }
                                 }
-                            },
-                            description: "Responsive container with predefined max-width breakpoints."
-                        ).render()
+                                .style("background", color)
+                                .style("padding", "1rem 0")
+                            }
+                        }
                     }
-                    
-                    // Spacer Examples
-                    Section {
-                        CodeExample(
-                            title: "Spacer",
-                            swift: """
+                },
+                description: "Responsive container with predefined max-width breakpoints."
+            ).render()
+            }
+            
+            // Spacer Examples
+            Section {
+            CodeExample(
+                title: "Spacer",
+                swift: """
 // Navigation bar with spacer
 HStack {
     H3("Logo")
@@ -606,7 +598,7 @@ HStack {
     Text("Right")
 }
 """,
-                            html: """
+                html: """
 <!-- Navigation with spacer -->
 <div style="display: flex; flex-direction: row; align-items: center;">
     <h3>Logo</h3>
@@ -630,79 +622,79 @@ HStack {
     Right
 </div>
 """,
-                            preview: {
-                                VStack(spacing: 30) {
-                                    // Navigation example
-                                    Div {
-                                        P("Navigation with Spacer:")
-                                        HStack {
-                                            H3("SwiftLogo")
-                                                .style("margin", "0")
-                                                .style("color", "#007bff")
-                                            Spacer()
-                                            HStack(spacing: 20) {
-                                                Link(href: "#", "Home")
-                                                Link(href: "#", "About")
-                                                Link(href: "#", "Contact")
-                                            }
-                                        }
-                                        .style("background", "#f8f9fa")
-                                        .style("padding", "1rem")
-                                        .style("border-radius", "0.5rem")
-                                    }
-                                    
-                                    // Centered content
-                                    Div {
-                                        P("Centered with Spacers:")
-                                        HStack {
-                                            Spacer()
-                                            Button("Centered Button")
-                                                .style("padding", "0.5rem 2rem")
-                                                .style("background", "#28a745")
-                                                .style("color", "white")
-                                                .style("border", "none")
-                                                .style("border-radius", "2rem")
-                                            Spacer()
-                                        }
-                                        .style("background", "#e7f3ff")
-                                        .style("padding", "2rem")
-                                        .style("border-radius", "0.5rem")
-                                    }
-                                    
-                                    // Min length spacer
-                                    Div {
-                                        P("Spacer with minimum length:")
-                                        HStack {
-                                            Div {
-                                                Text("Left Side")
-                                                    .style("padding", "0.5rem 1rem")
-                                                    .style("background", "#ffc107")
-                                                    .style("border-radius", "4px")
-                                            }
-                                            Spacer(minLength: 100)
-                                            Div {
-                                                Text("Right Side")
-                                                    .style("padding", "0.5rem 1rem")
-                                                    .style("background", "#17a2b8")
-                                                    .style("color", "white")
-                                                    .style("border-radius", "4px")
-                                            }
-                                        }
-                                        .style("background", "#f0f0f0")
-                                        .style("padding", "1rem")
-                                        .style("border-radius", "0.5rem")
-                                    }
+                preview: {
+                    VStack(spacing: 30) {
+                        // Navigation example
+                        Div {
+                            P("Navigation with Spacer:")
+                            HStack {
+                                H3("SwiftLogo")
+                                    .style("margin", "0")
+                                    .style("color", "#007bff")
+                                Spacer()
+                                HStack(spacing: 20) {
+                                    Link(href: "#", "Home")
+                                    Link(href: "#", "About")
+                                    Link(href: "#", "Contact")
                                 }
-                            },
-                            description: "Flexible space that expands to push content apart."
-                        ).render()
+                            }
+                            .style("background", "#f8f9fa")
+                            .style("padding", "1rem")
+                            .style("border-radius", "0.5rem")
+                        }
+                        
+                        // Centered content
+                        Div {
+                            P("Centered with Spacers:")
+                            HStack {
+                                Spacer()
+                                Button("Centered Button")
+                                    .style("padding", "0.5rem 2rem")
+                                    .style("background", "#28a745")
+                                    .style("color", "white")
+                                    .style("border", "none")
+                                    .style("border-radius", "2rem")
+                                Spacer()
+                            }
+                            .style("background", "#e7f3ff")
+                            .style("padding", "2rem")
+                            .style("border-radius", "0.5rem")
+                        }
+                        
+                        // Min length spacer
+                        Div {
+                            P("Spacer with minimum length:")
+                            HStack {
+                                Div {
+                                    Text("Left Side")
+                                        .style("padding", "0.5rem 1rem")
+                                        .style("background", "#ffc107")
+                                        .style("border-radius", "4px")
+                                }
+                                Spacer(minLength: 100)
+                                Div {
+                                    Text("Right Side")
+                                        .style("padding", "0.5rem 1rem")
+                                        .style("background", "#17a2b8")
+                                        .style("color", "white")
+                                        .style("border-radius", "4px")
+                                }
+                            }
+                            .style("background", "#f0f0f0")
+                            .style("padding", "1rem")
+                            .style("border-radius", "0.5rem")
+                        }
                     }
-                    
-                    // Complex Layout Example
-                    Section {
-                        CodeExample(
-                            title: "Complex Layout Composition",
-                            swift: """
+                },
+                description: "Flexible space that expands to push content apart."
+            ).render()
+            }
+            
+            // Complex Layout Example
+            Section {
+            CodeExample(
+                title: "Complex Layout Composition",
+                swift: """
 Container(maxWidth: .large, padding: 20) {
     VStack(spacing: 24) {
         // Header
@@ -710,45 +702,45 @@ Container(maxWidth: .large, padding: 20) {
             H1("Dashboard")
             Spacer()
             HStack(spacing: 12) {
-                Button("Settings")
-                Button("Logout")
+            Button("Settings")
+            Button("Logout")
             }
         }
         
         // Stats Grid
         Grid(columns: .count(4), spacing: 16) {
             ForEach(stats) { stat in
-                VStack(alignment: .leading) {
-                    Text(stat.label).style("color", "#6c757d")
-                    H3(stat.value)
-                }
-                .style("background", "#f8f9fa")
-                .style("padding", "1rem")
-                .style("border-radius", "0.5rem")
+            VStack(alignment: .leading) {
+            Text(stat.label).style("color", "#6c757d")
+            H3(stat.value)
+            }
+            .style("background", "#f8f9fa")
+            .style("padding", "1rem")
+            .style("border-radius", "0.5rem")
             }
         }
         
         // Main Content Area
         HStack(alignment: .top, spacing: 24) {
             VStack(spacing: 16) {
-                // Main content
-                ForEach(items) { item in
-                    Card(item: item)
-                }
+            // Main content
+            ForEach(items) { item in
+            Card(item: item)
+            }
             }
             .style("flex", "2")
             
             VStack(spacing: 16) {
-                // Sidebar
-                H4("Recent Activity")
-                ActivityList()
+            // Sidebar
+            H4("Recent Activity")
+            ActivityList()
             }
             .style("flex", "1")
         }
     }
 }
 """,
-                            html: """
+                html: """
 <div style="max-width: 1140px; margin: 0 auto; padding: 20px;">
     <div style="display: flex; flex-direction: column; gap: 24px;">
         <!-- Header -->
@@ -756,8 +748,8 @@ Container(maxWidth: .large, padding: 20) {
             <h1>Dashboard</h1>
             <div style="flex: 1;"></div>
             <div style="display: flex; flex-direction: row; gap: 12px;">
-                <button>Settings</button>
-                <button>Logout</button>
+            <button>Settings</button>
+            <button>Logout</button>
             </div>
         </div>
         
@@ -769,154 +761,145 @@ Container(maxWidth: .large, padding: 20) {
         <!-- Main Content Area -->
         <div style="display: flex; flex-direction: row; align-items: flex-start; gap: 24px;">
             <div style="display: flex; flex-direction: column; gap: 16px; flex: 2;">
-                <!-- main content -->
+            <!-- main content -->
             </div>
             <div style="display: flex; flex-direction: column; gap: 16px; flex: 1;">
-                <!-- sidebar -->
+            <!-- sidebar -->
             </div>
         </div>
     </div>
 </div>
 """,
-                            preview: {
-                                Container(maxWidth: .large, padding: 20) {
-                                    VStack(spacing: 20) {
-                                        // Header
-                                        HStack {
-                                            H2("Dashboard")
-                                                .style("margin", "0")
-                                            Spacer()
-                                            HStack(spacing: 10) {
-                                                Button("⚙️ Settings")
-                                                    .style("padding", "0.5rem 1rem")
-                                                    .style("background", "#6c757d")
-                                                    .style("color", "white")
-                                                    .style("border", "none")
-                                                    .style("border-radius", "4px")
-                                                Button("Logout")
-                                                    .style("padding", "0.5rem 1rem")
-                                                    .style("background", "#dc3545")
-                                                    .style("color", "white")
-                                                    .style("border", "none")
-                                                    .style("border-radius", "4px")
-                                            }
-                                        }
-                                        .style("padding-bottom", "1rem")
-                                        .style("border-bottom", "2px solid #dee2e6")
-                                        
-                                        // Stats
-                                        Grid(columns: .count(4), spacing: 12) {
-                                            ForEach([
-                                                ("Users", "1,234", "#007bff"),
-                                                ("Revenue", "$12.5K", "#28a745"),
-                                                ("Orders", "456", "#ffc107"),
-                                                ("Growth", "+23%", "#17a2b8")
-                                            ]) { label, value, color in
-                                                VStack(alignment: .leading, spacing: 4) {
-                                                    Text(label)
+                preview: {
+                    Container(maxWidth: .large, padding: 20) {
+                        VStack(spacing: 20) {
+                            // Header
+                            HStack {
+                                H2("Dashboard")
+                                    .style("margin", "0")
+                                Spacer()
+                                HStack(spacing: 10) {
+                                    Button("⚙️ Settings")
+                                        .style("padding", "0.5rem 1rem")
+                                        .style("background", "#6c757d")
+                                        .style("color", "white")
+                                        .style("border", "none")
+                                        .style("border-radius", "4px")
+                                    Button("Logout")
+                                        .style("padding", "0.5rem 1rem")
+                                        .style("background", "#dc3545")
+                                        .style("color", "white")
+                                        .style("border", "none")
+                                        .style("border-radius", "4px")
+                                }
+                            }
+                            .style("padding-bottom", "1rem")
+                            .style("border-bottom", "2px solid #dee2e6")
+                            
+                            // Stats
+                            Grid(columns: .count(4), spacing: 12) {
+                                ForEach([
+                                    ("Users", "1,234", "#007bff"),
+                                    ("Revenue", "$12.5K", "#28a745"),
+                                    ("Orders", "456", "#ffc107"),
+                                    ("Growth", "+23%", "#17a2b8")
+                                ]) { label, value, color in
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(label)
+                                            .style("color", "#6c757d")
+                                            .style("font-size", "0.875rem")
+                                        H3(value)
+                                            .style("margin", "0")
+                                            .style("color", color)
+                                    }
+                                    .style("background", "#f8f9fa")
+                                    .style("padding", "1rem")
+                                    .style("border-radius", "0.5rem")
+                                    .style("border", "1px solid #e9ecef")
+                                }
+                            }
+                            
+                            // Content Area
+                            HStack(alignment: .top, spacing: 20) {
+                                VStack(spacing: 12) {
+                                    H3("Recent Orders")
+                                        .style("margin", "0 0 1rem 0")
+                                    ForEach(1...3) { i in
+                                        Div {
+                                            HStack {
+                                                VStack(alignment: .leading) {
+                                                    Text("Order #\(1000 + i)")
+                                                        .style("font-weight", "600")
+                                                    Text("2 items • $\(25 * i).00")
                                                         .style("color", "#6c757d")
                                                         .style("font-size", "0.875rem")
-                                                    H3(value)
-                                                        .style("margin", "0")
-                                                        .style("color", color)
                                                 }
-                                                .style("background", "#f8f9fa")
-                                                .style("padding", "1rem")
-                                                .style("border-radius", "0.5rem")
-                                                .style("border", "1px solid #e9ecef")
+                                                Spacer()
+                                                Span("Processing")
+                                                    .style("background", "#fff3cd")
+                                                    .style("color", "#856404")
+                                                    .style("padding", "0.25rem 0.75rem")
+                                                    .style("border-radius", "1rem")
+                                                    .style("font-size", "0.75rem")
                                             }
                                         }
-                                        
-                                        // Content Area
-                                        HStack(alignment: .top, spacing: 20) {
-                                            VStack(spacing: 12) {
-                                                H3("Recent Orders")
-                                                    .style("margin", "0 0 1rem 0")
-                                                ForEach(1...3) { i in
-                                                    Div {
-                                                        HStack {
-                                                            VStack(alignment: .leading) {
-                                                                Text("Order #\(1000 + i)")
-                                                                    .style("font-weight", "600")
-                                                                Text("2 items • $\(25 * i).00")
-                                                                    .style("color", "#6c757d")
-                                                                    .style("font-size", "0.875rem")
-                                                            }
-                                                            Spacer()
-                                                            Span("Processing")
-                                                                .style("background", "#fff3cd")
-                                                                .style("color", "#856404")
-                                                                .style("padding", "0.25rem 0.75rem")
-                                                                .style("border-radius", "1rem")
-                                                                .style("font-size", "0.75rem")
-                                                        }
-                                                    }
-                                                    .style("background", "white")
-                                                    .style("padding", "1rem")
-                                                    .style("border", "1px solid #dee2e6")
-                                                    .style("border-radius", "0.5rem")
-                                                }
+                                        .style("background", "white")
+                                        .style("padding", "1rem")
+                                        .style("border", "1px solid #dee2e6")
+                                        .style("border-radius", "0.5rem")
+                                    }
+                                }
+                                .style("flex", "2")
+                                
+                                VStack(spacing: 12) {
+                                    H4("Recent Activity")
+                                        .style("margin", "0 0 1rem 0")
+                                    VStack(spacing: 8) {
+                                        ForEach([
+                                            "New user registered",
+                                            "Order #1003 completed",
+                                            "Payment received",
+                                            "Inventory updated"
+                                        ]) { activity in
+                                            HStack {
+                                                Text("•")
+                                                    .style("color", "#28a745")
+                                                    .style("font-weight", "bold")
+                                                Text(activity)
+                                                    .style("font-size", "0.875rem")
                                             }
-                                            .style("flex", "2")
-                                            
-                                            VStack(spacing: 12) {
-                                                H4("Recent Activity")
-                                                    .style("margin", "0 0 1rem 0")
-                                                VStack(spacing: 8) {
-                                                    ForEach([
-                                                        "New user registered",
-                                                        "Order #1003 completed",
-                                                        "Payment received",
-                                                        "Inventory updated"
-                                                    ]) { activity in
-                                                        HStack {
-                                                            Text("•")
-                                                                .style("color", "#28a745")
-                                                                .style("font-weight", "bold")
-                                                            Text(activity)
-                                                                .style("font-size", "0.875rem")
-                                                        }
-                                                        .style("padding", "0.5rem")
-                                                        .style("background", "#f8f9fa")
-                                                        .style("border-radius", "4px")
-                                                    }
-                                                }
-                                            }
-                                            .style("flex", "1")
-                                            .style("background", "white")
-                                            .style("padding", "1rem")
-                                            .style("border", "1px solid #dee2e6")
-                                            .style("border-radius", "0.5rem")
+                                            .style("padding", "0.5rem")
+                                            .style("background", "#f8f9fa")
+                                            .style("border-radius", "4px")
                                         }
                                     }
                                 }
-                                .style("background", "#ffffff")
+                                .style("flex", "1")
+                                .style("background", "white")
+                                .style("padding", "1rem")
                                 .style("border", "1px solid #dee2e6")
                                 .style("border-radius", "0.5rem")
-                            },
-                            description: "Combining multiple layout components to create sophisticated interfaces."
-                        ).render()
+                            }
+                        }
                     }
-                    
-                    Div {
-                        Link(href: "/showcase/semantic-html", "Semantic HTML")
-                            .class("nav-button")
-                        Link(href: "/showcase/modifiers", "Modifiers")
-                            .class("nav-button nav-button-next")
-                    }
-                    .class("navigation-links")
-                }
-                .class("showcase-container")
+                    .style("background", "#ffffff")
+                    .style("border", "1px solid #dee2e6")
+                    .style("border-radius", "0.5rem")
+                },
+                description: "Combining multiple layout components to create sophisticated interfaces."
+            ).render()
             }
+            
+            Div {
+            Link(href: "/showcase/semantic-html", "Semantic HTML")
+                .class("nav-button")
+            Link(href: "/showcase/modifiers", "Modifiers")
+                .class("nav-button nav-button-next")
+            }
+            .class("navigation-links")
+            }
+            .class("showcase-container")
+            
         }
-        .render()
-        
-        let response = Response(
-            status: 200,
-            headers: ["Content-Type": "text/html; charset=utf-8"],
-            body: html
-        )
-        
-        print(try JSONEncoder().encode(response).base64EncodedString())
     }
 }
