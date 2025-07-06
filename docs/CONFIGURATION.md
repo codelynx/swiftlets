@@ -39,10 +39,10 @@ swiftlets-server <site-root> [options]
 ### Direct Server Usage
 ```bash
 # Run the server directly
-./bin/darwin/arm64/swiftlets-server sites/examples/swiftlets-site
+./bin/macos/arm64/swiftlets-server sites/examples/swiftlets-site
 
 # With options
-./bin/darwin/arm64/swiftlets-server sites/examples/swiftlets-site --port 3000 --debug
+./bin/macos/arm64/swiftlets-server sites/examples/swiftlets-site --port 3000 --debug
 ```
 
 ### Running from Current Directory

@@ -129,13 +129,10 @@ Swiftlets communicate with the server using JSON over stdin/stdout:
 ```json
 {
   "method": "GET",
-  "path": "/hello",
+  "url": "/hello?name=World",
   "headers": {
     "User-Agent": "Mozilla/5.0",
     "Accept": "text/html"
-  },
-  "queryParameters": {
-    "name": "World"
   }
 }
 ```

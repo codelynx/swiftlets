@@ -71,7 +71,7 @@ struct GettingStartedPage {
                 }
                 .class("code-block")
                 
-                P("This builds the server binary and places it in the platform-specific directory (e.g., bin/darwin/arm64/).")
+                P("This builds the server binary and places it in the platform-specific directory (e.g., bin/macos/arm64/).")
             }
             
             // Try the Showcase

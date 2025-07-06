@@ -210,7 +210,7 @@ Container images with pre-built binaries.
 ### SWIFTLETS_SITE
 Specifies which site to serve:
 ```bash
-SWIFTLETS_SITE=sites/examples/swiftlets-site ./bin/darwin/arm64/swiftlets-server
+SWIFTLETS_SITE=sites/examples/swiftlets-site ./bin/macos/arm64/swiftlets-server
 ```
 
 ### SWIFTLETS_SDK_ROOT (Future)

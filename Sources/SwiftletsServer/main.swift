@@ -334,9 +334,8 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         // Create Request JSON with context
         var requestDict: [String: Any] = [
             "method": request.method.rawValue,
-            "path": request.uri,
+            "url": request.uri,
             "headers": headers,
-            "queryParameters": [:], // TODO: Parse query parameters
             "context": [
                 "routePath": contextData.routePath,
                 "resourcePaths": contextData.resourcePaths,

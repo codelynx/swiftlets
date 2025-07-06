@@ -21,7 +21,7 @@ ARCH=$(uname -m)
 
 # Normalize OS names
 case "$OS" in
-    darwin*) OS="darwin" ;;
+    darwin*) OS="macos" ;;
     linux*) OS="linux" ;;
     *) echo -e "${RED}Unsupported OS: $OS${NC}"; exit 1 ;;
 esac

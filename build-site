@@ -27,7 +27,7 @@ ARCH=$(uname -m)
 
 # Normalize OS names
 case "$OS" in
-    darwin*) OS="darwin" ;;
+    darwin*) OS="macos" ;;
     linux*) OS="linux" ;;
     *) echo -e "${RED}Unsupported OS: $OS${NC}"; exit 1 ;;
 esac
@@ -40,7 +40,7 @@ case "$ARCH" in
 esac
 
 # MD5 command (macOS vs Linux)
-if [[ "$OS" == "darwin" ]]; then
+if [[ "$OS" == "macos" ]]; then
     MD5_CMD="md5 -q"
 else
     MD5_CMD="md5sum | cut -d' ' -f1"
@@ -325,23 +325,45 @@ build_site() {
             # Add the temp file and output
             build_cmd="$build_cmd $temp_file -o $output"
             
-            # Execute build
+            # Execute build with timeout for complex expression detection
+            local build_timeout=30  # 30 seconds timeout per file
+            local build_output
+            local build_start=$(date +%s)
+            
             if [ "$VERBOSE" = true ]; then
                 echo -e "    ${YELLOW}$build_cmd${NC}"
             fi
             
-            # Capture output and errors
-            local build_output
-            build_output=$(eval $build_cmd 2>&1)
+            # Run with timeout and capture output
+            build_output=$(timeout $build_timeout bash -c "eval $build_cmd 2>&1")
             local build_status=$?
+            local build_end=$(date +%s)
+            local build_time=$((build_end - build_start))
             
+            # Check for timeout (exit code 124)
+            if [ $build_status -eq 124 ]; then
+                echo -e "    ${RED}✗ Build timeout after ${build_timeout}s${NC}"
+                echo -e "    ${YELLOW}⚠️  Likely cause: Expression too complex for type checker${NC}"
+                echo -e "    ${YELLOW}💡 Solution: Break down complex HTML into smaller functions${NC}"
+                echo -e "    ${YELLOW}📖 See: docs/troubleshooting-complex-expressions.md${NC}"
+                failed=$((failed + 1))
+                continue
+            fi
+            
+            # Check for success
             if [ $build_status -eq 0 ]; then
-                echo -e "    ${GREEN}✓ Success${NC}"
+                # Warn if build was slow (>10 seconds)
+                if [ $build_time -gt 10 ]; then
+                    echo -e "    ${YELLOW}⚠️  Slow build: ${build_time}s${NC}"
+                    echo -e "    ${YELLOW}💡 Consider breaking down complex expressions${NC}"
+                else
+                    echo -e "    ${GREEN}✓ Success${NC} (${build_time}s)"
+                fi
                 
                 # Generate MD5 and create webbin
                 if [ -f "$output" ]; then
                     local md5
-                    if [[ "$OS" == "darwin" ]]; then
+                    if [[ "$OS" == "macos" ]]; then
                         md5=$(md5 -q "$output")
                     else
                         md5=$(md5sum "$output" | cut -d' ' -f1)
@@ -359,10 +381,24 @@ build_site() {
                 fi
             else
                 echo -e "    ${RED}✗ Failed${NC}"
-                if [ -n "$build_output" ]; then
-                    echo -e "    ${RED}Error output:${NC}"
-                    echo "$build_output" | sed 's/^/        /'
+                
+                # Check for specific error patterns
+                if echo "$build_output" | grep -q "unable to type-check this expression in reasonable time"; then
+                    echo -e "    ${RED}Error: Expression too complex for type checker${NC}"
+                    echo -e "    ${YELLOW}💡 Solution: Break down complex HTML into smaller functions${NC}"
+                    echo -e "    ${YELLOW}📖 See: docs/troubleshooting-complex-expressions.md${NC}"
+                elif echo "$build_output" | grep -q "expression was too complex"; then
+                    echo -e "    ${RED}Error: Complex expression detected${NC}"
+                    echo -e "    ${YELLOW}💡 Solution: Use function decomposition pattern${NC}"
+                    echo -e "    ${YELLOW}📖 See: docs/troubleshooting-complex-expressions.md${NC}"
+                else
+                    # Show generic error output
+                    if [ -n "$build_output" ]; then
+                        echo -e "    ${RED}Error output:${NC}"
+                        echo "$build_output" | sed 's/^/        /'
+                    fi
                 fi
+                
                 failed=$((failed + 1))
                 # Don't exit on first failure, continue with other files
                 echo -e "    ${YELLOW}Continuing despite failure...${NC}"

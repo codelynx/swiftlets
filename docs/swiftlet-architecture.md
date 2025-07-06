@@ -193,10 +193,9 @@ PATH_PARAMS='{"id": "123"}'
 ```json
 {
   "method": "POST",
-  "path": "/api/users",
+  "url": "/api/users",
   "headers": {...},
-  "body": "{\"name\": \"John\"}",
-  "params": {}
+  "body": "{\"name\": \"John\"}"
 }
 ```
 

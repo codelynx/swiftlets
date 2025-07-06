@@ -412,8 +412,8 @@ The best way to learn Swiftlets is by exploring our comprehensive showcase:
 
 ```bash
 # Quick start with the showcase
-./smake build sites/examples/swiftlets-site
-./smake run sites/examples/swiftlets-site
+./build-site sites/examples/swiftlets-site
+./run-site sites/examples/swiftlets-site
 ```
 
 The showcase includes:
@@ -430,11 +430,12 @@ The showcase includes:
 ### Run Any Example
 
 ```bash
-# List all available sites
-./smake list
+# Build and run a specific site
+./build-site sites/examples/swiftlets-site
+./run-site sites/examples/swiftlets-site
 
-# Run a specific site
-./smake run sites/examples/swiftlets-site
+# Or build and run in one command
+./run-site sites/examples/swiftlets-site --build
 ```
 
 ## 📁 Project Structure
@@ -492,8 +493,5 @@ For more troubleshooting help, see the [documentation](docs/).
 ---
 
 <p align="center">
-  <a href="https://swiftlets.dev">Website</a> •
-  <a href="https://github.com/yourusername/swiftlets">GitHub</a> •
-  <a href="https://twitter.com/swiftlets">Twitter</a> •
-  <a href="https://discord.gg/swiftlets">Discord</a>
+  <a href="https://github.com/codelynx/swiftlets">GitHub</a>
 </p>

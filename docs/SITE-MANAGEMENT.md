@@ -57,7 +57,7 @@ done
 ./build-server
 
 # Run with specific site
-./bin/darwin/arm64/swiftlets-server sites/examples/swiftlets-site
+./bin/macos/arm64/swiftlets-server sites/examples/swiftlets-site
 ```
 
 ### Method 2: From Site Directory
