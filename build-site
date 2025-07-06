@@ -196,11 +196,11 @@ build_site() {
     fi
     echo
     
-    # Check for Components.swift
+    # Check for Components.swift (legacy support)
     local components_file=""
     if [ -f "$SITE_ROOT/src/Components.swift" ]; then
         components_file="$SITE_ROOT/src/Components.swift"
-        [ "$VERBOSE" = true ] && echo -e "Found shared components: ${BLUE}Components.swift${NC}"
+        [ "$VERBOSE" = true ] && echo -e "Found legacy shared components: ${BLUE}Components.swift${NC}"
     fi
     
     # Framework sources
@@ -211,6 +211,47 @@ build_site() {
         $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Layout/*.swift \
         $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Modifiers/*.swift \
         $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Builders/*.swift"
+    
+    # Function to discover shared components for a given file
+    discover_shared_components() {
+        local swift_file="$1"
+        local src_root="$SITE_ROOT/src"
+        
+        # Get directory path relative to src/
+        local rel_path="${swift_file#$src_root/}"
+        local dir_path=$(dirname "$rel_path")
+        
+        [ "$VERBOSE" = true ] && echo -e "    Discovering shared components for: $rel_path" >&2
+        
+        local shared_files=""
+        
+        # Walk up directory tree from file location
+        local current_dir="$dir_path"
+        while [ "$current_dir" != "." ] && [ "$current_dir" != "/" ]; do
+            if [ -d "$src_root/$current_dir/shared" ]; then
+                [ "$VERBOSE" = true ] && echo -e "      ${GREEN}✓${NC} Found: $current_dir/shared/" >&2
+                # Add all Swift files in this shared directory
+                for shared_file in "$src_root/$current_dir/shared/"*.swift; do
+                    if [ -f "$shared_file" ]; then
+                        shared_files="$shared_files $shared_file"
+                    fi
+                done
+            fi
+            current_dir=$(dirname "$current_dir")
+        done
+        
+        # Add global shared
+        if [ -d "$src_root/shared" ]; then
+            [ "$VERBOSE" = true ] && echo -e "      ${GREEN}✓${NC} Found: shared/ (global)" >&2
+            for shared_file in "$src_root/shared/"*.swift; do
+                if [ -f "$shared_file" ]; then
+                    shared_files="$shared_files $shared_file"
+                fi
+            done
+        fi
+        
+        echo "$shared_files"
+    }
     
     # Build each file
     local built=0
@@ -237,8 +278,8 @@ build_site() {
         # Skip empty lines
         [ -z "$file" ] && continue
         
-        # Skip Components.swift
-        if [[ "$file" == *"Components.swift" ]]; then
+        # Skip Components.swift and files in shared directories
+        if [[ "$file" == *"Components.swift" ]] || [[ "$file" == */shared/*.swift ]]; then
             continue
         fi
         
@@ -278,6 +319,19 @@ build_site() {
             elif [ -n "$components_file" ] && [ "$components_file" -nt "$output" ]; then
                 need_build=1
                 [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}🔧${NC} Components changed: $relative"
+            elif [ -n "$(discover_shared_components "$file")" ]; then
+                # Check if any shared components have changed
+                local shared_newer=false
+                for shared_file in $(discover_shared_components "$file"); do
+                    if [ "$shared_file" -nt "$output" ]; then
+                        shared_newer=true
+                        break
+                    fi
+                done
+                if [ "$shared_newer" = true ]; then
+                    need_build=1
+                    [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}🔄${NC} Shared components changed: $relative"
+                fi
             else
                 # Check framework files (only check first file of each directory for performance)
                 local framework_dirs=(
@@ -312,14 +366,22 @@ build_site() {
                 -e 's/let request = try/let _ = try/' \
                 "$file" > "$temp_file"
             
+            # Discover shared components for this file
+            local shared_components=$(discover_shared_components "$file")
+            
             # Build command
             local build_cmd="swiftc -parse-as-library \
                 -module-name Swiftlets \
                 $framework_sources"
             
-            # Add components if exists
+            # Add legacy components if exists
             if [ -n "$components_file" ]; then
                 build_cmd="$build_cmd $components_file"
+            fi
+            
+            # Add discovered shared components
+            if [ -n "$shared_components" ]; then
+                build_cmd="$build_cmd $shared_components"
             fi
             
             # Add the temp file and output

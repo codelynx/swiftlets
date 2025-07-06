@@ -55,17 +55,17 @@ See `TODO.md` for the current task list and priorities.
 - Support process pooling for performance
 - Allow mixing of different programming languages
 
-## Project Structure
+## Key Documentation
 - `/docs/project-structure.md` - Modular structure for core and third-party development
 - `/docs/swiftlet-architecture.md` - Detailed explanation of the executable module system
-- `/docs/poc-simple-server.md` - First POC implementation without result builders
 - `/docs/sites-organization.md` - Organization of sites for core, test, and third-party development
-- `/docs/html-builder-implementation-plan.md` - Detailed plan for HTML component builder using result builders
-- `/docs/html-builder-poc.swift` - Proof of concept demonstrating SwiftUI-like HTML generation
-- `/docs/html-dsl-implementation-status.md` - Current implementation status of Swiftlets HTML DSL
 - `/docs/html-elements-reference.md` - Complete reference of all implemented HTML elements
-- `/docs/roadmap.md` - Comprehensive development roadmap and vision
-- `/docs/roadmap-quick.md` - Quick reference for immediate priorities and tasks
+- `/docs/shared-components-guide.md` - Guide to the hierarchical shared components system
+- `/docs/troubleshooting-complex-expressions.md` - Solutions for Swift type-checking issues
+- `/docs/SWIFTUI-API-IMPLEMENTATION.md` - SwiftUI-style API documentation
+- `/docs/README.md` - Complete documentation index
+
+Note: Historical documentation and POCs have been moved to `/docs/archive/` for reference.
 
 ## Latest Development
 - **Unified Swiftlets Framework**: Consolidated SwiftletsCore and SwiftletsHTML into a single `Swiftlets` framework
