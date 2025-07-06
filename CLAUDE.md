@@ -29,7 +29,7 @@ See `/docs/swiftlet-architecture.md` for detailed architecture documentation.
 
 See `TODO.md` for the current task list and priorities.
 
-### Latest Accomplishment (January 2025)
+### Latest Accomplishments (January 2025)
 - **SwiftUI-Style API**: Successfully implemented a zero-boilerplate API inspired by SwiftUI
   - Property wrappers for clean data access (@Query, @FormValue, @JSONBody, @Cookie, @Environment)
   - Declarative syntax with `@main` and `body` property
@@ -38,6 +38,11 @@ See `TODO.md` for the current task list and priorities.
   - See `/docs/SWIFTUI-API-IMPLEMENTATION.md` for complete documentation
   - See `/docs/SWIFTUI-API-MIGRATION-GUIDE.md` for migration guide
   - See `/sites/test/swiftui-api-example/` for working examples
+- **Hierarchical Shared Components**: Fully implemented in the main build system
+  - Components are discovered by walking up the directory tree
+  - Automatic compilation with each swiftlet for code reuse
+  - Example at `/sites/examples/shared-test/` demonstrates the system
+  - See `/docs/shared-components-guide.md` for documentation
 
 ## Development Workflow
 
@@ -142,6 +147,8 @@ See `/docs/troubleshooting-complex-expressions.md` for detailed patterns and exa
 ## Sites
 - `/sites/core/` - Official example sites (hello, showcase)
 - `/sites/test/` - Test sites for framework development
+- `/sites/examples/` - Example sites demonstrating specific features
+  - `shared-test/` - Demonstrates hierarchical shared components system
 - `/sites/templates/` - Third-party site templates
 
 Run with: `.build/release/swiftlets-server sites/core/showcase`

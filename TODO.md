@@ -1,6 +1,15 @@
 # Swiftlets TODO List
 
-## ✅ Recently Completed (June 8, 2025)
+## ✅ Recently Completed (July 2025)
+
+### Hierarchical Shared Components
+- [x] Implement file-based discovery system in build-site
+- [x] Support hierarchical component lookup
+- [x] Create shared components guide documentation
+- [x] Add example sites demonstrating the system
+- [x] Clean up experimental build scripts and outdated docs
+
+## ✅ Recently Completed (June 2025)
 
 ### SwiftUI-Style API
 - [x] Design zero-boilerplate SwiftUI-style API

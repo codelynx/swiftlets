@@ -198,10 +198,15 @@ If builds are slow with many shared components:
 2. Use the timestamp-based caching (don't use `--force` unless needed)
 3. Avoid complex expressions in shared components (see troubleshooting guide)
 
-## Example Project
+## Example Projects
 
-See `/sites/test/shared-components-demo/` for a complete example demonstrating:
-- Global site header and footer
-- Product category components
-- Electronics-specific components
-- Proper scoping and hierarchy
+- `/sites/test/shared-components-demo/` - Demonstrates hierarchical components:
+  - Global site header and footer
+  - Product category components
+  - Electronics-specific components
+  - Proper scoping and hierarchy
+
+- `/sites/examples/shared-test/` - Simple shared components example:
+  - Shared navigation and footer
+  - Page layout wrapper
+  - Basic component reuse across pages
