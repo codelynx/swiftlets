@@ -28,18 +28,53 @@ The project provides three main scripts for working with sites:
 ./build-site sites/swiftlets-site --force
 ```
 
+## Build-Site Options
+
+The `build-site` script supports several options:
+
+- `--clean` - Remove compiled binaries and webbin files without rebuilding. Useful for:
+  - Cleaning up after moving or renaming files
+  - Resetting the build environment
+  - Removing stale artifacts
+  
+- `--force` - Force rebuild all files (ignores timestamps). This:
+  - Performs a clean first
+  - Then rebuilds all Swift files
+  
+- `--verbose` or `-v` - Show detailed build output
+
+- `--timeout N` or `-t N` - Set build timeout per file in seconds (default: 30)
+
+- `--jobs N` or `-j N` - Number of parallel builds (default: 1)
+
+### Examples:
+
+```bash
+# Clean only (no build)
+./build-site sites/swiftlets-site --clean
+
+# Clean and rebuild everything
+./build-site sites/swiftlets-site --force
+
+# Verbose output with parallel builds
+./build-site sites/swiftlets-site -v -j 4
+
+# Extended timeout for complex files
+./build-site sites/swiftlets-site --timeout 60
+```
+
 ## Building Multiple Sites
 
 To build multiple sites, use shell commands:
 
 ```bash
-# Build all example sites
-for site in sites/examples/*; do
+# Build all sites
+for site in sites/*; do
     [ -d "$site/src" ] && ./build-site "$site"
 done
 
-# Build all test sites
-for site in sites/tests/*; do
+# Build specific test sites
+for site in sites/test/*; do
     [ -d "$site/src" ] && ./build-site "$site"
 done
 

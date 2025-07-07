@@ -165,13 +165,12 @@ Body {
 See `/docs/troubleshooting-complex-expressions.md` for detailed patterns and examples.
 
 ## Sites
-- `/sites/core/` - Official example sites (hello, showcase)
+- `/sites/swiftlets-site/` - Official documentation and showcase site
+- `/sites/shared-test/` - Demonstrates hierarchical shared components system
 - `/sites/test/` - Test sites for framework development
-- `/sites/examples/` - Example sites demonstrating specific features
-  - `shared-test/` - Demonstrates hierarchical shared components system
 - `/sites/templates/` - Third-party site templates
 
-Run with: `.build/release/swiftlets-server sites/core/showcase`
+Run with: `./run-site sites/swiftlets-site`
 
 ## References
 - Ignite framework (in `/external/Ignite/`) - MIT Licensed static site generator by Paul Hudson

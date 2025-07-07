@@ -3,245 +3,146 @@ import Swiftlets
 @main
 struct ShowcasePage: SwiftletMain {
     var title = "Showcase - Swiftlets"
-    var meta = [
-        "description": "Explore the components and layouts available in Swiftlets",
-        "viewport": "width=device-width, initial-scale=1.0"
-    ]
     
     var body: some HTMLElement {
-        Div {
-            // Navigation
-            Div {
-                Div {
-                    Link(href: "/", "Swiftlets")
-                        .class("nav-brand")
-                    Div {
-                        Link(href: "/docs", "Documentation")
-                        Link(href: "/showcase", "Showcase")
-                            .class("active")
-                        Link(href: "/about", "About")
-                        Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
-                            .attribute("target", "_blank")
-                    }
-                    .class("nav-links")
-                }
-                .class("nav-content")
-            }
-            .class("nav-container")
-            
-            // Header
-            Div {
-                Div {
-                    H1("Component Showcase")
-                    P("Explore the components and layouts available in Swiftlets")
-                        .style("font-size", "1.25rem")
-                        .style("color", "#6c757d")
-                }
-                .class("showcase-container")
-                .style("text-align", "center")
-            }
-            .class("showcase-header")
-            
-            // Main Content
-            Div {
-                Div {
-                    // Category Navigation
-                    Section {
-                        H2("HTML Element Categories")
-                        P("Browse comprehensive examples showing Swift DSL code and generated HTML")
-                        
-                        Grid(columns: .count(3), spacing: 20) {
-                            CategoryCard(
-                                title: "Basic Elements",
-                                description: "Headings, paragraphs, divs, spans, links, and more",
-                                href: "/showcase/basic-elements",
-                                icon: "📝"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Text Formatting",
-                                description: "Bold, italic, code, quotes, and text styling",
-                                href: "/showcase/text-formatting",
-                                icon: "✨"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Lists",
-                                description: "Ordered, unordered, and definition lists",
-                                href: "/showcase/list-examples",
-                                icon: "📋"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Forms",
-                                description: "All input types, labels, buttons, and form elements",
-                                href: "/showcase/forms",
-                                icon: "📝"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Media Elements",
-                                description: "Images, audio, video, and embedded content",
-                                href: "/showcase/media-elements",
-                                icon: "🎬"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Layout Components",
-                                description: "HStack, VStack, Grid, and responsive layouts",
-                                href: "/showcase/layout-components",
-                                icon: "🏗️"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Semantic HTML",
-                                description: "Header, footer, article, section, and more",
-                                href: "/showcase/semantic-html",
-                                icon: "🏷️"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Modifiers",
-                                description: "Styling, classes, IDs, and attributes",
-                                href: "/showcase/modifiers",
-                                icon: "🎨"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "SwiftUI-Style API",
-                                description: "New @main API with property wrappers",
-                                href: "/showcase/api-demo",
-                                icon: "🚀"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "SwiftUI-Style Features",
-                                description: "Deep dive into SwiftUI-style features",
-                                href: "/showcase/swiftui-style",
-                                icon: "📱"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Dynamic Content",
-                                description: "Loops, conditionals, and dynamic generation",
-                                href: "/showcase/dynamic-content",
-                                icon: "⚡"
-                            ).render()
-                        }
-                    }
-                    .style("margin-bottom", "3rem")
-                    
-                    // Examples Section
-                    Section {
-                        H2("Quick Examples")
-                        
-                        VStack(spacing: 30) {
-                            // HStack Example
-                            examplePreview(
-                                title: "HStack",
-                                description: "Horizontal stack with spacing",
-                                code: """
-                                HStack(spacing: 20) {
-                                    Button("Button 1")
-                                    Button("Button 2")
-                                    Button("Button 3")
-                                }
-                                """
-                            ) {
-                                HStack(spacing: 20) {
-                                    Button("Button 1")
-                                    Button("Button 2")
-                                    Button("Button 3")
-                                }
-                                .style("padding", "1rem")
-                                .style("background", "#f8f9fa")
-                                .style("border-radius", "0.5rem")
-                            }
-                            
-                            // Grid Example
-                            examplePreview(
-                                title: "Grid",
-                                description: "Responsive grid layout",
-                                code: """
-                                Grid(columns: .count(3), spacing: 20) {
-                                    ForEach(1...6) { i in
-                                        Card(number: i)
-                                    }
-                                }
-                                """
-                            ) {
-                                Grid(columns: .count(3), spacing: 20) {
-                                    ForEach(1...6) { i in
-                                        Div {
-                                            H4("Card \(i)")
-                                            P("This is a sample card component")
-                                        }
-                                        .style("padding", "1.5rem")
-                                        .style("background", "white")
-                                        .style("border", "1px solid #dee2e6")
-                                        .style("border-radius", "0.5rem")
-                                        .style("box-shadow", "0 1px 3px rgba(0,0,0,0.1)")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .style("margin-top", "4rem")
-                }
-                .class("showcase-container")
-            }
-            .class("showcase-content")
-            
-            // Footer
-            Footer {
-                Container(maxWidth: .large) {
-                    HStack {
-                        P("© 2025 Swiftlets Project")
-                        Spacer()
-                        HStack(spacing: 20) {
-                            Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
-                            Link(href: "/docs", "Docs")
-                            Link(href: "/showcase", "Examples")
-                        }
-                    }
-                    .style("align-items", "center")
-                }
-            }
-            .style("padding", "2rem 0")
-            .style("border-top", "1px solid #dee2e6")
+        Fragment {
+            modernStyles()
+            navBar()
+            hero()
+            categories()
+            footer()
         }
     }
     
-    // Helper function
     @HTMLBuilder
-    func examplePreview<Content: HTMLElement>(
-        title: String,
-        description: String,
-        code: String,
-        @HTMLBuilder demo: () -> Content
-    ) -> some HTMLElement {
-        Div {
-            H3(title)
-            P(description)
-            
-            Div {
-                H4("Code:")
-                    .style("margin-bottom", "0.5rem")
-                Pre {
-                    Code(code)
+    func modernStyles() -> some HTMLElement {
+        Style("""
+        /* Modern Showcase Styles */
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        .nav-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .showcase-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .showcase-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .showcase-hero p {
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+        
+        .showcase-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .showcase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px rgba(0,0,0,0.1);
+            border-color: transparent;
+        }
+        
+        .showcase-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .showcase-card h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .showcase-card p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        a { text-decoration: none; color: inherit; }
+        a:hover { opacity: 0.8; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.6s ease-out;
+        }
+        """)
+    }
+    
+    @HTMLBuilder
+    func navBar() -> some HTMLElement {
+        showcaseNav()
+    }
+    
+    @HTMLBuilder 
+    func hero() -> some HTMLElement {
+        showcaseHero(
+            title: "Component Showcase",
+            subtitle: "Explore beautiful, modern components built with Swiftlets"
+        )
+    }
+    
+    @HTMLBuilder
+    func categories() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2("Browse by Category")
+                    .style("margin-bottom", "2rem")
+                    .style("color", "#2c3e50")
+                
+                Grid(columns: .count(3), spacing: 24) {
+                    categoryCard("Basic Elements", "Headings, paragraphs, and more", "/showcase/basic-elements", "📝")
+                    categoryCard("Text Formatting", "Bold, italic, code, quotes", "/showcase/text-formatting", "✨")
+                    categoryCard("Lists & Tables", "Ordered, unordered lists", "/showcase/list-examples", "📋")
+                    categoryCard("Forms", "Input types and form elements", "/showcase/forms", "📝")
+                    categoryCard("Media", "Images, audio, video", "/showcase/media-elements", "🎬")
+                    categoryCard("Layout", "HStack, VStack, Grid", "/showcase/layout-components", "🏗️")
                 }
-                .class("language-swift")
-            }
-            
-            Div {
-                H4("Preview:")
-                    .style("margin-bottom", "0.5rem")
-                demo()
             }
         }
-        .style("padding", "2rem")
+        .style("padding", "4rem 0")
         .style("background", "#f8f9fa")
-        .style("border-radius", "8px")
-        .style("margin-bottom", "2rem")
+    }
+    
+    @HTMLBuilder
+    func categoryCard(_ title: String, _ desc: String, _ href: String, _ icon: String) -> some HTMLElement {
+        showcaseCard(
+            title: title,
+            description: desc,
+            href: href,
+            icon: icon
+        )
+    }
+    
+    @HTMLBuilder
+    func footer() -> some HTMLElement {
+        showcaseFooter()
     }
 }

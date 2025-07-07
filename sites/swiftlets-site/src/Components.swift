@@ -1,5 +1,3 @@
-import Swiftlets
-
 // Helper component to show Swift code and generated HTML
 public struct CodeExample {
     let title: String?
