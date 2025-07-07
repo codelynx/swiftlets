@@ -40,7 +40,7 @@ cd swiftlets
 ./build-server
 ```
 
-This builds the server binary and places it in the platform-specific directory (e.g., `bin/darwin/arm64/`).
+This builds the server binary and places it in the platform-specific directory (e.g., `bin/macos/arm64/`).
 
 ### 2. Try the Showcase Site
 
@@ -424,8 +424,7 @@ The showcase includes:
 
 ### Other Examples
 
-- [**Test Sites**](sites/tests/) - Testing sites for framework development
-- [**Templates**](templates/) - Project templates for quick start
+- [**Templates**](sdk/templates/) - Project templates for quick start
 
 ### Run Any Example
 
@@ -443,11 +442,17 @@ The showcase includes:
 ```
 swiftlets/
 ├── Sources/           # Framework and server source code
-├── bin/{os}/{arch}/   # Platform-specific binaries
-├── sites/             # Example and test sites
-├── templates/         # Project templates
-├── tools/             # Build and packaging tools
-└── docs/              # Documentation
+├── bin/               # Platform-specific binaries
+│   ├── macos/         # macOS binaries (x86_64, arm64)
+│   └── linux/         # Linux binaries (x86_64, arm64)
+├── sites/             # Website projects
+│   └── swiftlets-site/# Official documentation site
+├── docs/              # Documentation
+├── external/          # External dependencies (Ignite)
+├── sdk/               # SDK distribution
+│   ├── examples/      # SDK examples
+│   └── templates/     # Project templates
+└── articles/          # Blog articles and guides
 ```
 
 See [Project Structure](docs/PROJECT-STRUCTURE.md) for details.
