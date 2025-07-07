@@ -159,7 +159,7 @@ struct HomePage {
             Footer {
             Container {
             HStack {
-                P("© 2024 Swiftlets. Built with Swift and ❤️")
+                P("© 2025 Swiftlets. Built with Swift and ❤️")
                 Spacer()
                 HStack(spacing: 20) {
                     Link(href: "/docs", "Docs")

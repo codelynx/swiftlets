@@ -6,85 +6,362 @@ struct ConceptsIndex: SwiftletMain {
     
     var body: some HTMLElement {
         Fragment {
-            // Navigation
+            conceptStyles()
             navigation()
-            
-            // Hero Section
             heroSection()
-            
-            // Main Content
             mainContent()
-            
-            // Footer
             footer()
         }
     }
     
     @HTMLBuilder
-    func navigation() -> some HTMLElement {
-        Nav {
-            Container(maxWidth: .xl) {
-                HStack {
-                    Link(href: "/") {
-                        H1("Swiftlets").style("margin", "0")
-                    }
-                    Spacer()
-                    HStack(spacing: 20) {
-                        Link(href: "/docs", "Documentation").class("active")
-                        Link(href: "/showcase", "Showcase")
-                        Link(href: "/about", "About")
-                        Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
-                            .attribute("target", "_blank")
-                    }
-                }
-                .style("align-items", "center")
+    func conceptStyles() -> some HTMLElement {
+        Style("""
+        /* Core Concepts Styles */
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1a202c;
+            line-height: 1.6;
+            background: #ffffff;
+        }
+        
+        /* Navigation */
+        .concept-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #667eea;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+            padding: 4rem 0 3rem;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -25%;
+            width: 50%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .breadcrumb a:hover {
+            color: #764ba2;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 1rem 0;
+            animation: fadeInUp 0.6s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-        .style("background", "#f8f9fa")
-        .style("padding", "1rem 0")
-        .style("border-bottom", "1px solid #dee2e6")
+        
+        .hero-subtitle {
+            font-size: 1.375rem;
+            color: #4a5568;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Concept Cards */
+        .concept-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2.5rem;
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .concept-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border-color: transparent;
+        }
+        
+        .concept-card:hover::before {
+            transform: translateY(0);
+        }
+        
+        .concept-icon {
+            font-size: 3.5rem;
+            display: inline-block;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Learning Path */
+        .learning-path {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 4rem 2rem;
+            border-radius: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .learning-path::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -25%;
+            width: 50%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: float 15s ease-in-out infinite reverse;
+        }
+        
+        .learning-step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .learning-step:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(8px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Key Principles */
+        .principle-card {
+            text-align: center;
+            padding: 2rem;
+            background: #f7fafc;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .principle-card:hover {
+            background: #edf2f7;
+            transform: translateY(-4px);
+        }
+        
+        .principle-icon {
+            font-size: 2.5rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Footer */
+        .concept-footer {
+            background: #f7fafc;
+            padding: 4rem 0 2rem 0;
+            margin-top: 5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-heading {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0 0 1rem 0;
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: #718096;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: #667eea;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .nav-links { gap: 1rem; font-size: 0.9rem; }
+            .concept-card { padding: 2rem; }
+            .learning-path { padding: 3rem 1.5rem; }
+        }
+        """)
+    }
+    
+    @HTMLBuilder
+    func navigation() -> some HTMLElement {
+        Nav {
+            Div {
+                Link(href: "/", "Swiftlets")
+                    .class("nav-brand")
+                Div {
+                    Link(href: "/docs", "Documentation")
+                        .class("active")
+                    Link(href: "/showcase", "Showcase")
+                    Link(href: "/about", "About")
+                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        .attribute("target", "_blank")
+                }
+                .class("nav-links")
+            }
+            .class("nav-content")
+        }
+        .class("concept-nav")
     }
     
     @HTMLBuilder
     func heroSection() -> some HTMLElement {
         Section {
             Container(maxWidth: .large) {
-                VStack(spacing: 30) {
-                    // Breadcrumb
-                    HStack(spacing: 10) {
-                        Link(href: "/docs", "Docs")
-                            .style("color", "#667eea")
-                        Text("→")
-                            .style("color", "#a0aec0")
-                        Text("Core Concepts")
-                            .style("font-weight", "600")
-                    }
-                    .class("breadcrumb")
-                    .style("font-size", "0.875rem")
-                    
-                    // Hero Content
-                    VStack(spacing: 20) {
-                        H1("Core Concepts")
-                            .style("font-size", "3rem")
-                            .style("font-weight", "800")
-                            .style("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
-                            .style("-webkit-background-clip", "text")
-                            .style("-webkit-text-fill-color", "transparent")
-                            .style("margin", "0")
-                        
-                        P("Understand the fundamental ideas that power Swiftlets and make it unique")
-                            .style("font-size", "1.375rem")
-                            .style("color", "#4a5568")
-                            .style("max-width", "600px")
-                            .style("margin", "0 auto")
-                            .style("text-align", "center")
-                    }
-                    .style("text-align", "center")
+                // Breadcrumb
+                Div {
+                    Link(href: "/docs", "Docs")
+                    Span(" → ")
+                    Span("Core Concepts")
                 }
+                .class("breadcrumb")
+                
+                // Hero Content
+                VStack(spacing: 20) {
+                    H1("Core Concepts")
+                        .class("hero-title")
+                    
+                    P("Understand the fundamental ideas that power Swiftlets and make it unique")
+                        .class("hero-subtitle")
+                }
+                .style("text-align", "center")
             }
         }
-        .style("padding", "4rem 0 3rem 0")
-        .style("background", "linear-gradient(180deg, #ffffff 0%, #f7fafc 100%)")
+        .class("hero-section")
     }
     
     @HTMLBuilder
@@ -118,14 +395,8 @@ struct ConceptsIndex: SwiftletMain {
                 Link(href: "/docs/concepts/architecture") {
                     Div {
                         VStack(spacing: 20) {
-                            Div {
-                                Text("🏗️")
-                                    .style("font-size", "3.5rem")
-                            }
-                            .style("height", "80px")
-                            .style("display", "flex")
-                            .style("align-items", "center")
-                            .style("justify-content", "center")
+                            Span("🏗️")
+                                .class("concept-icon")
                             
                             VStack(spacing: 10) {
                                 H3("Architecture")
@@ -140,13 +411,6 @@ struct ConceptsIndex: SwiftletMain {
                         }
                     }
                     .class("concept-card")
-                    .style("padding", "2.5rem")
-                    .style("background", "white")
-                    .style("border", "2px solid #e2e8f0")
-                    .style("border-radius", "16px")
-                    .style("height", "100%")
-                    .style("transition", "all 0.3s ease")
-                    .style("cursor", "pointer")
                 }
                 .style("text-decoration", "none")
                 .style("color", "inherit")
@@ -154,14 +418,8 @@ struct ConceptsIndex: SwiftletMain {
                 Link(href: "/docs/concepts/html-dsl") {
                     Div {
                         VStack(spacing: 20) {
-                            Div {
-                                Text("🎨")
-                                    .style("font-size", "3.5rem")
-                            }
-                            .style("height", "80px")
-                            .style("display", "flex")
-                            .style("align-items", "center")
-                            .style("justify-content", "center")
+                            Span("🎨")
+                                .class("concept-icon")
                             
                             VStack(spacing: 10) {
                                 H3("HTML DSL")
@@ -176,13 +434,6 @@ struct ConceptsIndex: SwiftletMain {
                         }
                     }
                     .class("concept-card")
-                    .style("padding", "2.5rem")
-                    .style("background", "white")
-                    .style("border", "2px solid #e2e8f0")
-                    .style("border-radius", "16px")
-                    .style("height", "100%")
-                    .style("transition", "all 0.3s ease")
-                    .style("cursor", "pointer")
                 }
                 .style("text-decoration", "none")
                 .style("color", "inherit")
@@ -190,14 +441,8 @@ struct ConceptsIndex: SwiftletMain {
                 Link(href: "/docs/concepts/routing") {
                     Div {
                         VStack(spacing: 20) {
-                            Div {
-                                Text("🛣️")
-                                    .style("font-size", "3.5rem")
-                            }
-                            .style("height", "80px")
-                            .style("display", "flex")
-                            .style("align-items", "center")
-                            .style("justify-content", "center")
+                            Span("🛣️")
+                                .class("concept-icon")
                             
                             VStack(spacing: 10) {
                                 H3("Routing")
@@ -212,13 +457,6 @@ struct ConceptsIndex: SwiftletMain {
                         }
                     }
                     .class("concept-card")
-                    .style("padding", "2.5rem")
-                    .style("background", "white")
-                    .style("border", "2px solid #e2e8f0")
-                    .style("border-radius", "16px")
-                    .style("height", "100%")
-                    .style("transition", "all 0.3s ease")
-                    .style("cursor", "pointer")
                 }
                 .style("text-decoration", "none")
                 .style("color", "inherit")
@@ -226,14 +464,8 @@ struct ConceptsIndex: SwiftletMain {
                 Link(href: "/docs/concepts/request-response") {
                     Div {
                         VStack(spacing: 20) {
-                            Div {
-                                Text("🔄")
-                                    .style("font-size", "3.5rem")
-                            }
-                            .style("height", "80px")
-                            .style("display", "flex")
-                            .style("align-items", "center")
-                            .style("justify-content", "center")
+                            Span("🔄")
+                                .class("concept-icon")
                             
                             VStack(spacing: 10) {
                                 H3("Request & Response")
@@ -248,13 +480,6 @@ struct ConceptsIndex: SwiftletMain {
                         }
                     }
                     .class("concept-card")
-                    .style("padding", "2.5rem")
-                    .style("background", "white")
-                    .style("border", "2px solid #e2e8f0")
-                    .style("border-radius", "16px")
-                    .style("height", "100%")
-                    .style("transition", "all 0.3s ease")
-                    .style("cursor", "pointer")
                 }
                 .style("text-decoration", "none")
                 .style("color", "inherit")
@@ -285,10 +510,7 @@ struct ConceptsIndex: SwiftletMain {
                 }
             }
         }
-        .style("background", "linear-gradient(135deg, #667eea 0%, #764ba2 100%)")
-        .style("padding", "4rem 2rem")
-        .style("border-radius", "24px")
-        .style("color", "white")
+        .class("learning-path")
     }
     
     @HTMLBuilder
@@ -297,17 +519,8 @@ struct ConceptsIndex: SwiftletMain {
             HStack(spacing: 20) {
                 Div {
                     Text(number)
-                        .style("font-size", "1.5rem")
-                        .style("font-weight", "800")
                 }
-                .style("width", "60px")
-                .style("height", "60px")
-                .style("background", "rgba(255, 255, 255, 0.2)")
-                .style("border-radius", "16px")
-                .style("display", "flex")
-                .style("align-items", "center")
-                .style("justify-content", "center")
-                .style("flex-shrink", "0")
+                .class("step-number")
                 
                 VStack(spacing: 5) {
                     H3(title)
@@ -329,12 +542,6 @@ struct ConceptsIndex: SwiftletMain {
                 .style("margin-left", "auto")
             }
             .class("learning-step")
-            .style("background", "rgba(255, 255, 255, 0.1)")
-            .style("padding", "1.5rem")
-            .style("border-radius", "16px")
-            .style("border", "2px solid rgba(255, 255, 255, 0.2)")
-            .style("transition", "all 0.3s ease")
-            .style("align-items", "center")
         }
         .style("text-decoration", "none")
         .style("color", "white")
@@ -366,8 +573,8 @@ struct ConceptsIndex: SwiftletMain {
     func principleCard(icon: String, title: String, description: String) -> some HTMLElement {
         Div {
             VStack(spacing: 15) {
-                Text(icon)
-                    .style("font-size", "2.5rem")
+                Span(icon)
+                    .class("principle-icon")
                 H3(title)
                     .style("margin", "0")
                     .style("font-size", "1.125rem")
@@ -378,8 +585,7 @@ struct ConceptsIndex: SwiftletMain {
                     .style("line-height", "1.6")
             }
         }
-        .style("text-align", "center")
-        .style("padding", "1.5rem")
+        .class("principle-card")
     }
     
     @HTMLBuilder
@@ -391,7 +597,7 @@ struct ConceptsIndex: SwiftletMain {
                     Grid(columns: .count(4), spacing: 40) {
                         VStack(spacing: 15) {
                             H4("Swiftlets")
-                                .style("margin", "0")
+                                .class("footer-heading")
                             P("A revolutionary approach to building web applications with Swift")
                                 .style("margin", "0")
                                 .style("color", "#718096")
@@ -400,37 +606,37 @@ struct ConceptsIndex: SwiftletMain {
                         
                         VStack(spacing: 15) {
                             H4("Documentation")
-                                .style("margin", "0")
-                            VStack(spacing: 10) {
+                                .class("footer-heading")
+                            Div {
                                 Link(href: "/docs/getting-started", "Getting Started")
                                 Link(href: "/docs/concepts", "Core Concepts")
                                 Link(href: "/docs/api", "API Reference")
                             }
+                            .class("footer-links")
                         }
-                        .style("font-size", "0.875rem")
                         
                         VStack(spacing: 15) {
                             H4("Community")
-                                .style("margin", "0")
-                            VStack(spacing: 10) {
-                                Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
+                                .class("footer-heading")
+                            Div {
+                                Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
                                     .attribute("target", "_blank")
                                 Link(href: "/showcase", "Examples")
                                 Link(href: "/about", "About")
                             }
+                            .class("footer-links")
                         }
-                        .style("font-size", "0.875rem")
                         
                         VStack(spacing: 15) {
                             H4("Resources")
-                                .style("margin", "0")
-                            VStack(spacing: 10) {
+                                .class("footer-heading")
+                            Div {
                                 Link(href: "/docs/troubleshooting", "Troubleshooting")
                                 Link(href: "/docs/faq", "FAQ")
                                 Link(href: "/docs/changelog", "Changelog")
                             }
+                            .class("footer-links")
                         }
-                        .style("font-size", "0.875rem")
                     }
                     
                     // Bottom bar
@@ -453,8 +659,6 @@ struct ConceptsIndex: SwiftletMain {
                 }
             }
         }
-        .style("background", "#f7fafc")
-        .style("padding", "4rem 0 2rem 0")
-        .style("margin-top", "5rem")
+        .class("concept-footer")
     }
 }

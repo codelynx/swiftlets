@@ -1,61 +1,361 @@
-import Foundation
 import Swiftlets
 
 @main
-struct GettingStartedPage {
-    static func main() async throws {
-        // Swiftlets passes request data via stdin, but we don't need it for this static page
-        _ = try JSONDecoder().decode(Request.self, from: FileHandle.standardInput.readDataToEndOfFile())
+struct GettingStartedPage: SwiftletMain {
+    var title = "Getting Started - Swiftlets"
+    
+    var body: some HTMLElement {
+        Fragment {
+            getStartedStyles()
+            navigation()
+            hero()
+            installationSection()
+            tryShowcaseSection()
+            architectureSection()
+            workingSitesSection()
+            swiftuiStyleSection()
+            nextStepsSection()
+            footer()
+        }
+    }
+    
+    @HTMLBuilder
+    func getStartedStyles() -> some HTMLElement {
+        Style("""
+        /* Getting Started Styles */
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1a202c;
+            line-height: 1.6;
+            background: #ffffff;
+        }
         
-        let html = Html {
-            Head {
-            Title("Getting Started - Swiftlets")
-            Meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
-            LinkElement(rel: "stylesheet", href: "/styles/main.css")
-            }
-            Body {
-            // Navigation
-            Nav {
-            Container(maxWidth: .xl) {
-            HStack {
-                Link(href: "/") {
-                    H1("Swiftlets").style("margin", "0")
-                }
-                Spacer()
-                HStack(spacing: 20) {
-                    Link(href: "/docs", "Documentation").class("active")
+        /* Navigation */
+        .docs-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #667eea;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 4rem 0 3rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-lead {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin: 0;
+            max-width: 800px;
+        }
+        
+        /* Section Styles */
+        .content-section {
+            padding: 3rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .content-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-number {
+            display: inline-flex;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0 0 1.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Code Blocks */
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 1rem 0;
+        }
+        
+        .code-inline {
+            background: #f7fafc;
+            color: #764ba2;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 0.875em;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* Tip Boxes */
+        .tip-box {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .tip-box p {
+            margin: 0;
+            color: #1e40af;
+        }
+        
+        /* Feature Lists */
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-list li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: #4a5568;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        .feature-list strong {
+            color: #1a202c;
+            font-weight: 600;
+        }
+        
+        /* Next Steps Cards */
+        .next-steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .next-step-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .next-step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            border-color: #cbd5e0;
+        }
+        
+        .next-step-card h3 {
+            color: #667eea;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+        }
+        
+        .next-step-card p {
+            color: #718096;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+        
+        /* SwiftUI Demo Button */
+        .demo-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+            margin-top: 1.5rem;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Architecture Diagram */
+        .architecture-box {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        /* Footer */
+        .docs-footer {
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 3rem 0;
+            margin-top: 5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .section-title { font-size: 1.5rem; }
+            .nav-links { gap: 1rem; font-size: 0.9rem; }
+            .next-steps-grid { grid-template-columns: 1fr; }
+        }
+        """)
+    }
+    
+    @HTMLBuilder
+    func navigation() -> some HTMLElement {
+        Nav {
+            Div {
+                Link(href: "/", "Swiftlets")
+                    .class("nav-brand")
+                Div {
+                    Link(href: "/docs", "Documentation")
+                        .class("active")
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
                     Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
+                .class("nav-links")
             }
-            .style("align-items", "center")
-            }
-            }
-            .style("background", "#f8f9fa")
-            .style("padding", "1rem 0")
-            .style("border-bottom", "1px solid #dee2e6")
-            
-            // Content
+            .class("nav-content")
+        }
+        .class("docs-nav")
+    }
+    
+    @HTMLBuilder
+    func hero() -> some HTMLElement {
+        Section {
             Container(maxWidth: .large) {
-            VStack(spacing: 40) {
-            // Breadcrumb
-            HStack(spacing: 10) {
-                Link(href: "/docs", "Docs")
-                Text("→")
-                Text("Getting Started")
+                // Breadcrumb
+                Div {
+                    Link(href: "/docs", "Docs")
+                    Span(" → ")
+                    Span("Getting Started")
+                }
+                .class("breadcrumb")
+                
+                H1("Getting Started with Swiftlets")
+                    .class("hero-title")
+                
+                P("Get up and running with Swiftlets in just a few minutes. This guide will walk you through installation, creating your first project, and understanding the basics.")
+                    .class("hero-lead")
             }
-            .style("color", "#6c757d")
-            
-            H1("Getting Started with Swiftlets")
-            
-            P("Get up and running with Swiftlets in just a few minutes. This guide will walk you through installation, creating your first project, and understanding the basics.")
-                .style("font-size", "1.25rem")
-            
-            // Installation
-            Section {
-                H2("1. Clone and Build")
+        }
+        .class("hero-section")
+    }
+    
+    @HTMLBuilder
+    func installationSection() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2 {
+                    Span("1")
+                        .class("section-number")
+                    Text("Clone and Build")
+                }
+                .class("section-title")
                 
                 P("First, ensure you have Swift installed (5.7 or later), then clone the Swiftlets repository and build the server:")
                 
@@ -71,12 +371,27 @@ struct GettingStartedPage {
                 }
                 .class("code-block")
                 
-                P("This builds the server binary and places it in the platform-specific directory (e.g., bin/macos/arm64/).")
+                P {
+                    Text("This builds the server binary and places it in the platform-specific directory (e.g., ")
+                    Code("bin/macos/arm64/")
+                        .class("code-inline")
+                    Text(").")
+                }
             }
-            
-            // Try the Showcase
-            Section {
-                H2("2. Try the Showcase Site")
+        }
+        .class("content-section")
+    }
+    
+    @HTMLBuilder
+    func tryShowcaseSection() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2 {
+                    Span("2")
+                        .class("section-number")
+                    Text("Try the Showcase Site")
+                }
+                .class("section-title")
                 
                 P("Before creating your own project, let's explore what Swiftlets can do! The repository includes a complete example site with documentation and component showcases - all built with Swiftlets.")
                 
@@ -96,7 +411,12 @@ struct GettingStartedPage {
                 }
                 .class("code-block")
                 
-                P("Visit http://localhost:8080 and explore:")
+                P {
+                    Text("Visit ")
+                    Link(href: "http://localhost:8080", "http://localhost:8080")
+                        .style("color", "#667eea")
+                    Text(" and explore:")
+                }
                 
                 UL {
                     LI {
@@ -111,45 +431,57 @@ struct GettingStartedPage {
                         Strong("View source")
                         Text(" - Check ")
                         Code("sites/swiftlets-site/src/")
+                            .class("code-inline")
                         Text(" to see how it's built")
                     }
                 }
+                .class("feature-list")
                 
                 Div {
                     P("💡 Tip: The entire documentation site you're reading right now is built with Swiftlets! Check out the source code to see real-world examples.")
                 }
-                .style("background", "#f0f9ff")
-                .style("border-left", "4px solid #3b82f6")
-                .style("padding", "1rem")
-                .style("margin", "1rem 0")
+                .class("tip-box")
             }
-            
-            // Understanding Swiftlets
-            Section {
-                H2("3. Understanding the Architecture")
+        }
+        .class("content-section")
+    }
+    
+    @HTMLBuilder
+    func architectureSection() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2 {
+                    Span("3")
+                        .class("section-number")
+                    Text("Understanding the Architecture")
+                }
+                .class("section-title")
                 
                 P("Swiftlets uses a unique architecture where each route is a standalone executable:")
                 
-                Pre {
-                    Code("""
-                    sites/swiftlets-site/
-                    ├── src/              # Swift source files
-                    │   ├── index.swift   # Homepage route
-                    │   ├── about.swift   # About page route
-                    │   └── docs/
-                    │       └── index.swift  # Docs index route
-                    ├── web/              # Static files + .webbin markers
-                    │   ├── styles/       # CSS files
-                    │   ├── *.webbin      # Route markers (generated)
-                    │   └── images/       # Static assets
-                    └── bin/              # Compiled executables (generated)
-                        ├── index         # Executable for /
-                        ├── about         # Executable for /about
-                        └── docs/
-                            └── index     # Executable for /docs
-                    """)
+                Div {
+                    Pre {
+                        Code("""
+                        sites/swiftlets-site/
+                        ├── src/              # Swift source files
+                        │   ├── index.swift   # Homepage route
+                        │   ├── about.swift   # About page route
+                        │   └── docs/
+                        │       └── index.swift  # Docs index route
+                        ├── web/              # Static files + .webbin markers
+                        │   ├── styles/       # CSS files
+                        │   ├── *.webbin      # Route markers (generated)
+                        │   └── images/       # Static assets
+                        └── bin/              # Compiled executables (generated)
+                            ├── index         # Executable for /
+                            ├── about         # Executable for /about
+                            └── docs/
+                                └── index     # Executable for /docs
+                        """)
+                    }
+                    .class("code-block")
                 }
-                .class("code-block")
+                .class("architecture-box")
                 
                 P("Key concepts:")
                 UL {
@@ -170,11 +502,22 @@ struct GettingStartedPage {
                         Text(" Executables can be rebuilt without restarting the server")
                     }
                 }
+                .class("feature-list")
             }
-            
-            // Working with Sites
-            Section {
-                H2("4. Working with Sites")
+        }
+        .class("content-section")
+    }
+    
+    @HTMLBuilder
+    func workingSitesSection() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2 {
+                    Span("4")
+                        .class("section-number")
+                    Text("Working with Sites")
+                }
+                .class("section-title")
                 
                 P("The build scripts make it easy to work with any site:")
                 
@@ -204,44 +547,41 @@ struct GettingStartedPage {
                 Div {
                     P("💡 Tip: The scripts automatically detect your platform (macOS/Linux) and architecture (x86_64/arm64).")
                 }
-                .style("background", "#f0f9ff")
-                .style("border-left", "4px solid #3b82f6")
-                .style("padding", "1rem")
-                .style("margin", "1rem 0")
+                .class("tip-box")
             }
-            
-            // SwiftUI-Style Components
-            Section {
-                H2("5. SwiftUI-Style Components")
+        }
+        .class("content-section")
+    }
+    
+    @HTMLBuilder
+    func swiftuiStyleSection() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2 {
+                    Span("5")
+                        .class("section-number")
+                    Text("SwiftUI-Style Components")
+                }
+                .class("section-title")
                 
-                P("Swiftlets also supports creating reusable components with a SwiftUI-like API:")
+                P("Swiftlets now supports a zero-boilerplate API with @main, inspired by SwiftUI:")
                 
                 Pre {
                     Code("""
-                    struct Greeting: HTMLComponent {
-                        let name: String
-                        
-                        var body: some HTMLElement {
-                            VStack(spacing: 10) {
-                                H1("Hello, \\(name)!")
-                                P("Welcome to Swiftlets")
-                            }
-                            .style("text-align", "center")
-                        }
-                    }
-                    
-                    // Use it in your page:
                     @main
                     struct HomePage: SwiftletMain {
-                        var title: String { "Home" }
+                        @Query("name") var userName: String?
+                        
+                        var title = "Welcome"
                         
                         var body: some HTMLElement {
-                            Html {
-                                Head { Title(title) }
-                                Body {
-                                    Greeting(name: "Developer").body
-                                }
+                            VStack(spacing: 20) {
+                                H1("Hello, \\(userName ?? "World")!")
+                                P("Welcome to Swiftlets")
+                                    .style("font-size", "1.25rem")
                             }
+                            .style("text-align", "center")
+                            .style("padding", "3rem")
                         }
                     }
                     """)
@@ -250,71 +590,87 @@ struct GettingStartedPage {
                 
                 P("This approach enables building complex UIs from simple, composable components - just like SwiftUI!")
                 
-                Link(href: "/showcase/swiftui-style") {
-                    Button("See SwiftUI-Style Examples →")
-                        .class("btn btn-primary")
-                        .style("margin-top", "1rem")
-                }
-            }
-            
-            // Next Steps
-            Section {
-                H2("Next Steps")
-                
-                UL {
-                    LI {
-                        Link(href: "/docs/concepts", "Core Concepts")
-                        Text(" - Understand how Swiftlets works")
-                    }
-                    LI {
-                        Link(href: "/showcase", "Component Showcase")
-                        Text(" - See all available components")
-                    }
-                    LI {
-                        Link(href: "/showcase/swiftui-style", "SwiftUI-Style API")
-                        Text(" - Build with reusable components")
-                    }
-                    LI {
-                        Link(href: "https://github.com/codelynx/swiftlets/tree/main/sites/swiftlets-site", "Study the Source")
-                            .attribute("target", "_blank")
-                        Text(" - Learn from real examples")
-                    }
-                    LI {
-                        Link(href: "/docs/concepts/html-dsl", "HTML DSL Guide")
-                        Text(" - Master the SwiftUI-like syntax")
-                    }
-                }
-            }
-            }
-            }
-            .style("padding", "3rem 0")
-            
-            // Footer
-            Footer {
-            Container(maxWidth: .large) {
-            HStack {
-                P("© 2025 Swiftlets Project")
-                Spacer()
-                HStack(spacing: 20) {
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
-                    Link(href: "/docs", "Docs")
-                    Link(href: "/showcase", "Examples")
-                }
-            }
-            .style("align-items", "center")
-            }
-            }
-            .style("padding", "2rem 0")
-            .style("border-top", "1px solid #dee2e6")
+                Link(href: "/showcase/swiftui-style", "See SwiftUI-Style Examples →")
+                    .class("demo-button")
             }
         }
-        
-        let response = Response(
-            status: 200,
-            headers: ["Content-Type": "text/html; charset=utf-8"],
-            body: html.render()
-        )
-        
-        print(try JSONEncoder().encode(response).base64EncodedString())
+        .class("content-section")
+    }
+    
+    @HTMLBuilder
+    func nextStepsSection() -> some HTMLElement {
+        Section {
+            Container(maxWidth: .large) {
+                H2("Next Steps")
+                    .style("font-size", "2rem")
+                    .style("margin-bottom", "2rem")
+                
+                Div {
+                    Link(href: "/docs/concepts") {
+                        Div {
+                            H3("Core Concepts")
+                            P("Understand how Swiftlets works")
+                        }
+                        .class("next-step-card")
+                    }
+                    
+                    Link(href: "/showcase") {
+                        Div {
+                            H3("Component Showcase")
+                            P("See all available components")
+                        }
+                        .class("next-step-card")
+                    }
+                    
+                    Link(href: "/showcase/swiftui-style") {
+                        Div {
+                            H3("SwiftUI-Style API")
+                            P("Build with declarative syntax")
+                        }
+                        .class("next-step-card")
+                    }
+                    
+                    Link(href: "https://github.com/codelynx/swiftlets/tree/main/sites/swiftlets-site") {
+                        Div {
+                            H3("Study the Source")
+                            P("Learn from real examples")
+                        }
+                        .class("next-step-card")
+                    }
+                    .attribute("target", "_blank")
+                    
+                    Link(href: "/docs/concepts/html-dsl") {
+                        Div {
+                            H3("HTML DSL Guide")
+                            P("Master the SwiftUI-like syntax")
+                        }
+                        .class("next-step-card")
+                    }
+                }
+                .class("next-steps-grid")
+            }
+        }
+        .class("content-section")
+    }
+    
+    @HTMLBuilder
+    func footer() -> some HTMLElement {
+        Footer {
+            Container(maxWidth: .large) {
+                HStack {
+                    P("© 2025 Swiftlets Project")
+                        .style("margin", "0")
+                        .style("color", "#718096")
+                    Spacer()
+                    HStack(spacing: 24) {
+                        Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        Link(href: "/docs", "Docs")
+                        Link(href: "/showcase", "Examples")
+                    }
+                    .style("color", "#4a5568")
+                }
+            }
+        }
+        .class("docs-footer")
     }
 }

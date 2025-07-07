@@ -65,7 +65,7 @@ Main {
 }
 
 Footer {
-    P("© 2024 My Company. All rights reserved.")
+    P("© 2025 My Company. All rights reserved.")
 }
 """,
                 html: """
@@ -94,7 +94,7 @@ Footer {
 </main>
 
 <footer>
-    <p>© 2024 My Company. All rights reserved.</p>
+    <p>© 2025 My Company. All rights reserved.</p>
 </footer>
 """,
                 preview: {
@@ -139,7 +139,7 @@ Footer {
                         }
                         
                         Footer {
-                            P("© 2024 Swiftlets. All rights reserved.")
+                            P("© 2025 Swiftlets. All rights reserved.")
                                 .style("margin", "0")
                                 .style("text-align", "center")
                         }
@@ -164,13 +164,13 @@ Section {
     
     Article {
         H3("Breaking News")
-        Time("December 6, 2024", datetime: "2024-12-06")
+        Time("January 15, 2025", datetime: "2025-01-15")
         P("Important news content...")
     }
     
     Article {
         H3("Technology Update")
-        Time("December 5, 2024", datetime: "2024-12-05")
+        Time("January 14, 2025", datetime: "2025-01-14")
         P("Latest tech news...")
     }
 }
@@ -181,13 +181,13 @@ Section {
     
     <article>
         <h3>Breaking News</h3>
-        <time datetime="2024-12-06">December 6, 2024</time>
+        <time datetime="2025-01-15">January 15, 2025</time>
         <p>Important news content...</p>
     </article>
     
     <article>
         <h3>Technology Update</h3>
-        <time datetime="2024-12-05">December 5, 2024</time>
+        <time datetime="2025-01-14">January 14, 2025</time>
         <p>Latest tech news...</p>
     </article>
 </section>
@@ -198,7 +198,7 @@ Section {
                         
                         Article {
                             H3("Breaking News")
-                            Time("December 6, 2024", datetime: "2024-12-06")
+                            Time("January 15, 2025", datetime: "2025-01-15")
                                 .style("display", "block")
                                 .style("color", "#6c757d")
                                 .style("font-size", "0.875rem")
@@ -212,7 +212,7 @@ Section {
                         
                         Article {
                             H3("Technology Update")
-                            Time("December 5, 2024", datetime: "2024-12-05")
+                            Time("January 14, 2025", datetime: "2025-01-14")
                                 .style("display", "block")
                                 .style("color", "#6c757d")
                                 .style("font-size", "0.875rem")
@@ -240,12 +240,12 @@ Section {
 Figure {
     Div {
         // Bar chart using CSS styles
-        Div { Text("Q4 2024 Sales Data") }
+        Div { Text("Q1 2025 Sales Data") }
             .style("padding", "1rem")
             .style("background", "#f8f9fa")
             .style("text-align", "center")
     }
-    FigCaption("Figure 1: Q4 2024 Sales Performance")
+    FigCaption("Figure 1: Q1 2025 Sales Performance")
 }
 
 // Figure with code
@@ -261,10 +261,10 @@ Figure {
 <figure>
     <div>
         <div style="padding: 1rem; background: #f8f9fa; text-align: center;">
-            Q4 2024 Sales Data
+            Q1 2025 Sales Data
         </div>
     </div>
-    <figcaption>Figure 1: Q4 2024 Sales Performance</figcaption>
+    <figcaption>Figure 1: Q1 2025 Sales Performance</figcaption>
 </figure>
 
 <!-- Figure with code -->
@@ -349,7 +349,7 @@ print(greeting)</code></pre>
                             .style("border-radius", "0.25rem")
                             .style("padding", "1rem")
                             
-                            FigCaption("Figure 1: Q4 2024 Sales Performance")
+                            FigCaption("Figure 1: Q1 2025 Sales Performance")
                                 .style("text-align", "center")
                                 .style("margin-top", "0.5rem")
                                 .style("color", "#6c757d")

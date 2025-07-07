@@ -184,7 +184,7 @@ struct HomePage: SwiftletMain {
         Footer {
             Div {
                 Div {
-                    Text("© 2024 Swiftlets. Built with Swift.")
+                    Text("© 2025 Swiftlets. Built with Swift.")
                     .style("margin-bottom", "0.5rem")
                     
                     Div {

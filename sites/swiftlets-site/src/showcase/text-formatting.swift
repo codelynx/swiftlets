@@ -342,12 +342,12 @@ struct TextFormattingShowcase: SwiftletMain {
                 Del {
                     Text("$99")
                 }
-                .attribute("datetime", "2024-01-01")
+                .attribute("datetime", "2025-01-01")
                 Text(" ")
                 Ins {
                     Text("$79")
                 }
-                .attribute("datetime", "2024-01-15")
+                .attribute("datetime", "2025-01-15")
             }
             
             // Strike through (using Del as alternative)
@@ -356,7 +356,7 @@ struct TextFormattingShowcase: SwiftletMain {
             html: """
             <p>The event is on <del>Saturday</del> <ins>Sunday</ins>.</p>
             
-            <p>Price: <del datetime="2024-01-01">$99</del> <ins datetime="2024-01-15">$79</ins></p>
+            <p>Price: <del datetime="2025-01-01">$99</del> <ins datetime="2025-01-15">$79</ins></p>
             
             <del>This text is no longer accurate</del>
             """,
@@ -375,12 +375,12 @@ struct TextFormattingShowcase: SwiftletMain {
                         Del {
                             Text("$99")
                         }
-                        .attribute("datetime", "2024-01-01")
+                        .attribute("datetime", "2025-01-01")
                         Text(" ")
                         Ins {
                             Text("$79")
                         }
-                        .attribute("datetime", "2024-01-15")
+                        .attribute("datetime", "2025-01-15")
                     }
                     
                     Del("This text is no longer accurate")

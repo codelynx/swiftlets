@@ -43,6 +43,13 @@ See `TODO.md` for the current task list and priorities.
   - Automatic compilation with each swiftlet for code reuse
   - Example at `/sites/shared-test/` demonstrates the system
   - See `/docs/shared-components-guide.md` for documentation
+- **Complete Documentation Site Modernization**: Fully modernized the official documentation website
+  - All 8 main documentation pages converted to SwiftUI-style API
+  - Modern responsive design with comprehensive CSS animations
+  - New comprehensive troubleshooting documentation at `/docs/troubleshooting`
+  - Consistent navigation and footer components across all pages
+  - Updated copyright years to 2025 throughout the site
+  - Eye-catching gradient designs and interactive hover effects
 
 ## Development Workflow
 
@@ -69,6 +76,11 @@ See `TODO.md` for the current task list and priorities.
 - `/docs/troubleshooting-complex-expressions.md` - Solutions for Swift type-checking issues
 - `/docs/SWIFTUI-API-IMPLEMENTATION.md` - SwiftUI-style API documentation
 - `/docs/README.md` - Complete documentation index
+
+## Website Documentation
+- `/sites/swiftlets-site/src/docs/troubleshooting.swift` - **NEW** Comprehensive web-based troubleshooting guide
+- `/sites/swiftlets-site/src/docs/` - Complete modernized documentation website with SwiftUI-style API
+- `/sites/swiftlets-site/src/about.swift` - About page explaining Swiftlets philosophy and architecture
 
 Note: Historical documentation and POCs have been moved to `/docs/archive/` for reference.
 
@@ -165,12 +177,16 @@ Body {
 See `/docs/troubleshooting-complex-expressions.md` for detailed patterns and examples.
 
 ## Sites
-- `/sites/swiftlets-site/` - Official documentation and showcase site
+- `/sites/swiftlets-site/` - **Official documentation and showcase site** (FULLY MODERNIZED)
+  - Complete documentation with modern design and SwiftUI-style API
+  - Comprehensive troubleshooting guide
+  - Interactive showcase demonstrating all HTML elements
+  - About page explaining project philosophy and architecture
 - `/sites/shared-test/` - Demonstrates hierarchical shared components system
 - `/sites/test/` - Test sites for framework development
 - `/sites/templates/` - Third-party site templates
 
-Run with: `./run-site sites/swiftlets-site`
+Run with: `./build-site sites/swiftlets-site && ./run-site sites/swiftlets-site`
 
 ## References
 - Ignite framework (in `/external/Ignite/`) - MIT Licensed static site generator by Paul Hudson
