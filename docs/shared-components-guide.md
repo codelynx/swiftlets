@@ -216,7 +216,7 @@ This means:
   - Electronics-specific components
   - Proper scoping and hierarchy
 
-- `/sites/examples/shared-test/` - Simple shared components example:
+- `/sites/shared-test/` - Simple shared components example:
   - Shared navigation and footer
   - Page layout wrapper
   - Basic component reuse across pages

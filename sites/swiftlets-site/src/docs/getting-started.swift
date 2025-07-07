@@ -85,13 +85,13 @@ struct GettingStartedPage {
                 Pre {
                     Code("""
                     # Build the site
-                    ./build-site sites/examples/swiftlets-site
+                    ./build-site sites/swiftlets-site
                     
                     # Run the site
-                    ./run-site sites/examples/swiftlets-site
+                    ./run-site sites/swiftlets-site
                     
                     # Or combine build and run
-                    ./run-site sites/examples/swiftlets-site --build
+                    ./run-site sites/swiftlets-site --build
                     """)
                 }
                 .class("code-block")
@@ -110,7 +110,7 @@ struct GettingStartedPage {
                     LI {
                         Strong("View source")
                         Text(" - Check ")
-                        Code("sites/examples/swiftlets-site/src/")
+                        Code("sites/swiftlets-site/src/")
                         Text(" to see how it's built")
                     }
                 }
@@ -132,7 +132,7 @@ struct GettingStartedPage {
                 
                 Pre {
                     Code("""
-                    sites/examples/swiftlets-site/
+                    sites/swiftlets-site/
                     ├── src/              # Swift source files
                     │   ├── index.swift   # Homepage route
                     │   ├── about.swift   # About page route
@@ -275,7 +275,7 @@ struct GettingStartedPage {
                         Text(" - Build with reusable components")
                     }
                     LI {
-                        Link(href: "https://github.com/codelynx/swiftlets/tree/main/sites/examples/swiftlets-site", "Study the Source")
+                        Link(href: "https://github.com/codelynx/swiftlets/tree/main/sites/swiftlets-site", "Study the Source")
                             .attribute("target", "_blank")
                         Text(" - Learn from real examples")
                     }

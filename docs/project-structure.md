@@ -181,7 +181,7 @@ Each site has its own Makefile that:
 3. Generates `.webbin` files with MD5 hashes
 
 ```bash
-cd sites/examples/swiftlets-site
+cd sites/swiftlets-site
 make build
 ```
 

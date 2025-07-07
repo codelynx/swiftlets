@@ -102,7 +102,7 @@ swiftlets serve [path] [options]
 swiftlets serve
 
 # Serve specific site
-swiftlets serve sites/examples/swiftlets-site
+swiftlets serve sites/swiftlets-site
 
 # Use custom port
 swiftlets serve --port 3000
@@ -188,18 +188,18 @@ For convenience when working from the project root, use the `smake` wrapper:
 
 # Run sites with simple syntax
 ./smake run                                    # Run default site
-./smake run sites/examples/swiftlets-site      # Run specific site
+./smake run sites/swiftlets-site      # Run specific site
 ./smake run sites/tests/test-html              # Run test site
 
 # Build sites
 ./smake build                                  # Build default site
-./smake build sites/examples/swiftlets-site    # Build specific site
+./smake build sites/swiftlets-site    # Build specific site
 
 # Clean sites
-./smake clean sites/examples/swiftlets-site    # Clean site artifacts
+./smake clean sites/swiftlets-site    # Clean site artifacts
 
 # Development mode
-./smake dev sites/examples/swiftlets-site      # Run in dev mode
+./smake dev sites/swiftlets-site      # Run in dev mode
 ```
 
 The `smake` wrapper provides positional argument syntax instead of the traditional `make SITE=path` syntax.

@@ -41,7 +41,7 @@ See `TODO.md` for the current task list and priorities.
 - **Hierarchical Shared Components**: Fully implemented in the main build system
   - Components are discovered by walking up the directory tree
   - Automatic compilation with each swiftlet for code reuse
-  - Example at `/sites/examples/shared-test/` demonstrates the system
+  - Example at `/sites/shared-test/` demonstrates the system
   - See `/docs/shared-components-guide.md` for documentation
 
 ## Development Workflow

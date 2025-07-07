@@ -204,8 +204,8 @@ final class SwiftletHTTPHandler: ChannelInboundHandler, @unchecked Sendable {
         
         // Derive executable path from webbin path
         // SECURITY: Executables are in bin/ directory OUTSIDE web root
-        // sites/examples/swiftlets-site/web/hello.webbin -> sites/examples/swiftlets-site/bin/hello
-        // sites/examples/swiftlets-site/web/showcase/index.webbin -> sites/examples/swiftlets-site/bin/showcase/index
+        // sites/swiftlets-site/web/hello.webbin -> sites/swiftlets-site/bin/hello
+        // sites/swiftlets-site/web/showcase/index.webbin -> sites/swiftlets-site/bin/showcase/index
         
         let webbinURL = URL(fileURLWithPath: webbinPath)
         let filename = webbinURL.lastPathComponent.replacingOccurrences(of: ".webbin", with: "")
