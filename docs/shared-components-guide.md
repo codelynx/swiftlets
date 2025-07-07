@@ -198,6 +198,16 @@ If builds are slow with many shared components:
 2. Use the timestamp-based caching (don't use `--force` unless needed)
 3. Avoid complex expressions in shared components (see troubleshooting guide)
 
+## Build System Behavior
+
+**Important**: Files in `shared/` directories are automatically compiled with each swiftlet but are NOT built as standalone executables. The build script specifically excludes files in `shared/` directories from being treated as pages.
+
+This means:
+- ✅ Components in `shared/` are available to pages
+- ✅ Components are compiled fresh with each page build
+- ❌ Files in `shared/` cannot be accessed directly via URLs
+- ❌ Files in `shared/` should not have `@main` attributes
+
 ## Example Projects
 
 - `/sites/test/shared-components-demo/` - Demonstrates hierarchical components:

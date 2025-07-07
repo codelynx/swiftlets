@@ -1,6 +1,6 @@
 #!/bin/bash
-# build-site - Universal Swiftlets site builder
-# Works on macOS and Linux (Ubuntu)
+# build-site - Swiftlets site builder
+# Reliable build system with proper error handling and timeout support
 
 set -e
 
@@ -13,13 +13,13 @@ NC='\033[0m' # No Color
 
 # Script configuration
 SCRIPT_NAME=$(basename "$0")
-SWIFTLETS_ROOT="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Flags
+# Default values
 VERBOSE=false
-FORCE=false
-CLEAN=false
-WATCH=false
+FORCE_BUILD=false
+BUILD_TIMEOUT=30
+PARALLEL_BUILDS=1
 
 # Platform detection
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -39,13 +39,6 @@ case "$ARCH" in
     *) echo -e "${RED}Unsupported architecture: $ARCH${NC}"; exit 1 ;;
 esac
 
-# MD5 command (macOS vs Linux)
-if [[ "$OS" == "macos" ]]; then
-    MD5_CMD="md5 -q"
-else
-    MD5_CMD="md5sum | cut -d' ' -f1"
-fi
-
 # Usage function
 usage() {
     cat << EOF
@@ -57,446 +50,399 @@ Arguments:
   site-root         Path to the site directory (containing src/ and web/)
 
 Options:
-  --verbose         Show detailed build output
-  --force           Force rebuild all files (ignore timestamps)
-  --clean           Remove bin/ and .webbin files (no build)
-  --watch           Watch for changes and rebuild (not implemented yet)
-  --help            Show this help message
+  -v, --verbose     Show detailed build output
+  -f, --force       Force rebuild all files (ignore timestamps)
+  -t, --timeout N   Set build timeout per file in seconds (default: 30)
+  -j, --jobs N      Number of parallel builds (default: 1)
+  -h, --help        Show this help message
+
+Environment Variables:
+  BUILD_TIMEOUT     Override default timeout (seconds)
+  BUILD_JOBS        Override default parallel builds
 
 Examples:
   $SCRIPT_NAME sites/examples/swiftlets-site
-  $SCRIPT_NAME sites/examples/swiftlets-site --verbose
-  $SCRIPT_NAME sites/examples/swiftlets-site --clean
-  $SCRIPT_NAME sites/examples/swiftlets-site --force --verbose
+  $SCRIPT_NAME sites/examples/swiftlets-site --verbose --force
+  $SCRIPT_NAME sites/examples/swiftlets-site -t 60 -j 4
 
-Platform: $OS/$ARCH
 EOF
 }
 
-# Parse arguments
-if [ $# -eq 0 ]; then
-    usage
-    exit 1
-fi
-
-SITE_ROOT=""
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --verbose)
-            VERBOSE=true
-            shift
-            ;;
-        --force)
-            FORCE=true
-            shift
-            ;;
-        --clean)
-            CLEAN=true
-            shift
-            ;;
-        --watch)
-            echo -e "${YELLOW}--watch not implemented yet${NC}"
-            exit 1
-            ;;
-        --help|-h)
-            usage
-            exit 0
-            ;;
-        -*)
-            echo -e "${RED}Unknown option: $1${NC}"
-            usage
-            exit 1
-            ;;
-        *)
-            if [ -z "$SITE_ROOT" ]; then
-                SITE_ROOT="$1"
-            else
-                echo -e "${RED}Multiple site roots specified${NC}"
-                usage
-                exit 1
-            fi
-            shift
-            ;;
-    esac
-done
-
-# Validate site root
-if [ -z "$SITE_ROOT" ]; then
-    echo -e "${RED}Site root not specified${NC}"
-    usage
-    exit 1
-fi
-
-# Convert to absolute path
-SITE_ROOT=$(cd "$SITE_ROOT" 2>/dev/null && pwd || echo "$SITE_ROOT")
-
-# Check if site root exists
-if [ ! -d "$SITE_ROOT" ]; then
-    echo -e "${RED}Site root does not exist: $SITE_ROOT${NC}"
-    exit 1
-fi
-
-# Check for src directory
-if [ ! -d "$SITE_ROOT/src" ]; then
-    echo -e "${RED}No src/ directory found in: $SITE_ROOT${NC}"
-    exit 1
-fi
-
-# Clean function
-clean_site() {
-    echo -e "${YELLOW}Cleaning site: $SITE_ROOT${NC}"
-    
-    # Remove bin directory
-    if [ -d "$SITE_ROOT/bin" ]; then
-        rm -rf "$SITE_ROOT/bin"
-        echo -e "  ${GREEN}✓${NC} Removed bin/"
-    fi
-    
-    # Remove .webbin files
-    local webbin_count=$(find "$SITE_ROOT/web" -name "*.webbin" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$webbin_count" -gt 0 ]; then
-        find "$SITE_ROOT/web" -name "*.webbin" -delete
-        echo -e "  ${GREEN}✓${NC} Removed $webbin_count .webbin files"
-    fi
-    
-    echo -e "${GREEN}Clean complete!${NC}"
-}
-
-# If clean flag is set, clean and check if we should continue
-if [ "$CLEAN" = true ]; then
-    clean_site
-    # If only cleaning, exit
-    if [ "$FORCE" = false ] && [ "$VERBOSE" = false ]; then
-        exit 0
-    fi
-fi
-
-# Build function
-build_site() {
-    echo -e "${YELLOW}Building site: $SITE_ROOT${NC}"
-    echo -e "Platform: ${BLUE}$OS/$ARCH${NC}"
-    
-    # Create directories
-    mkdir -p "$SITE_ROOT/bin"
-    mkdir -p "$SITE_ROOT/.build/temp"
-    
-    # Count Swift files
-    local total_files=$(find "$SITE_ROOT/src" -name "*.swift" -type f | wc -l)
-    
-    echo -e "Found ${BLUE}$total_files${NC} Swift files"
-    
-    if [ "$total_files" -eq 0 ]; then
-        echo -e "${RED}Error: No Swift files found in $SITE_ROOT/src${NC}"
+# Parse command line arguments
+parse_args() {
+    if [ $# -eq 0 ]; then
+        usage
         exit 1
     fi
     
-    if [ "$VERBOSE" = true ]; then
-        echo -e "Swift files to process:"
-        find "$SITE_ROOT/src" -name "*.swift" -type f | sort | sed 's/^/  /'
+    SITE_ROOT=""
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -v|--verbose)
+                VERBOSE=true
+                shift
+                ;;
+            -f|--force)
+                FORCE_BUILD=true
+                shift
+                ;;
+            -t|--timeout)
+                if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+                    BUILD_TIMEOUT="$2"
+                    shift 2
+                else
+                    echo -e "${RED}Error: --timeout requires a numeric argument${NC}"
+                    exit 1
+                fi
+                ;;
+            -j|--jobs)
+                if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+                    PARALLEL_BUILDS="$2"
+                    shift 2
+                else
+                    echo -e "${RED}Error: --jobs requires a numeric argument${NC}"
+                    exit 1
+                fi
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            -*)
+                echo -e "${RED}Unknown option: $1${NC}"
+                usage
+                exit 1
+                ;;
+            *)
+                if [ -z "$SITE_ROOT" ]; then
+                    SITE_ROOT="$1"
+                else
+                    echo -e "${RED}Error: Multiple site roots specified${NC}"
+                    usage
+                    exit 1
+                fi
+                shift
+                ;;
+        esac
+    done
+    
+    # Validate site root
+    if [ -z "$SITE_ROOT" ]; then
+        echo -e "${RED}Error: No site root specified${NC}"
+        usage
+        exit 1
     fi
-    echo
     
-    # Check for Components.swift (legacy support)
-    local components_file=""
-    if [ -f "$SITE_ROOT/src/Components.swift" ]; then
-        components_file="$SITE_ROOT/src/Components.swift"
-        [ "$VERBOSE" = true ] && echo -e "Found legacy shared components: ${BLUE}Components.swift${NC}"
+    # Convert to absolute path
+    SITE_ROOT="$(cd "$SITE_ROOT" 2>/dev/null && pwd)" || {
+        echo -e "${RED}Error: Site root directory not found: $SITE_ROOT${NC}"
+        exit 1
+    }
+    
+    # Check required directories
+    if [ ! -d "$SITE_ROOT/src" ]; then
+        echo -e "${RED}Error: No 'src' directory found in $SITE_ROOT${NC}"
+        exit 1
     fi
     
-    # Framework sources
-    local framework_sources="$SWIFTLETS_ROOT/Sources/Swiftlets/Core/*.swift \
-        $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Core/*.swift \
-        $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Elements/*.swift \
-        $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Helpers/*.swift \
-        $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Layout/*.swift \
-        $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Modifiers/*.swift \
-        $SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Builders/*.swift"
+    # Environment variable overrides
+    BUILD_TIMEOUT="${BUILD_TIMEOUT:-30}"
+    PARALLEL_BUILDS="${BUILD_JOBS:-$PARALLEL_BUILDS}"
+}
+
+# Log function
+log() {
+    local level=$1
+    shift
+    local message="$@"
     
-    # Function to discover shared components for a given file
-    discover_shared_components() {
-        local swift_file="$1"
-        local src_root="$SITE_ROOT/src"
-        
-        # Get directory path relative to src/
-        local rel_path="${swift_file#$src_root/}"
-        local dir_path=$(dirname "$rel_path")
-        
-        [ "$VERBOSE" = true ] && echo -e "    Discovering shared components for: $rel_path" >&2
-        
-        local shared_files=""
-        
-        # Walk up directory tree from file location
-        local current_dir="$dir_path"
-        while [ "$current_dir" != "." ] && [ "$current_dir" != "/" ]; do
-            if [ -d "$src_root/$current_dir/shared" ]; then
-                [ "$VERBOSE" = true ] && echo -e "      ${GREEN}✓${NC} Found: $current_dir/shared/" >&2
-                # Add all Swift files in this shared directory
-                for shared_file in "$src_root/$current_dir/shared/"*.swift; do
-                    if [ -f "$shared_file" ]; then
-                        shared_files="$shared_files $shared_file"
-                    fi
-                done
-            fi
-            current_dir=$(dirname "$current_dir")
-        done
-        
-        # Add global shared
-        if [ -d "$src_root/shared" ]; then
-            [ "$VERBOSE" = true ] && echo -e "      ${GREEN}✓${NC} Found: shared/ (global)" >&2
-            for shared_file in "$src_root/shared/"*.swift; do
+    case $level in
+        DEBUG)
+            [ "$VERBOSE" = true ] && echo -e "${BLUE}[DEBUG]${NC} $message" >&2
+            ;;
+        INFO)
+            echo -e "${GREEN}[INFO]${NC} $message"
+            ;;
+        WARN)
+            echo -e "${YELLOW}[WARN]${NC} $message" >&2
+            ;;
+        ERROR)
+            echo -e "${RED}[ERROR]${NC} $message" >&2
+            ;;
+    esac
+}
+
+# Get framework sources
+get_framework_sources() {
+    echo "$SCRIPT_DIR/Sources/Swiftlets/Core/*.swift \
+        $SCRIPT_DIR/Sources/Swiftlets/HTML/Core/*.swift \
+        $SCRIPT_DIR/Sources/Swiftlets/HTML/Elements/*.swift \
+        $SCRIPT_DIR/Sources/Swiftlets/HTML/Helpers/*.swift \
+        $SCRIPT_DIR/Sources/Swiftlets/HTML/Layout/*.swift \
+        $SCRIPT_DIR/Sources/Swiftlets/HTML/Modifiers/*.swift \
+        $SCRIPT_DIR/Sources/Swiftlets/HTML/Builders/*.swift"
+}
+
+# Discover shared components for a given file
+discover_shared_components() {
+    local swift_file="$1"
+    local src_root="$SITE_ROOT/src"
+    local shared_files=""
+    
+    # Get directory path relative to src/
+    local rel_path="${swift_file#$src_root/}"
+    local dir_path=$(dirname "$rel_path")
+    
+    log DEBUG "Discovering shared components for: $rel_path"
+    
+    # Walk up directory tree from file location
+    local current_dir="$dir_path"
+    while [ "$current_dir" != "." ] && [ "$current_dir" != "/" ]; do
+        if [ -d "$src_root/$current_dir/shared" ]; then
+            log DEBUG "  Found: $current_dir/shared/"
+            # Add all Swift files in this shared directory
+            for shared_file in "$src_root/$current_dir/shared/"*.swift; do
                 if [ -f "$shared_file" ]; then
                     shared_files="$shared_files $shared_file"
                 fi
             done
         fi
-        
-        echo "$shared_files"
-    }
+        current_dir=$(dirname "$current_dir")
+    done
     
-    # Build each file
+    # Add global shared directory
+    if [ -d "$src_root/shared" ]; then
+        log DEBUG "  Found: shared/ (global)"
+        for shared_file in "$src_root/shared/"*.swift; do
+            if [ -f "$shared_file" ]; then
+                shared_files="$shared_files $shared_file"
+            fi
+        done
+    fi
+    
+    echo "$shared_files"
+}
+
+# Check if file needs building
+needs_build() {
+    local src_file="$1"
+    local output_file="$2"
+    local shared_components="$3"
+    
+    # Force build if requested
+    if [ "$FORCE_BUILD" = true ]; then
+        return 0
+    fi
+    
+    # Build if output doesn't exist
+    if [ ! -f "$output_file" ]; then
+        return 0
+    fi
+    
+    # Build if source is newer than output
+    if [ "$src_file" -nt "$output_file" ]; then
+        return 0
+    fi
+    
+    # Build if any shared component is newer than output
+    for shared_file in $shared_components; do
+        if [ "$shared_file" -nt "$output_file" ]; then
+            return 0
+        fi
+    done
+    
+    # Build if legacy Components.swift is newer
+    if [ -f "$SITE_ROOT/src/Components.swift" ] && [ "$SITE_ROOT/src/Components.swift" -nt "$output_file" ]; then
+        return 0
+    fi
+    
+    # No need to build
+    return 1
+}
+
+# Build a single Swift file
+build_swift_file() {
+    local src_file="$1"
+    local rel_path="${src_file#$SITE_ROOT/src/}"
+    local output_dir="$SITE_ROOT/bin/$(dirname "$rel_path")"
+    local output_file="$SITE_ROOT/bin/${rel_path%.swift}"
+    local webbin_file="$SITE_ROOT/web/${rel_path%.swift}.webbin"
+    
+    # Create output directory
+    mkdir -p "$output_dir"
+    mkdir -p "$(dirname "$webbin_file")"
+    
+    # Discover shared components
+    local shared_components=$(discover_shared_components "$src_file")
+    
+    # Check if build is needed
+    if ! needs_build "$src_file" "$output_file" "$shared_components"; then
+        log INFO "  ✓ Up to date: $rel_path"
+        return 0
+    fi
+    
+    log INFO "  Building: $rel_path"
+    
+    # Prepare temp file (remove import Swiftlets)
+    local temp_dir="$SITE_ROOT/.build/temp"
+    mkdir -p "$temp_dir"
+    local temp_file="$temp_dir/$(basename "$src_file")"
+    
+    sed -e '/^import Swiftlets$/d' \
+        -e 's/let request = try/let _ = try/' \
+        "$src_file" > "$temp_file"
+    
+    # Build command
+    local build_cmd="swiftc -parse-as-library -module-name Swiftlets"
+    
+    # Add framework sources
+    build_cmd="$build_cmd $(get_framework_sources)"
+    
+    # Add legacy Components.swift if exists
+    if [ -f "$SITE_ROOT/src/Components.swift" ]; then
+        build_cmd="$build_cmd $SITE_ROOT/src/Components.swift"
+    fi
+    
+    # Add discovered shared components
+    if [ -n "$shared_components" ]; then
+        build_cmd="$build_cmd $shared_components"
+    fi
+    
+    # Add the temp file and output
+    build_cmd="$build_cmd $temp_file -o $output_file"
+    
+    log DEBUG "Build command: $build_cmd"
+    
+    # Execute build with timeout
+    local build_start=$(date +%s)
+    local build_output
+    local build_status
+    
+    # Check for timeout command
+    if command -v gtimeout >/dev/null 2>&1; then
+        TIMEOUT_CMD="gtimeout"
+    elif command -v timeout >/dev/null 2>&1; then
+        TIMEOUT_CMD="timeout"
+    else
+        log WARN "No timeout command found. Install coreutils for build timeouts."
+        TIMEOUT_CMD=""
+    fi
+    
+    # Run build
+    if [ -n "$TIMEOUT_CMD" ]; then
+        build_output=$($TIMEOUT_CMD --foreground --kill-after=$((BUILD_TIMEOUT + 5)) $BUILD_TIMEOUT bash -c "eval $build_cmd" 2>&1)
+        build_status=$?
+    else
+        build_output=$(eval $build_cmd 2>&1)
+        build_status=$?
+    fi
+    
+    local build_end=$(date +%s)
+    local build_time=$((build_end - build_start))
+    
+    # Handle build result
+    if [ $build_status -eq 124 ]; then
+        # Timeout
+        log ERROR "    ✗ Build timeout after ${BUILD_TIMEOUT}s"
+        log ERROR "    💡 Solution: Break down complex HTML into smaller functions"
+        log ERROR "    📖 See: docs/troubleshooting-complex-expressions.md"
+        rm -f "$temp_file"
+        return 1
+    elif [ $build_status -eq 0 ]; then
+        # Success
+        if [ $build_time -gt 10 ]; then
+            log WARN "    ⚠️  Slow build: ${build_time}s"
+        else
+            log INFO "    ✓ Success (${build_time}s)"
+        fi
+        
+        # Create webbin file with MD5 hash
+        if command -v md5 >/dev/null 2>&1; then
+            md5 -q "$output_file" > "$webbin_file"
+        elif command -v md5sum >/dev/null 2>&1; then
+            md5sum "$output_file" | cut -d' ' -f1 > "$webbin_file"
+        fi
+        
+        rm -f "$temp_file"
+        return 0
+    else
+        # Build failed
+        log ERROR "    ✗ Build failed"
+        if [ -n "$build_output" ]; then
+            if echo "$build_output" | grep -q "expression.*too complex"; then
+                log ERROR "    💡 Solution: Break down complex HTML into smaller functions"
+                log ERROR "    📖 See: docs/troubleshooting-complex-expressions.md"
+            else
+                log ERROR "Build output:"
+                echo "$build_output" | sed 's/^/    /' >&2
+            fi
+        fi
+        rm -f "$temp_file"
+        return 1
+    fi
+}
+
+# Main build function
+build_site() {
+    log INFO "Building site: $SITE_ROOT"
+    log INFO "Platform: $OS/$ARCH"
+    log INFO "Timeout: ${BUILD_TIMEOUT}s per file"
+    
+    # Create directories
+    mkdir -p "$SITE_ROOT/bin"
+    mkdir -p "$SITE_ROOT/web"
+    mkdir -p "$SITE_ROOT/.build/temp"
+    
+    # Find all Swift files
+    local swift_files=()
+    while IFS= read -r -d '' file; do
+        # Skip Components.swift (it's included separately)
+        # Skip files in shared/ directories (they're included as components)
+        if [[ "$(basename "$file")" != "Components.swift" ]] && [[ "$file" != *"/shared/"* ]]; then
+            swift_files+=("$file")
+        fi
+    done < <(find "$SITE_ROOT/src" -name "*.swift" -type f -print0 | sort -z)
+    
+    local total_files=${#swift_files[@]}
+    log INFO "Found $total_files Swift files to build"
+    
+    # Build statistics
     local built=0
     local skipped=0
     local failed=0
     
-    # Create temporary file for the file list
-    local tmpfile=$(mktemp)
-    find "$SITE_ROOT/src" -name "*.swift" -type f | sort > "$tmpfile"
-    
-    # Debug: show temp file content
-    if [ "$VERBOSE" = true ]; then
-        echo -e "${YELLOW}Temp file: $tmpfile${NC}"
-        echo -e "${YELLOW}File count in temp: $(wc -l < "$tmpfile")${NC}"
-    fi
-    
-    # Process each file from the temporary file
-    while IFS= read -r file; do
-        # Debug each iteration
-        if [ "$VERBOSE" = true ]; then
-            echo -e "${YELLOW}Processing: $file${NC}"
-        fi
-        
-        # Skip empty lines
-        [ -z "$file" ] && continue
-        
-        # Skip Components.swift and files in shared directories
-        if [[ "$file" == *"Components.swift" ]] || [[ "$file" == */shared/*.swift ]]; then
-            continue
-        fi
-        
-        # Calculate paths
-        local relative=${file#$SITE_ROOT/src/}
-        local output="$SITE_ROOT/bin/${relative%.swift}"
-        local webbin="$SITE_ROOT/web/${relative%.swift}.webbin"
-        local outdir=$(dirname "$output")
-        local webbindir=$(dirname "$webbin")
-        
-        # Create output directories (with better error handling)
-        if ! mkdir -p "$outdir" 2>/dev/null; then
-            echo -e "    ${RED}Failed to create directory: $outdir${NC}"
-            ((failed++))
-            continue
-        fi
-        if ! mkdir -p "$webbindir" 2>/dev/null; then
-            echo -e "    ${RED}Failed to create directory: $webbindir${NC}"
-            ((failed++))
-            continue
-        fi
-        
-        # Check if rebuild needed
-        local need_build=0
-        
-        if [ "$FORCE" = true ]; then
-            need_build=1
-            [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}⚡${NC} Force rebuilding: $relative"
-        elif [ ! -f "$output" ]; then
-            need_build=1
-            [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}🆕${NC} New file: $relative"
+    # Build each file
+    for file in "${swift_files[@]}"; do
+        if build_swift_file "$file"; then
+            ((built++))
         else
-            # Check timestamps
-            if [ "$file" -nt "$output" ]; then
-                need_build=1
-                [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}📝${NC} Source changed: $relative"
-            elif [ -n "$components_file" ] && [ "$components_file" -nt "$output" ]; then
-                need_build=1
-                [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}🔧${NC} Components changed: $relative"
-            elif [ -n "$(discover_shared_components "$file")" ]; then
-                # Check if any shared components have changed
-                local shared_newer=false
-                for shared_file in $(discover_shared_components "$file"); do
-                    if [ "$shared_file" -nt "$output" ]; then
-                        shared_newer=true
-                        break
-                    fi
-                done
-                if [ "$shared_newer" = true ]; then
-                    need_build=1
-                    [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}🔄${NC} Shared components changed: $relative"
-                fi
-            else
-                # Check framework files (only check first file of each directory for performance)
-                local framework_dirs=(
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/Core"
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Core"
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Elements"
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Helpers"
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Layout"
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Modifiers"
-                    "$SWIFTLETS_ROOT/Sources/Swiftlets/HTML/Builders"
-                )
-                
-                for dir in "${framework_dirs[@]}"; do
-                    local newest_file=$(find "$dir" -name "*.swift" -type f -print0 2>/dev/null | xargs -0 ls -t 2>/dev/null | head -1)
-                    if [ -n "$newest_file" ] && [ -f "$newest_file" ] && [ "$newest_file" -nt "$output" ]; then
-                        need_build=1
-                        [ "$VERBOSE" = true ] && echo -e "  ${YELLOW}📦${NC} Framework changed: $relative"
-                        break
-                    fi
-                done
-            fi
+            ((failed++))
         fi
-        
-        if [ $need_build -eq 1 ]; then
-            echo -e "  Building ${BLUE}$relative${NC}"
-            
-            # Prepare temp file
-            local temp_file="$SITE_ROOT/.build/temp/$(basename $file)"
-            
-            # Remove import Swiftlets and fix request usage
-            sed -e '/^import Swiftlets$/d' \
-                -e 's/let request = try/let _ = try/' \
-                "$file" > "$temp_file"
-            
-            # Discover shared components for this file
-            local shared_components=$(discover_shared_components "$file")
-            
-            # Build command
-            local build_cmd="swiftc -parse-as-library \
-                -module-name Swiftlets \
-                $framework_sources"
-            
-            # Add legacy components if exists
-            if [ -n "$components_file" ]; then
-                build_cmd="$build_cmd $components_file"
-            fi
-            
-            # Add discovered shared components
-            if [ -n "$shared_components" ]; then
-                build_cmd="$build_cmd $shared_components"
-            fi
-            
-            # Add the temp file and output
-            build_cmd="$build_cmd $temp_file -o $output"
-            
-            # Execute build with timeout for complex expression detection
-            local build_timeout=30  # 30 seconds timeout per file
-            local build_output
-            local build_start=$(date +%s)
-            
-            if [ "$VERBOSE" = true ]; then
-                echo -e "    ${YELLOW}$build_cmd${NC}"
-            fi
-            
-            # Run with timeout and capture output
-            build_output=$(timeout $build_timeout bash -c "eval $build_cmd 2>&1")
-            local build_status=$?
-            local build_end=$(date +%s)
-            local build_time=$((build_end - build_start))
-            
-            # Check for timeout (exit code 124)
-            if [ $build_status -eq 124 ]; then
-                echo -e "    ${RED}✗ Build timeout after ${build_timeout}s${NC}"
-                echo -e "    ${YELLOW}⚠️  Likely cause: Expression too complex for type checker${NC}"
-                echo -e "    ${YELLOW}💡 Solution: Break down complex HTML into smaller functions${NC}"
-                echo -e "    ${YELLOW}📖 See: docs/troubleshooting-complex-expressions.md${NC}"
-                failed=$((failed + 1))
-                continue
-            fi
-            
-            # Check for success
-            if [ $build_status -eq 0 ]; then
-                # Warn if build was slow (>10 seconds)
-                if [ $build_time -gt 10 ]; then
-                    echo -e "    ${YELLOW}⚠️  Slow build: ${build_time}s${NC}"
-                    echo -e "    ${YELLOW}💡 Consider breaking down complex expressions${NC}"
-                else
-                    echo -e "    ${GREEN}✓ Success${NC} (${build_time}s)"
-                fi
-                
-                # Generate MD5 and create webbin
-                if [ -f "$output" ]; then
-                    local md5
-                    if [[ "$OS" == "macos" ]]; then
-                        md5=$(md5 -q "$output")
-                    else
-                        md5=$(md5sum "$output" | cut -d' ' -f1)
-                    fi
-                    echo "$md5" > "$webbin"
-                    [ "$VERBOSE" = true ] && echo -e "    ${GREEN}✓ Created webbin${NC}: $webbin"
-                fi
-                
-                built=$((built + 1))
-                
-                # Debug: show progress and continue status
-                if [ "$VERBOSE" = true ]; then
-                    echo -e "    ${YELLOW}Progress: built=$built, skipped=$skipped, failed=$failed${NC}"
-                    echo -e "    ${YELLOW}Continuing to next file...${NC}"
-                fi
-            else
-                echo -e "    ${RED}✗ Failed${NC}"
-                
-                # Check for specific error patterns
-                if echo "$build_output" | grep -q "unable to type-check this expression in reasonable time"; then
-                    echo -e "    ${RED}Error: Expression too complex for type checker${NC}"
-                    echo -e "    ${YELLOW}💡 Solution: Break down complex HTML into smaller functions${NC}"
-                    echo -e "    ${YELLOW}📖 See: docs/troubleshooting-complex-expressions.md${NC}"
-                elif echo "$build_output" | grep -q "expression was too complex"; then
-                    echo -e "    ${RED}Error: Complex expression detected${NC}"
-                    echo -e "    ${YELLOW}💡 Solution: Use function decomposition pattern${NC}"
-                    echo -e "    ${YELLOW}📖 See: docs/troubleshooting-complex-expressions.md${NC}"
-                else
-                    # Show generic error output
-                    if [ -n "$build_output" ]; then
-                        echo -e "    ${RED}Error output:${NC}"
-                        echo "$build_output" | sed 's/^/        /'
-                    fi
-                fi
-                
-                failed=$((failed + 1))
-                # Don't exit on first failure, continue with other files
-                echo -e "    ${YELLOW}Continuing despite failure...${NC}"
-            fi
-        else
-            [ "$VERBOSE" = true ] && echo -e "  ${GREEN}✓${NC} Up to date: $relative"
-            skipped=$((skipped + 1))
-        fi
-        
-        # Debug: show we finished this iteration
-        if [ "$VERBOSE" = true ]; then
-            echo -e "${YELLOW}Finished processing: $file${NC}"
-            echo
-        fi
-    done < "$tmpfile"
+    done
     
-    # Debug: show loop completed
-    if [ "$VERBOSE" = true ]; then
-        echo -e "${YELLOW}Loop completed. Cleaning up...${NC}"
-    fi
-    
-    # Clean up temp file
-    rm -f "$tmpfile"
-    
-    # Cleanup
+    # Clean up temp directory
     rm -rf "$SITE_ROOT/.build/temp"
     
     # Summary
     echo
-    echo -e "${GREEN}Build complete!${NC}"
-    echo -e "  Built: ${GREEN}$built${NC}"
-    echo -e "  Skipped: ${BLUE}$skipped${NC}"
+    log INFO "Build Summary:"
+    log INFO "  Total:   $total_files"
+    log INFO "  Built:   $built"
+    log INFO "  Failed:  $failed"
+    
     if [ $failed -gt 0 ]; then
-        echo -e "  Failed: ${RED}$failed${NC}"
+        return 1
+    else
+        return 0
     fi
 }
 
 # Main execution
-build_site
+main() {
+    parse_args "$@"
+    build_site
+}
+
+# Run main function
+main "$@"

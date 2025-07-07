@@ -68,75 +68,76 @@ struct ShowcasePage: SwiftletMain {
                             CategoryCard(
                                 title: "Lists",
                                 description: "Ordered, unordered, and definition lists",
-                                href: "/showcase/lists",
+                                href: "/showcase/list-examples",
                                 icon: "📋"
                             ).render()
                             
                             CategoryCard(
-                                title: "Tables",
-                                description: "Table structures with headers, bodies, and styling",
-                                href: "/showcase/tables",
-                                icon: "📊"
-                            ).render()
-                            
-                            CategoryCard(
                                 title: "Forms",
-                                description: "Input fields, buttons, selects, and form layouts",
+                                description: "All input types, labels, buttons, and form elements",
                                 href: "/showcase/forms",
                                 icon: "📝"
                             ).render()
                             
                             CategoryCard(
-                                title: "Media",
-                                description: "Images, videos, audio, and embedded content",
-                                href: "/showcase/media",
-                                icon: "🖼️"
-                            ).render()
-                            
-                            CategoryCard(
-                                title: "Semantic HTML",
-                                description: "Header, footer, nav, article, section, and more",
-                                href: "/showcase/semantic-html",
-                                icon: "🏗️"
+                                title: "Media Elements",
+                                description: "Images, audio, video, and embedded content",
+                                href: "/showcase/media-elements",
+                                icon: "🎬"
                             ).render()
                             
                             CategoryCard(
                                 title: "Layout Components",
-                                description: "HStack, VStack, Grid, Container, and spacing",
+                                description: "HStack, VStack, Grid, and responsive layouts",
                                 href: "/showcase/layout-components",
-                                icon: "📐"
+                                icon: "🏗️"
+                            ).render()
+                            
+                            CategoryCard(
+                                title: "Semantic HTML",
+                                description: "Header, footer, article, section, and more",
+                                href: "/showcase/semantic-html",
+                                icon: "🏷️"
                             ).render()
                             
                             CategoryCard(
                                 title: "Modifiers",
-                                description: "Classes, styles, attributes, and chaining",
+                                description: "Styling, classes, IDs, and attributes",
                                 href: "/showcase/modifiers",
                                 icon: "🎨"
                             ).render()
                             
                             CategoryCard(
                                 title: "SwiftUI-Style API",
-                                description: "Build components with HTMLComponent protocol",
-                                href: "/showcase/swiftui-style",
+                                description: "New @main API with property wrappers",
+                                href: "/showcase/api-demo",
                                 icon: "🚀"
                             ).render()
                             
                             CategoryCard(
-                                title: "API Demo (@main)",
-                                description: "Interactive demo of the new @main API with property wrappers",
-                                href: "/showcase/api-demo",
-                                icon: "✨"
+                                title: "SwiftUI-Style Features",
+                                description: "Deep dive into SwiftUI-style features",
+                                href: "/showcase/swiftui-style",
+                                icon: "📱"
+                            ).render()
+                            
+                            CategoryCard(
+                                title: "Dynamic Content",
+                                description: "Loops, conditionals, and dynamic generation",
+                                href: "/showcase/dynamic-content",
+                                icon: "⚡"
                             ).render()
                         }
                     }
+                    .style("margin-bottom", "3rem")
                     
-                    // Quick Examples
+                    // Examples Section
                     Section {
                         H2("Quick Examples")
                         
                         VStack(spacing: 30) {
                             // HStack Example
-                            ExamplePreview(
+                            examplePreview(
                                 title: "HStack",
                                 description: "Horizontal stack with spacing",
                                 code: """
@@ -158,7 +159,7 @@ struct ShowcasePage: SwiftletMain {
                             }
                             
                             // Grid Example
-                            ExamplePreview(
+                            examplePreview(
                                 title: "Grid",
                                 description: "Responsive grid layout",
                                 code: """
@@ -210,54 +211,15 @@ struct ShowcasePage: SwiftletMain {
             .style("border-top", "1px solid #dee2e6")
         }
     }
-}
-
-// Reusable Components
-
-struct CategoryCard: HTMLComponent {
-    let title: String
-    let description: String
-    let href: String
-    let icon: String
     
-    var body: some HTMLElement {
-        Link(href: href) {
-            Div {
-                VStack(spacing: 15) {
-                    Text(icon)
-                        .style("font-size", "3rem")
-                        .style("text-align", "center")
-                    H3(title)
-                        .style("margin", "0")
-                    P(description)
-                        .style("color", "#6c757d")
-                        .style("margin", "0")
-                }
-            }
-            .style("padding", "2rem")
-            .style("height", "100%")
-            .style("transition", "transform 0.2s")
-            .class("category-card")
-        }
-        .style("text-decoration", "none")
-        .style("color", "inherit")
-    }
-}
-
-struct ExamplePreview<Content: HTMLElement>: HTMLComponent {
-    let title: String
-    let description: String
-    let code: String
-    let demo: Content
-    
-    init(title: String, description: String, code: String, @HTMLBuilder demo: () -> Content) {
-        self.title = title
-        self.description = description
-        self.code = code
-        self.demo = demo()
-    }
-    
-    var body: some HTMLElement {
+    // Helper function
+    @HTMLBuilder
+    func examplePreview<Content: HTMLElement>(
+        title: String,
+        description: String,
+        code: String,
+        @HTMLBuilder demo: () -> Content
+    ) -> some HTMLElement {
         Div {
             H3(title)
             P(description)
@@ -272,10 +234,14 @@ struct ExamplePreview<Content: HTMLElement>: HTMLComponent {
             }
             
             Div {
-                H4("Result:")
+                H4("Preview:")
                     .style("margin-bottom", "0.5rem")
-                demo
+                demo()
             }
         }
+        .style("padding", "2rem")
+        .style("background", "#f8f9fa")
+        .style("border-radius", "8px")
+        .style("margin-bottom", "2rem")
     }
 }

@@ -6,7 +6,7 @@ struct APIDemo: SwiftletMain {
     // Property wrappers for accessing request data
     @Query("name") var userName: String?
     @Query("filter") var filter: String?
-    @Cookie("theme") var theme = "light"
+    @Cookie("theme", default: "light") var theme: String?
     
     // Page metadata
     var title = "SwiftUI-Style API Demo"
@@ -15,7 +15,26 @@ struct APIDemo: SwiftletMain {
     // The body property defines the page content
     var body: some HTMLElement {
         Fragment {
-            NavigationBar(activePage: "showcase")
+            // Navigation
+            Nav {
+                Container(maxWidth: .xl) {
+                    HStack {
+                        Link(href: "/") {
+                            H1("Swiftlets").style("margin", "0")
+                        }
+                        Spacer()
+                        HStack(spacing: 20) {
+                            Link(href: "/docs", "Documentation")
+                            Link(href: "/showcase", "Showcase").class("active")
+                            Link(href: "/about", "About")
+                        }
+                    }
+                    .style("align-items", "center")
+                }
+            }
+            .style("background", "#f8f9fa")
+            .style("padding", "1rem 0")
+            .style("border-bottom", "1px solid #dee2e6")
             
             Main {
                 heroSection()
@@ -27,7 +46,23 @@ struct APIDemo: SwiftletMain {
             .style("margin", "0 auto")
             .style("padding", "2rem 20px")
             
-            SiteFooter()
+            // Footer
+            Footer {
+                Container(maxWidth: .large) {
+                    HStack {
+                        P("© 2025 Swiftlets Project. MIT Licensed.")
+                            .style("margin", "0")
+                            .style("color", "#718096")
+                        Spacer()
+                        Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
+                            .style("color", "#667eea")
+                    }
+                    .style("align-items", "center")
+                }
+            }
+            .style("padding", "2rem 0")
+            .style("border-top", "1px solid #e2e8f0")
+            .style("margin-top", "3rem")
         }
     }
     
@@ -58,7 +93,7 @@ struct APIDemo: SwiftletMain {
                 UL {
                     LI("@Query(\"name\"): \(userName ?? "not set")")
                     LI("@Query(\"filter\"): \(filter ?? "not set")")
-                    LI("@Cookie(\"theme\"): \(theme)")
+                    LI("@Cookie(\"theme\"): \(theme ?? "light")")
                 }
             }
             .style("background", "#e6f3ff")
@@ -187,7 +222,7 @@ struct APIDemo: SwiftletMain {
 struct APIDemo: SwiftletMain {
     @Query("name") var userName: String?
     @Query("filter") var filter: String?
-    @Cookie("theme") var theme = "light"
+    @Cookie("theme", default: "light") var theme: String?
     
     var title = "SwiftUI-Style API Demo"
     var meta = ["description": "Interactive demo"]

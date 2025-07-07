@@ -107,35 +107,7 @@ struct SwiftUIStyleShowcase: SwiftletMain {
     }
     
     var body: some HTMLElement {
-        Html {
-            Head {
-            Title(title)
-            Meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
-            LinkElement(rel: "stylesheet", href: "/styles/main.css")
-            Style("""
-            .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            }
-            .example-section {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            margin: 2rem 0;
-            }
-            .code-example {
-            background: #282c34;
-            color: #abb2bf;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            }
-            """)
-            }
-            Body {
+        Fragment {
             // Navigation
             Nav {
             Container(maxWidth: .xl) {
@@ -243,24 +215,17 @@ struct SwiftUIStyleShowcase: SwiftletMain {
                 // Live example
                 Div {
                     H3("Result:")
-                    struct LiveGreeting: HTMLComponent {
-                        let name: String
+                    VStack(spacing: 10) {
+                        H2("Hello, Developer!")
+                            .style("color", "#007bff")
                         
-                        var body: some HTMLElement {
-                            VStack(spacing: 10) {
-                                H2("Hello, \(name)!")
-                                    .style("color", "#007bff")
-                                
-                                P("Welcome to Swiftlets")
-                                    .style("font-size", "1.1rem")
-                            }
-                            .style("text-align", "center")
-                            .style("padding", "2rem")
-                            .style("background", "#f8f9fa")
-                            .style("border-radius", "0.5rem")
-                        }
+                        P("Welcome to Swiftlets")
+                            .style("font-size", "1.1rem")
                     }
-                    LiveGreeting(name: "Developer").body
+                    .style("text-align", "center")
+                    .style("padding", "2rem")
+                    .style("background", "#f8f9fa")
+                    .style("border-radius", "0.5rem")
                 }
                 .class("example-section")
             }
@@ -312,29 +277,27 @@ struct SwiftUIStyleShowcase: SwiftletMain {
                 Div {
                     H3("Live Demo:")
                     
-                    struct Product {
-                        let name: String
-                        let price: Double
-                        let imageURL: String
-                    }
-                    
-                    let sampleProducts = [
-                        Product(name: "Wireless Headphones", price: 99.99, imageURL: "https://via.placeholder.com/300x200/4f46e5/ffffff?text=Headphones"),
-                        Product(name: "Smart Watch", price: 249.99, imageURL: "https://via.placeholder.com/300x200/0891b2/ffffff?text=Smart+Watch"),
-                        Product(name: "Laptop Stand", price: 49.99, imageURL: "https://via.placeholder.com/300x200/059669/ffffff?text=Laptop+Stand")
-                    ]
-                    
                     VStack(spacing: 30) {
                         H2("Featured Products")
                         
                         Grid(columns: .count(3), spacing: 20) {
-                            ForEach(sampleProducts) { product in
-                                ProductCard(
-                                    name: product.name,
-                                    price: product.price,
-                                    imageURL: product.imageURL
-                                ).body
-                            }
+                            ProductCard(
+                                name: "Wireless Headphones",
+                                price: 99.99,
+                                imageURL: "https://via.placeholder.com/300x200/4f46e5/ffffff?text=Headphones"
+                            ).body
+                            
+                            ProductCard(
+                                name: "Smart Watch",
+                                price: 249.99,
+                                imageURL: "https://via.placeholder.com/300x200/0891b2/ffffff?text=Smart+Watch"
+                            ).body
+                            
+                            ProductCard(
+                                name: "Laptop Stand",
+                                price: 49.99,
+                                imageURL: "https://via.placeholder.com/300x200/059669/ffffff?text=Laptop+Stand"
+                            ).body
                         }
                     }
                 }
@@ -492,7 +455,6 @@ struct SwiftUIStyleShowcase: SwiftletMain {
             }
             .style("padding", "2rem 0")
             .style("border-top", "1px solid #dee2e6")
-            }
         }
     }
 }

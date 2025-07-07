@@ -122,6 +122,15 @@ Note: Historical documentation and POCs have been moved to `/docs/archive/` for 
   - These files demonstrate the new Resources & Storage APIs but exceed Swift's type-checking complexity limits
   - The APIs themselves work correctly; only the showcase examples are affected
 
+## Common Build Fixes (January 2025)
+When encountering build errors:
+1. **Generic parameter inference**: Use `If(condition)` helper instead of `if` statements in HTMLBuilder contexts
+2. **HTMLComponent conformance**: Use `.body` property or create helper functions for custom components
+3. **Property wrapper syntax**: Cookie requires `@Cookie("name", default: "value") var name: String?`
+4. **Method names**: Use `.attribute()` not `.attr()` on HTML elements
+5. **Struct declarations**: Cannot declare structs inside @HTMLBuilder closures
+6. **Shared components**: Place reusable components in `src/shared/` directory
+
 ## Troubleshooting
 
 ### Build Hangs or "Expression Too Complex" Errors
@@ -141,6 +150,17 @@ Body {
     footer()
 }
 ```
+
+**What to do when swiftc hangs:**
+1. The `build-site` script will automatically timeout after 30 seconds and show:
+   ```
+   ✗ Build timeout after 30s
+   ⚠️  Likely cause: Expression too complex for type checker
+   💡 Solution: Break down complex HTML into smaller functions
+   ```
+2. If running swiftc manually and it hangs, press `Ctrl+C` to stop it
+3. Identify the problematic file (usually the one with the most complex HTML)
+4. Apply function decomposition to break the HTML into smaller pieces
 
 See `/docs/troubleshooting-complex-expressions.md` for detailed patterns and examples.
 

@@ -13,7 +13,7 @@ struct FormsShowcase: SwiftletMain {
     var body: some HTMLElement {
         Div {
             // Navigation
-            ShowcaseNav()
+            ShowcaseNav().body
             
             // Header
             Container(maxWidth: .large) {
@@ -26,7 +26,7 @@ struct FormsShowcase: SwiftletMain {
                         .style("color", "#6c757d")
                     
                     // Show submitted data if form was posted
-                    if wasSubmitted == "true" {
+                    If(wasSubmitted == "true") {
                         Div {
                             H3("Form Submitted!")
                             P("Received values:")
@@ -44,8 +44,8 @@ struct FormsShowcase: SwiftletMain {
                     }
                     
                     // Text Inputs
-                    FormSection(title: "Text Inputs") {
-                        FormExample(
+                    formSection(title: "Text Inputs") {
+                        formExample(
                             title: "Basic Text Input",
                             code: """
                             Input(type: "text", name: "username", placeholder: "Enter username")
@@ -54,7 +54,7 @@ struct FormsShowcase: SwiftletMain {
                             Input(type: "text", name: "username", placeholder: "Enter username")
                         }
                         
-                        FormExample(
+                        formExample(
                             title: "Email Input",
                             code: """
                             Input(type: "email", name: "email", placeholder: "user@example.com")
@@ -63,7 +63,7 @@ struct FormsShowcase: SwiftletMain {
                             Input(type: "email", name: "email", placeholder: "user@example.com")
                         }
                         
-                        FormExample(
+                        formExample(
                             title: "Password Input",
                             code: """
                             Input(type: "password", name: "password", placeholder: "Enter password")
@@ -72,23 +72,23 @@ struct FormsShowcase: SwiftletMain {
                             Input(type: "password", name: "password", placeholder: "Enter password")
                         }
                         
-                        FormExample(
+                        formExample(
                             title: "Number Input",
                             code: """
                             Input(type: "number", name: "age", placeholder: "Age")
-                                .attr("min", "0")
-                                .attr("max", "120")
+                                .attribute("min", "0")
+                                .attribute("max", "120")
                             """
                         ) {
                             Input(type: "number", name: "age", placeholder: "Age")
-                                .attr("min", "0")
-                                .attr("max", "120")
+                                .attribute("min", "0")
+                                .attribute("max", "120")
                         }
                     }
                     
                     // Select and TextArea
-                    FormSection(title: "Select & TextArea") {
-                        FormExample(
+                    formSection(title: "Select & TextArea") {
+                        formExample(
                             title: "Select Dropdown",
                             code: """
                             Select(name: "country") {
@@ -107,7 +107,7 @@ struct FormsShowcase: SwiftletMain {
                             }
                         }
                         
-                        FormExample(
+                        formExample(
                             title: "TextArea",
                             code: """
                             TextArea(name: "message", rows: 4, placeholder: "Enter your message...")
@@ -118,8 +118,8 @@ struct FormsShowcase: SwiftletMain {
                     }
                     
                     // Buttons
-                    FormSection(title: "Buttons") {
-                        FormExample(
+                    formSection(title: "Buttons") {
+                        formExample(
                             title: "Button Types",
                             code: """
                             HStack(spacing: 10) {
@@ -144,7 +144,7 @@ struct FormsShowcase: SwiftletMain {
                     }
                     
                     // Complete Form Example
-                    FormSection(title: "Complete Form Example") {
+                    formSection(title: "Complete Form Example") {
                         Div {
                             H4("Working Form with SwiftUI-Style Property Wrappers")
                             P("This form uses @FormValue property wrappers to access submitted data")
@@ -184,6 +184,61 @@ struct FormsShowcase: SwiftletMain {
                     }
                 }
                 .style("padding-bottom", "4rem")
+            }
+        }
+    }
+    
+    // Helper functions
+    @HTMLBuilder
+    func formExample<Content: HTMLElement>(
+        title: String,
+        code: String,
+        @HTMLBuilder demo: () -> Content
+    ) -> some HTMLElement {
+        Div {
+            VStack(spacing: 15) {
+                H4(title)
+                
+                Grid(columns: .count(2), spacing: 20) {
+                    Div {
+                        H5("Code")
+                            .style("margin-bottom", "0.5rem")
+                            .style("color", "#6c757d")
+                        Pre {
+                            Code(code)
+                        }
+                        .class("language-swift")
+                        .style("margin", "0")
+                    }
+                    
+                    Div {
+                        H5("Result")
+                            .style("margin-bottom", "0.5rem")
+                            .style("color", "#6c757d")
+                        Div {
+                            demo()
+                        }
+                        .style("padding", "1rem")
+                        .style("background", "#f8f9fa")
+                        .style("border", "1px solid #dee2e6")
+                        .style("border-radius", "0.375rem")
+                    }
+                }
+            }
+        }
+        .class("form-example")
+    }
+    
+    @HTMLBuilder
+    func formSection<Content: HTMLElement>(
+        title: String,
+        @HTMLBuilder content: () -> Content
+    ) -> some HTMLElement {
+        Section {
+            VStack(spacing: 20) {
+                H3(title)
+                    .style("margin-top", "2rem")
+                content()
             }
         }
     }

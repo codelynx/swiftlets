@@ -8,7 +8,7 @@ struct BasicElementsShowcase: SwiftletMain {
     var body: some HTMLElement {
         Div {
             // Navigation
-            NavigationBar()
+            NavigationBar().body
             
             // Header
             Container(maxWidth: .large) {
@@ -21,9 +21,9 @@ struct BasicElementsShowcase: SwiftletMain {
                         .style("color", "#6c757d")
                     
                     // Headings Section
-                    ShowcaseSection(title: "Headings") {
+                    showcaseSection(title: "Headings") {
                         VStack(spacing: 20) {
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "All Heading Levels",
                                 code: """
                                 H1("Heading Level 1")
@@ -47,9 +47,9 @@ struct BasicElementsShowcase: SwiftletMain {
                     }
                     
                     // Paragraphs Section
-                    ShowcaseSection(title: "Paragraphs & Text") {
+                    showcaseSection(title: "Paragraphs & Text") {
                         VStack(spacing: 20) {
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "Basic Paragraph",
                                 code: """
                                 P("This is a paragraph with some text content.")
@@ -58,7 +58,7 @@ struct BasicElementsShowcase: SwiftletMain {
                                 P("This is a paragraph with some text content.")
                             }
                             
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "Multiple Paragraphs",
                                 code: """
                                 P("First paragraph with some introductory text.")
@@ -74,9 +74,9 @@ struct BasicElementsShowcase: SwiftletMain {
                     }
                     
                     // Links Section
-                    ShowcaseSection(title: "Links") {
+                    showcaseSection(title: "Links") {
                         VStack(spacing: 20) {
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "Basic Link",
                                 code: """
                                 Link(href: "https://example.com", "Visit Example")
@@ -85,23 +85,23 @@ struct BasicElementsShowcase: SwiftletMain {
                                 Link(href: "https://example.com", "Visit Example")
                             }
                             
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "Link with Target",
                                 code: """
                                 Link(href: "https://github.com", "Open GitHub")
-                                    .attr("target", "_blank")
+                                    .attribute("target", "_blank")
                                 """
                             ) {
                                 Link(href: "https://github.com", "Open GitHub")
-                                    .attr("target", "_blank")
+                                    .attribute("target", "_blank")
                             }
                         }
                     }
                     
                     // Divs and Spans Section
-                    ShowcaseSection(title: "Containers") {
+                    showcaseSection(title: "Containers") {
                         VStack(spacing: 20) {
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "Div Container",
                                 code: """
                                 Div {
@@ -121,7 +121,7 @@ struct BasicElementsShowcase: SwiftletMain {
                                 .style("border-radius", "0.5rem")
                             }
                             
-                            ShowcaseExample(
+                            showcaseExample(
                                 title: "Inline Span",
                                 code: """
                                 P {
@@ -145,6 +145,59 @@ struct BasicElementsShowcase: SwiftletMain {
                     }
                 }
                 .style("padding-bottom", "4rem")
+            }
+        }
+    }
+    
+    // Helper function for showcase examples
+    @HTMLBuilder
+    func showcaseExample<Content: HTMLElement>(
+        title: String,
+        code: String,
+        @HTMLBuilder demo: () -> Content
+    ) -> some HTMLElement {
+        Div {
+            VStack(spacing: 15) {
+                H4(title)
+                
+                Grid(columns: .count(2), spacing: 20) {
+                    Div {
+                        H5("Code")
+                            .style("margin-bottom", "0.5rem")
+                            .style("color", "#6c757d")
+                        Pre {
+                            Code(code)
+                        }
+                        .class("language-swift")
+                        .style("margin", "0")
+                    }
+                    
+                    Div {
+                        H5("Result")
+                            .style("margin-bottom", "0.5rem")
+                            .style("color", "#6c757d")
+                        Div {
+                            demo()
+                        }
+                        .class("preview-box")
+                    }
+                }
+            }
+        }
+        .class("showcase-example")
+    }
+    
+    // Helper function for showcase sections
+    @HTMLBuilder
+    func showcaseSection<Content: HTMLElement>(
+        title: String,
+        @HTMLBuilder content: () -> Content
+    ) -> some HTMLElement {
+        Section {
+            VStack(spacing: 20) {
+                H2(title)
+                    .style("margin-top", "3rem")
+                content()
             }
         }
     }
