@@ -1,0 +1,249 @@
+/* Documentation Pages Enhancements */
+
+/* Quick Start Cards */
+.quick-start-card:hover {
+    border-color: currentColor !important;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.quick-start-card:hover h3 {
+    color: #667eea;
+}
+
+/* Documentation Items */
+.doc-item:hover {
+    background: #f8f9fa;
+}
+
+.doc-item:hover .doc-item-bar {
+    height: 100%;
+    background: #667eea !important;
+}
+
+/* Next Step Cards */
+.next-step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+/* Code Blocks with Syntax Highlighting (basic) */
+.code-block {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.code-block code {
+    color: inherit;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Property Wrapper Cards */
+.property-wrapper-card {
+    transition: all 0.2s ease;
+}
+
+.property-wrapper-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Flow Diagram */
+.flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+/* Installation Steps */
+.install-step {
+    position: relative;
+}
+
+.install-step::after {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 100%;
+    width: 2px;
+    height: 1.5rem;
+    background: #e9ecef;
+}
+
+.install-step:last-child::after {
+    display: none;
+}
+
+/* Search Input Styling */
+input[type="search"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 1.5rem center;
+    padding-left: 3.5rem !important;
+}
+
+input[type="search"]:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+/* Feature Points */
+.feature-point {
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.feature-point:hover {
+    background: #f8f9fa;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    /* Stack grids on mobile */
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Adjust flow diagram */
+    .flow-diagram {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    .flow-arrow {
+        transform: rotate(90deg);
+    }
+    
+    /* Adjust installation steps */
+    .install-step::after {
+        left: 30px;
+    }
+    
+    /* Stack navigation on mobile */
+    nav .hstack {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* Gradient Text Animation */
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.gradient-text {
+    background-size: 200% 200%;
+    animation: gradient 5s ease infinite;
+}
+
+/* Announcement Banner */
+.announcement-banner {
+    position: relative;
+    overflow: hidden;
+}
+
+.announcement-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    animation: pulse 10s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* Help Cards */
+.help-card {
+    transition: all 0.2s ease;
+}
+
+.help-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Code Examples */
+pre.code-example {
+    position: relative;
+    padding-top: 2.5rem;
+}
+
+pre.code-example::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom-left-radius: 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+}
+
+/* Smooth Scrolling for Anchor Links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Skip to Content Link (Accessibility) */
+.skip-to-content {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 1rem;
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+}
+
+.skip-to-content:focus {
+    left: 1rem;
+    top: 1rem;
+}
+
+/* Print Styles */
+@media print {
+    nav, footer, .help-section {
+        display: none;
+    }
+    
+    .container {
+        max-width: 100%;
+    }
+    
+    a[href^="http"]:after {
+        content: " (" attr(href) ")";
+    }
+}

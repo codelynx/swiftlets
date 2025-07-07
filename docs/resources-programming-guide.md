@@ -364,7 +364,7 @@ do {
 
 For complete working examples, see:
 - `/sites/test/resource-example/` - Basic resource and storage usage
-- `/sites/examples/blog/` - Blog with uploads and caching (TODO)
-- `/sites/examples/api/` - API with database storage (TODO)
+- `/sites/swiftlets-site/` - Official site with shared components and resources
+- Future examples planned for blog and API demonstration sites
 
 Remember: Resources (.res/) are for configuration and static data, Storage (var/) is for dynamic user content!

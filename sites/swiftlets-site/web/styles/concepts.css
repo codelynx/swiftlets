@@ -1,0 +1,181 @@
+/* Concepts Page Enhancements */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Concept Cards - Hover Effect */
+.concept-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e0;
+}
+
+/* Learning Steps - Hover Effect */
+.learning-step:hover {
+    background: #f8f9fa;
+    border-color: #667eea;
+    transform: translateX(4px);
+}
+
+/* Navigation Active State */
+nav a.active {
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 768px) {
+    /* Stack grid on mobile */
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Adjust hero title size */
+    h1 {
+        font-size: 2rem !important;
+    }
+    
+    /* Stack navigation on mobile */
+    nav .hstack {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    /* Adjust table for mobile */
+    table {
+        font-size: 0.875rem;
+    }
+    
+    td, th {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Code Example Styles (if needed) */
+.code-example {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.code-example pre {
+    margin: 0;
+    background: #f8f9fa;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.code-example code {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+    font-size: 0.875rem;
+}
+
+/* Improve link styles in footer */
+footer a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: #495057;
+}
+
+footer h4 {
+    color: #1a202c;
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+}
+
+/* Add some animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.concept-card {
+    animation: fadeIn 0.6s ease-out;
+    animation-fill-mode: both;
+}
+
+.concept-card:nth-child(1) { animation-delay: 0.1s; }
+.concept-card:nth-child(2) { animation-delay: 0.2s; }
+.concept-card:nth-child(3) { animation-delay: 0.3s; }
+.concept-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Typography improvements */
+h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+}
+
+p {
+    line-height: 1.7;
+}
+
+/* Button styles */
+a[href*="/docs/getting-started"] span,
+a[href*="/showcase"] span {
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+a[href*="/docs/getting-started"]:hover span {
+    background: #5a67d8 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+a[href*="/showcase"]:hover span {
+    background: #667eea !important;
+    color: white !important;
+}
+
+/* Breadcrumb improvements */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Table improvements */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+tbody tr:hover td:last-child {
+    background: #e0e7ff !important;
+}
+
+/* Container max-widths */
+.container-large {
+    max-width: 1024px;
+}
+
+.container-xl {
+    max-width: 1280px;
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mt-5 { margin-top: 3rem; }

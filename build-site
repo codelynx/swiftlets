@@ -18,6 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Default values
 VERBOSE=false
 FORCE_BUILD=false
+CLEAN_BUILD=false
 BUILD_TIMEOUT=30
 PARALLEL_BUILDS=1
 
@@ -52,6 +53,7 @@ Arguments:
 Options:
   -v, --verbose     Show detailed build output
   -f, --force       Force rebuild all files (ignore timestamps)
+  -c, --clean       Clean bin directory and .webbin files (use alone to clean only)
   -t, --timeout N   Set build timeout per file in seconds (default: 30)
   -j, --jobs N      Number of parallel builds (default: 1)
   -h, --help        Show this help message
@@ -61,9 +63,11 @@ Environment Variables:
   BUILD_JOBS        Override default parallel builds
 
 Examples:
-  $SCRIPT_NAME sites/examples/swiftlets-site
-  $SCRIPT_NAME sites/examples/swiftlets-site --verbose --force
-  $SCRIPT_NAME sites/examples/swiftlets-site -t 60 -j 4
+  $SCRIPT_NAME sites/swiftlets-site
+  $SCRIPT_NAME sites/swiftlets-site --verbose --force
+  $SCRIPT_NAME sites/swiftlets-site --clean              # Clean only
+  $SCRIPT_NAME sites/swiftlets-site --clean --force      # Clean then build
+  $SCRIPT_NAME sites/swiftlets-site -t 60 -j 4
 
 EOF
 }
@@ -85,6 +89,10 @@ parse_args() {
                 ;;
             -f|--force)
                 FORCE_BUILD=true
+                shift
+                ;;
+            -c|--clean)
+                CLEAN_BUILD=true
                 shift
                 ;;
             -t|--timeout)
@@ -438,9 +446,35 @@ build_site() {
     fi
 }
 
+# Clean function
+clean_site() {
+    log INFO "Cleaning site: $SITE_ROOT"
+    
+    if [ -d "$SITE_ROOT/bin" ]; then
+        log INFO "Removing bin directory..."
+        rm -rf "$SITE_ROOT/bin"
+    fi
+    
+    if [ -d "$SITE_ROOT/web" ]; then
+        log INFO "Removing .webbin files..."
+        rm -f "$SITE_ROOT/web"/*.webbin
+    fi
+    
+    log INFO "Clean complete"
+}
+
 # Main execution
 main() {
     parse_args "$@"
+    
+    if [ "$CLEAN_BUILD" = true ]; then
+        clean_site
+        # If only --clean was specified without other build options, exit
+        if [ "$FORCE_BUILD" = false ] && [ "$VERBOSE" = false ]; then
+            exit 0
+        fi
+    fi
+    
     build_site
 }
 

@@ -50,19 +50,19 @@ Build and run the example site:
 
 ```bash
 # Build the site
-./build-site sites/examples/swiftlets-site
+./build-site sites/swiftlets-site
 
 # Run the site
-./run-site sites/examples/swiftlets-site
+./run-site sites/swiftlets-site
 
 # Or combine build and run
-./run-site sites/examples/swiftlets-site --build
+./run-site sites/swiftlets-site --build
 ```
 
 Visit `http://localhost:8080` and explore:
 - **`/showcase`** - See all HTML components in action
 - **`/docs`** - Read documentation (also built with Swiftlets!)
-- **View source** - Check `sites/examples/swiftlets-site/src/` to see how it's built
+- **View source** - Check `sites/swiftlets-site/src/` to see how it's built
 
 > 💡 **Tip**: The entire documentation site you're reading is built with Swiftlets! Check out the source code to see real-world examples.
 
@@ -71,7 +71,7 @@ Visit `http://localhost:8080` and explore:
 Swiftlets uses a unique architecture where each route is a standalone executable:
 
 ```
-sites/examples/swiftlets-site/
+sites/swiftlets-site/
 ├── src/              # Swift source files
 │   ├── index.swift   # Homepage route
 │   ├── about.swift   # About page route
@@ -123,7 +123,7 @@ The build scripts make it easy to work with any site:
 ### Next Steps
 
 - **[Component Showcase](/showcase)** - See all available components
-- **[Study the Source](https://github.com/codelynx/swiftlets/tree/main/sites/examples/swiftlets-site)** - Learn from real examples
+- **[Study the Source](https://github.com/codelynx/swiftlets/tree/main/sites/swiftlets-site)** - Learn from real examples
 - **[HTML DSL Guide](/docs)** - Master the SwiftUI-like syntax
 
 ## 📝 Create Your First Page
@@ -412,8 +412,8 @@ The best way to learn Swiftlets is by exploring our comprehensive showcase:
 
 ```bash
 # Quick start with the showcase
-./build-site sites/examples/swiftlets-site
-./run-site sites/examples/swiftlets-site
+./build-site sites/swiftlets-site
+./run-site sites/swiftlets-site
 ```
 
 The showcase includes:
@@ -431,11 +431,11 @@ The showcase includes:
 
 ```bash
 # Build and run a specific site
-./build-site sites/examples/swiftlets-site
-./run-site sites/examples/swiftlets-site
+./build-site sites/swiftlets-site
+./run-site sites/swiftlets-site
 
 # Or build and run in one command
-./run-site sites/examples/swiftlets-site --build
+./run-site sites/swiftlets-site --build
 ```
 
 ## 📁 Project Structure

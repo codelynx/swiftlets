@@ -23,33 +23,33 @@ swiftlets-server <site-root> [options]
 ### Using the Scripts (Recommended)
 ```bash
 # Build and run a site
-./build-site sites/examples/swiftlets-site
-./run-site sites/examples/swiftlets-site
+./build-site sites/swiftlets-site
+./run-site sites/swiftlets-site
 
 # Run on a different port
-./run-site sites/examples/swiftlets-site --port 3000
+./run-site sites/swiftlets-site --port 3000
 
 # Listen on all interfaces
-./run-site sites/examples/swiftlets-site --host 0.0.0.0 --port 8080
+./run-site sites/swiftlets-site --host 0.0.0.0 --port 8080
 
 # Enable debug logging
-./run-site sites/examples/swiftlets-site --debug
+./run-site sites/swiftlets-site --debug
 ```
 
 ### Direct Server Usage
 ```bash
 # Run the server directly
-./bin/macos/arm64/swiftlets-server sites/examples/swiftlets-site
+./bin/macos/arm64/swiftlets-server sites/swiftlets-site
 
 # With options
-./bin/macos/arm64/swiftlets-server sites/examples/swiftlets-site --port 3000 --debug
+./bin/macos/arm64/swiftlets-server sites/swiftlets-site --port 3000 --debug
 ```
 
 ### Running from Current Directory
 ```bash
 # If you're in the site directory
-cd sites/examples/swiftlets-site
-../../../swiftlets-server
+cd sites/swiftlets-site
+../../swiftlets-server
 
 # Or explicitly specify current directory
 ./swiftlets-server .
@@ -100,8 +100,8 @@ The server logs its configuration on startup:
 
 ```
 2025-06-06T10:30:00Z [INFO] Server Configuration:
-2025-06-06T10:30:00Z [INFO]   Site Root: sites/examples/swiftlets-site
-2025-06-06T10:30:00Z [INFO]   Web Root: sites/examples/swiftlets-site/web
+2025-06-06T10:30:00Z [INFO]   Site Root: sites/swiftlets-site
+2025-06-06T10:30:00Z [INFO]   Web Root: sites/swiftlets-site/web
 2025-06-06T10:30:00Z [INFO]   Host: 127.0.0.1
 2025-06-06T10:30:00Z [INFO]   Port: 8080
 2025-06-06T10:30:00Z [INFO]   Platform: macos/arm64
@@ -127,11 +127,11 @@ The project now uses dedicated scripts instead of Makefiles:
 
 ```bash
 # Build and run a site
-./build-site sites/examples/swiftlets-site
-./run-site sites/examples/swiftlets-site
+./build-site sites/swiftlets-site
+./run-site sites/swiftlets-site
 
 # Or combine build and run
-./run-site sites/examples/swiftlets-site --build
+./run-site sites/swiftlets-site --build
 ```
 
 ## Using with swiftlets CLI
@@ -143,13 +143,13 @@ The swiftlets CLI automatically uses the new server interface:
 swiftlets serve
 
 # Serve specific site
-swiftlets serve sites/examples/swiftlets-site
+swiftlets serve sites/swiftlets-site
 
 # With options
-swiftlets serve sites/examples/swiftlets-site --port 3000 --host 0.0.0.0
+swiftlets serve sites/swiftlets-site --port 3000 --host 0.0.0.0
 
 # With debug logging
-swiftlets serve sites/examples/swiftlets-site --debug
+swiftlets serve sites/swiftlets-site --debug
 ```
 
 ## Platform-Specific Notes
@@ -163,7 +163,7 @@ On Ubuntu ARM64, the platform will show as `linux/arm64`:
 ```bash
 # On Ubuntu ARM64
 cd ~/Projects/swiftlets
-./bin/linux/arm64/swiftlets-server sites/examples/swiftlets-site
+./bin/linux/arm64/swiftlets-server sites/swiftlets-site
 ```
 
 ## Troubleshooting

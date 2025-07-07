@@ -55,21 +55,27 @@ swiftlets/
 │           └── swiftlets-server
 │
 ├── sites/                     # Websites and web applications
-│   ├── examples/              # Example sites for users
-│   │   └── swiftlets-site/    # Official documentation site
-│   │       ├── Makefile       # Build configuration
-│   │       ├── src/           # Swift source files
-│   │       │   ├── index.swift
-│   │       │   ├── about.swift
-│   │       │   ├── showcase.swift
-│   │       │   └── docs/
-│   │       │       └── getting-started.swift
-│   │       └── web/           # Web root directory
-│   │           ├── bin/       # Compiled swiftlets
-│   │           ├── *.webbin   # Route markers
-│   │           └── styles/    # Static assets
+│   ├── swiftlets-site/        # Official documentation and showcase site
+│   │   ├── src/               # Swift source files
+│   │   │   ├── index.swift
+│   │   │   ├── about.swift
+│   │   │   ├── showcase/      # Showcase examples
+│   │   │   │   └── *.swift
+│   │   │   ├── docs/          # Documentation pages
+│   │   │   │   └── *.swift
+│   │   │   └── shared/        # Shared components
+│   │   │       └── *.swift
+│   │   └── web/               # Web root directory
+│   │       ├── bin/           # Compiled swiftlets
+│   │       ├── *.webbin       # Route markers
+│   │       └── styles/        # Static assets
 │   │
-│   └── tests/                 # Test sites for framework development
+│   ├── shared-test/           # Example of shared components system
+│   │   └── src/
+│   │       ├── shared/        # Shared components
+│   │       └── *.swift        # Page files
+│   │
+│   └── test/                  # Test sites for framework development
 │       ├── test-html/         # HTML DSL testing
 │       ├── test-routing/      # Routing system testing
 │       └── benchmark/         # Performance benchmarks
@@ -181,7 +187,7 @@ Each site has its own Makefile that:
 3. Generates `.webbin` files with MD5 hashes
 
 ```bash
-cd sites/examples/swiftlets-site
+cd sites/swiftlets-site
 make build
 ```
 

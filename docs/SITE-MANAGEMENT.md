@@ -13,19 +13,54 @@ The project provides three main scripts for working with sites:
 ./build-server
 
 # Build a site
-./build-site sites/examples/swiftlets-site
+./build-site sites/swiftlets-site
 
 # Run a site
-./run-site sites/examples/swiftlets-site
+./run-site sites/swiftlets-site
 
 # Or combine build and run
-./run-site sites/examples/swiftlets-site --build
+./run-site sites/swiftlets-site --build
 
 # Clean site artifacts
-./build-site sites/examples/swiftlets-site --clean
+./build-site sites/swiftlets-site --clean
 
 # Force rebuild
-./build-site sites/examples/swiftlets-site --force
+./build-site sites/swiftlets-site --force
+```
+
+## Build-Site Options
+
+The `build-site` script supports several options:
+
+- `--clean` - Remove compiled binaries and webbin files without rebuilding. Useful for:
+  - Cleaning up after moving or renaming files
+  - Resetting the build environment
+  - Removing stale artifacts
+  
+- `--force` - Force rebuild all files (ignores timestamps). This:
+  - Performs a clean first
+  - Then rebuilds all Swift files
+  
+- `--verbose` or `-v` - Show detailed build output
+
+- `--timeout N` or `-t N` - Set build timeout per file in seconds (default: 30)
+
+- `--jobs N` or `-j N` - Number of parallel builds (default: 1)
+
+### Examples:
+
+```bash
+# Clean only (no build)
+./build-site sites/swiftlets-site --clean
+
+# Clean and rebuild everything
+./build-site sites/swiftlets-site --force
+
+# Verbose output with parallel builds
+./build-site sites/swiftlets-site -v -j 4
+
+# Extended timeout for complex files
+./build-site sites/swiftlets-site --timeout 60
 ```
 
 ## Building Multiple Sites
@@ -33,13 +68,13 @@ The project provides three main scripts for working with sites:
 To build multiple sites, use shell commands:
 
 ```bash
-# Build all example sites
-for site in sites/examples/*; do
+# Build all sites
+for site in sites/*; do
     [ -d "$site/src" ] && ./build-site "$site"
 done
 
-# Build all test sites
-for site in sites/tests/*; do
+# Build specific test sites
+for site in sites/test/*; do
     [ -d "$site/src" ] && ./build-site "$site"
 done
 
@@ -57,32 +92,32 @@ done
 ./build-server
 
 # Run with specific site
-./bin/macos/arm64/swiftlets-server sites/examples/swiftlets-site
+./bin/macos/arm64/swiftlets-server sites/swiftlets-site
 ```
 
 ### Method 2: From Site Directory
 ```bash
 # Navigate to site and build/run from there
-cd sites/examples/swiftlets-site
-../../../build-site .
-../../../run-site .
+cd sites/swiftlets-site
+../../build-site .
+../../run-site .
 ```
 
 ### Method 3: Using CLI Tool
 ```bash
 # Use swiftlets CLI (if installed)
-swiftlets serve --site sites/examples/swiftlets-site
+swiftlets serve --site sites/swiftlets-site
 ```
 
 ## Site Organization
 
 ```
 sites/
+├── swiftlets-site/  # Main documentation site
 ├── core/           # Core example sites
 │   ├── hello/      # Minimal example
 │   └── showcase/   # Feature showcase
 ├── examples/       # Full example sites
-│   └── swiftlets-site/  # Main documentation site
 └── tests/          # Test sites
     ├── test-html/  # HTML DSL tests
     └── test-routing/  # Routing tests
@@ -102,9 +137,9 @@ The site management system now uses dedicated scripts:
 
 1. **Development**: Work from the site directory for faster iteration
    ```bash
-   cd sites/examples/my-site
-   ../../../build-site .
-   ../../../run-site . --debug
+   cd sites/my-site
+   ../../build-site .
+   ../../run-site . --debug
    ```
 
 2. **Testing Multiple Sites**: Run on different ports
