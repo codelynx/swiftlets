@@ -19,8 +19,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VERBOSE=false
 FORCE_BUILD=false
 CLEAN_BUILD=false
-BUILD_TIMEOUT=30
-PARALLEL_BUILDS=1
+BUILD_TIMEOUT=60  # Increased from 30s for complex Swift files on EC2
+PARALLEL_BUILDS=1  # Sequential builds for memory-constrained environments
 
 # Platform detection
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -54,9 +54,13 @@ Options:
   -v, --verbose     Show detailed build output
   -f, --force       Force rebuild all files (ignore timestamps)
   -c, --clean       Clean bin directory and .webbin files (use alone to clean only)
-  -t, --timeout N   Set build timeout per file in seconds (default: 30)
+  -t, --timeout N   Set build timeout per file in seconds (default: 60)
   -j, --jobs N      Number of parallel builds (default: 1)
   -h, --help        Show this help message
+
+Note: Default timeout increased to 60s for complex Swift files.
+      For resource-constrained environments (EC2 t2.micro, etc), 
+      use -j 1 (default) to avoid memory issues.
 
 Environment Variables:
   BUILD_TIMEOUT     Override default timeout (seconds)
