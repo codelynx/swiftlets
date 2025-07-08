@@ -1,5 +1,9 @@
 # Swiftlets Documentation
 
+## Getting Started
+
+- **[Alice's Story: Getting Started Guide](alice-story-getting-started.md)** - A beginner-friendly narrative guide to building and deploying your first Swiftlets site
+
 ## Core Documentation
 
 - **[Project Structure](project-structure.md)** - Complete guide to the project layout and organization
