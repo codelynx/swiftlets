@@ -1,0 +1,210 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+      site:
+        description: 'Site to deploy'
+        required: true
+        default: 'swiftlets-site'
+        type: string
+
+env:
+  SWIFT_VERSION: '5.9.2'
+
+jobs:
+  build:
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [x86_64]  # Add aarch64 if using ARM instances
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: ${{ env.SWIFT_VERSION }}
+      
+      - name: Cache Swift packages
+        uses: actions/cache@v3
+        with:
+          path: .build
+          key: ${{ runner.os }}-swift-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-swift-
+      
+      - name: Build site
+        run: |
+          ./build-site sites/${{ github.event.inputs.site || 'swiftlets-site' }} \
+            --platform linux \
+            --arch ${{ matrix.architecture }}
+      
+      - name: Package build
+        run: |
+          mkdir -p deploy/ec2/builds
+          SITE_NAME="${{ github.event.inputs.site || 'swiftlets-site' }}"
+          VERSION="${{ github.sha }}"
+          tar -czf "deploy/ec2/builds/swiftlets-${SITE_NAME}-${VERSION}-linux-${{ matrix.architecture }}.tar.gz" \
+            bin/linux/${{ matrix.architecture }} \
+            sites/${SITE_NAME} \
+            run-site \
+            Package.swift
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: swiftlets-build-${{ matrix.architecture }}
+          path: deploy/ec2/builds/*.tar.gz
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: swiftlets-build-x86_64
+          path: deploy/ec2/builds
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      
+      - name: Get EC2 instance IP
+        id: get-instance
+        run: |
+          INSTANCE_ID="${{ vars.EC2_INSTANCE_ID }}"
+          INSTANCE_IP=$(aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+          echo "instance_ip=$INSTANCE_IP" >> $GITHUB_OUTPUT
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ steps.get-instance.outputs.instance_ip }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy to EC2
+        run: |
+          PACKAGE=$(ls -t deploy/ec2/builds/*.tar.gz | head -1)
+          
+          # Upload package
+          scp -i ~/.ssh/deploy_key \
+            "$PACKAGE" \
+            ubuntu@${{ steps.get-instance.outputs.instance_ip }}:/tmp/
+          
+          # Deploy on server
+          ssh -i ~/.ssh/deploy_key ubuntu@${{ steps.get-instance.outputs.instance_ip }} << 'EOF'
+            set -e
+            
+            # Backup current deployment
+            if [ -d "/opt/swiftlets/bin" ]; then
+              sudo mkdir -p "/opt/swiftlets/backups/$(date +%Y%m%d_%H%M%S)"
+              sudo cp -r /opt/swiftlets/bin /opt/swiftlets/sites \
+                "/opt/swiftlets/backups/$(date +%Y%m%d_%H%M%S)/"
+            fi
+            
+            # Extract new deployment
+            cd /opt/swiftlets
+            sudo tar -xzf /tmp/swiftlets-*.tar.gz
+            sudo chown -R ubuntu:ubuntu /opt/swiftlets
+            chmod +x /opt/swiftlets/run-site
+            find /opt/swiftlets/bin -type f -exec chmod +x {} \;
+            
+            # Restart service
+            sudo systemctl restart swiftlets
+            
+            # Verify deployment
+            sleep 5
+            if sudo systemctl is-active --quiet swiftlets; then
+              echo "Deployment successful"
+            else
+              echo "Deployment failed"
+              exit 1
+            fi
+            
+            # Cleanup
+            rm -f /tmp/swiftlets-*.tar.gz
+          EOF
+      
+      - name: Health check
+        run: |
+          sleep 10
+          curl -f -s -o /dev/null -w "%{http_code}" \
+            http://${{ steps.get-instance.outputs.instance_ip }} || exit 1
+          echo "Health check passed"
+      
+      - name: Notify deployment
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful to ${{ github.event.inputs.environment || 'production' }}"
+          else
+            echo "❌ Deployment failed"
+          fi
+
+  cleanup:
+    name: Cleanup old deployments
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      
+      - name: Get EC2 instance IP
+        id: get-instance
+        run: |
+          INSTANCE_ID="${{ vars.EC2_INSTANCE_ID }}"
+          INSTANCE_IP=$(aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+          echo "instance_ip=$INSTANCE_IP" >> $GITHUB_OUTPUT
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ steps.get-instance.outputs.instance_ip }} >> ~/.ssh/known_hosts
+      
+      - name: Clean old backups
+        run: |
+          ssh -i ~/.ssh/deploy_key ubuntu@${{ steps.get-instance.outputs.instance_ip }} << 'EOF'
+            # Keep only last 5 backups
+            cd /opt/swiftlets/backups
+            ls -t | tail -n +6 | xargs -r sudo rm -rf
+          EOF
