@@ -1,0 +1,61 @@
+# ContainerFile for Swiftlets
+# This extends the base container created by Swift Container Plugin
+# to include sites and runtime configuration
+
+# Start from the container built by Swift Container Plugin
+ARG BASE_IMAGE=swiftlets:latest
+FROM ${BASE_IMAGE} AS swift-container
+
+# Create a new stage that adds Swiftlets-specific content
+FROM ubuntu:22.04
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    libcurl4 \
+    libxml2 \
+    tzdata \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create user
+RUN useradd -m -s /bin/bash swiftlets
+
+# Set working directory
+WORKDIR /app
+
+# Copy the Swift executable from the container plugin build
+COPY --from=swift-container /usr/bin/SwiftletsServer /app/SwiftletsServer
+
+# Copy sites and runtime files
+# These need to be built separately and available in the build context
+COPY bin /app/bin
+COPY sites /app/sites
+COPY run-site /app/run-site
+
+# Set permissions
+RUN chmod +x /app/SwiftletsServer /app/run-site && \
+    chown -R swiftlets:swiftlets /app
+
+# Create directories for runtime data
+RUN mkdir -p /app/var /app/logs && \
+    chown -R swiftlets:swiftlets /app/var /app/logs
+
+# Switch to non-root user
+USER swiftlets
+
+# Environment variables
+ENV SWIFTLETS_ENV=production
+ENV PORT=8080
+ENV SITE_NAME=swiftlets-site
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/ || exit 1
+
+# Entry point
+ENTRYPOINT ["/app/run-site"]
+CMD ["sites/${SITE_NAME}", "--port", "${PORT}"]

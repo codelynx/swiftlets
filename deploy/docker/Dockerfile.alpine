@@ -1,0 +1,67 @@
+# Alpine-based Dockerfile for smaller images
+# Uses static linking for minimal runtime dependencies
+
+# Build stage
+FROM swift:5.9-jammy AS builder
+
+# Install static linking dependencies
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy and build
+COPY Package.swift Package.resolved ./
+COPY Sources ./Sources
+COPY sites ./sites
+COPY build-site build-server ./
+
+RUN chmod +x build-site build-server
+
+# Build with static linking
+RUN swift build -c release \
+    -Xswiftc -static-stdlib \
+    -Xswiftc -static-executable
+
+ARG SITE_NAME=swiftlets-site
+RUN ./build-site sites/${SITE_NAME} --static
+
+# Runtime stage - Alpine
+FROM alpine:3.19
+
+# Install minimal runtime dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    tzdata \
+    curl
+
+# Create user
+RUN adduser -D -s /bin/sh swiftlets
+
+WORKDIR /app
+
+# Copy artifacts
+COPY --from=builder /build/.build/release/SwiftletsServer /app/
+COPY --from=builder /build/bin /app/bin
+COPY --from=builder /build/sites /app/sites
+COPY --from=builder /build/run-site /app/
+
+RUN chmod +x /app/SwiftletsServer /app/run-site && \
+    chown -R swiftlets:swiftlets /app
+
+USER swiftlets
+
+EXPOSE 8080
+
+ENV SWIFTLETS_ENV=production
+ENV PORT=8080
+ARG SITE_NAME=swiftlets-site
+ENV SITE_NAME=${SITE_NAME}
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/ || exit 1
+
+CMD ["./run-site", "sites/${SITE_NAME}", "--port", "${PORT}"]
