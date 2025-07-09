@@ -13,9 +13,16 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-SWIFT_VERSION="5.9.2"
+SWIFT_VERSION="5.9.2"  # For Ubuntu 20.04/22.04
 UBUNTU_VERSION=$(lsb_release -rs)
 ARCHITECTURE=$(uname -m)
+
+# Check if Ubuntu 24.04
+if [[ "$UBUNTU_VERSION" =~ ^24\. ]]; then
+    echo -e "${YELLOW}Ubuntu 24.04 detected. Using updated setup script...${NC}"
+    echo "Please run: setup-instance-ubuntu24.sh"
+    exit 0
+fi
 
 echo -e "${GREEN}=== Swiftlets EC2 Setup Script ===${NC}"
 echo "Ubuntu Version: $UBUNTU_VERSION"
@@ -32,7 +39,7 @@ sudo apt install -y \
     git \
     gnupg2 \
     libc6-dev \
-    libcurl4-openssl-dev \
+    libcurl4 \
     libedit2 \
     libgcc-9-dev \
     libpython3.8 \
@@ -64,6 +71,8 @@ elif [ "$UBUNTU_VERSION" = "20.04" ]; then
     fi
 else
     echo -e "${RED}Unsupported Ubuntu version: $UBUNTU_VERSION${NC}"
+    echo "Supported versions: 20.04, 22.04"
+    echo "For Ubuntu 24.04, use setup-instance-ubuntu24.sh"
     exit 1
 fi
 

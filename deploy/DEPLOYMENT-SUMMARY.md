@@ -1,109 +1,64 @@
-# Swiftlets Deployment - Implementation Summary
+# Swiftlets EC2 Deployment Summary
 
-## What We've Built
+## Successfully Deployed!
 
-This branch (`feature/aws-ec2-deployment`) adds comprehensive deployment infrastructure for Swiftlets, supporting multiple deployment targets and methodologies.
+Your Swiftlets documentation site is now running on EC2:
+- **URL**: http://<YOUR-EC2-IP>:8080/
+- **Platform**: Ubuntu 24.04 ARM64 on EC2 t4g.small
+- **Swift Version**: 6.1.2 (matching your local Mac version)
 
-## Deployment Options Implemented
+## Deployment Method
 
-### 1. Container Deployment (`deploy/container/`)
-- **Swift Container Plugin Integration**: Added to Package.swift for native Swift container builds
-- **Build Scripts**: 
-  - `build-container.sh` - Uses Swift Container Plugin
-  - `build-full-container.sh` - Creates complete containers with sites
-  - `push-to-registry.sh` - Supports GitHub, Docker Hub, ECR, GCR
-- **ContainerFile**: Configuration for extending base containers
-- **Documentation**: Complete guide in `docs/container-deployment.md`
+We deployed using the **build-on-EC2** approach:
+1. Package source code locally
+2. Upload to EC2
+3. Build and run on EC2 using systemd service
 
-### 2. EC2 Deployment (`deploy/ec2/`)
-- **Setup Automation**: `setup-instance.sh` for Ubuntu EC2 instances
-- **Deployment Scripts**: `deploy.sh` for zero-downtime deployments
-- **Infrastructure**:
-  - systemd service configuration
-  - Nginx reverse proxy setup
-  - Terraform security groups
-- **CI/CD**: GitHub Actions workflow for automated deployments
-- **Documentation**: Complete guide in `docs/aws-ec2-deployment.md`
+## Key Files Created
 
-### 3. Lambda Deployment (`deploy/lambda/`) - Experimental
-- **Swift Lambda Adapter**: Complete implementation for serverless
-- **Build Scripts**: Package Swiftlets for Lambda runtime
-- **SAM Templates**: Infrastructure as code for deployment
-- **Status**: Implementation complete, needs testing
+1. **`/deploy/deploy-swiftlets-site.sh`**
+   - Main deployment script
+   - Packages source, uploads to EC2, builds remotely
+   - Sets up systemd service for automatic restart
 
-## Key Features
+2. **Systemd Service on EC2**
+   - Service name: `swiftlets-site`
+   - Auto-starts on boot
+   - Automatically restarts if crashes
 
-### Multi-Architecture Support
-- x86_64 (AMD64) and ARM64 (aarch64)
-- Cross-compilation from macOS to Linux
-- Platform-specific binary paths
+## Container Approach Status
 
-### Security
-- Non-root container execution
-- Security groups and IAM roles
-- HTTPS/TLS support with Let's Encrypt
-- Nginx security headers
+The container-based cross-compilation approach encountered challenges:
+- Swift SDK version mismatch (6.0.2 SDK vs 6.1.2 compiler)
+- No readily available 6.1.2 Linux SDK
+- Apple's Container Plugin still requires matching SDK versions
 
-### Automation
-- GitHub Actions workflows
-- Zero-downtime deployments
-- Automated backups
-- Health checks
+## Future Improvements
 
-## Documentation Updates
+1. **Container Deployment**: When matching SDKs become available
+2. **CI/CD Pipeline**: Automate deployments on git push
+3. **Load Balancer**: Add HTTPS support with AWS ALB
+4. **Multiple Instances**: Scale horizontally with container orchestration
 
-1. **New Documentation**:
-   - `docs/deployment-overview.md` - Comprehensive deployment guide
-   - `docs/container-deployment.md` - Container-specific guide
-   - `docs/aws-ec2-deployment.md` - EC2 deployment guide
-   - `deploy/README.md` - Quick start for deployment scripts
+## Commands Reference
 
-2. **Updated Files**:
-   - `Package.swift` - Added Swift Container Plugin dependency
-   - `docs/README.md` - Added deployment section
-
-## Usage Examples
-
-### Quick Container Deployment
 ```bash
-# Build and run locally
-./deploy/container/build-full-container.sh swiftlets-site
-docker run -p 8080:8080 swiftlets-full:latest
+# Deploy updates
+./deploy/deploy-swiftlets-site.sh
 
-# Push to GitHub Container Registry
-export GITHUB_TOKEN=your-token
-./deploy/container/push-to-registry.sh swiftlets-full latest ghcr
+# Check service status
+ssh -i ~/.ssh/<YOUR-KEY-NAME>.pem ubuntu@<YOUR-EC2-IP> 'sudo systemctl status swiftlets-site'
+
+# View logs
+ssh -i ~/.ssh/<YOUR-KEY-NAME>.pem ubuntu@<YOUR-EC2-IP> 'sudo journalctl -u swiftlets-site -f'
+
+# Restart service
+ssh -i ~/.ssh/<YOUR-KEY-NAME>.pem ubuntu@<YOUR-EC2-IP> 'sudo systemctl restart swiftlets-site'
 ```
 
-### Quick EC2 Deployment
-```bash
-# On EC2
-./deploy/ec2/setup-instance.sh
+## Notes
 
-# From local machine
-./deploy/ec2/deploy.sh ec2-host.amazonaws.com
-```
-
-## Next Steps
-
-1. **Testing**: Test container builds with Docker running
-2. **Swift SDK**: Install Linux SDK for cross-compilation
-3. **CI/CD**: Set up GitHub secrets for automated deployment
-4. **Production**: Choose deployment method based on requirements
-
-## Clean Architecture
-
-- Removed all POC/test scripts
-- Fixed Dockerfile CMD syntax
-- Updated documentation to reflect actual implementation
-- Clear separation between deployment methods
-
-## Ready for Production
-
-All deployment methods are production-ready with:
-- Comprehensive error handling
-- Logging and monitoring
-- Security best practices
-- Automated workflows
-
-The deployment infrastructure is now complete and ready for use!
+- EC2 instance has limited disk space (90% used)
+- Consider cleanup or larger instance for production
+- The deployment builds all dependencies on EC2 (takes ~5 minutes)
+- Pre-compiled deployment would be faster with matching SDKs
