@@ -6,6 +6,8 @@
 [![Platform](https://img.shields.io/badge/Platform-macOS%20|%20Linux-lightgray.svg)](https://swift.org)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+🌐 **Live Demo**: [http://swiftlet.eastlynx.com:8080/](http://swiftlet.eastlynx.com:8080/)
+
 > [!WARNING]
 > **Development Status**: Swiftlets is under active development and is **NOT ready for production use**. APIs may change, and features may be incomplete. We welcome feedback and contributions to help shape the future of Swift on the web!
 
