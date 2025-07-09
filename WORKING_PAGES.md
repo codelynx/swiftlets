@@ -1,7 +1,7 @@
 # Swiftlets on AWS EC2 - Working Pages
 
 ## Server Access
-- **URL**: http://ec2-3-92-76-113.compute-1.amazonaws.com:8080/
+- **URL**: http://ec2-<YOUR-EC2-PUBLIC-IP>.compute-1.amazonaws.com:8080/
 - **Status**: ✅ Running
 
 ## Successfully Built Pages
@@ -40,7 +40,7 @@
 ## How to Access
 
 Simply visit the URLs above. For example:
-- http://ec2-3-92-76-113.compute-1.amazonaws.com:8080/showcase/basic-elements-simple
+- http://ec2-<YOUR-EC2-PUBLIC-IP>.compute-1.amazonaws.com:8080/showcase/basic-elements-simple
 
 ## Adding New Pages
 

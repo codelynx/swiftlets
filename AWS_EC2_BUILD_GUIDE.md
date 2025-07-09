@@ -162,7 +162,7 @@ http://<your-ec2-public-ip>:8080/
 
 Example:
 ```
-http://ec2-3-92-76-113.compute-1.amazonaws.com:8080/
+http://ec2-<YOUR-EC2-PUBLIC-IP>.compute-1.amazonaws.com:8080/
 ```
 
 ## Platform Details

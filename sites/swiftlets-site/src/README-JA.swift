@@ -290,7 +290,7 @@ struct ReadmeJA: SwiftletMain {
                     Link(href: "/docs", "ドキュメント")
                     Link(href: "/showcase", "ショーケース")
                     Link(href: "/about", "Swiftletsについて")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                     
                     // Language Switcher
@@ -589,7 +589,7 @@ sites/swiftlets-site/
                         .style("color", "#718096")
                     Spacer()
                     HStack(spacing: 24) {
-                        Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         Link(href: "/docs", "ドキュメント")
                         Link(href: "/showcase", "例")
                     }

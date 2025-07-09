@@ -224,10 +224,39 @@ To update the site:
 - Consider reserved instances for long-term savings
 - Use CloudFront for static assets
 
+## Production Setup
+
+### Systemd Service (Active)
+
+The server is now managed by systemd for automatic restarts and boot startup:
+
+```bash
+# Service management commands
+sudo systemctl status swiftlets      # Check status
+sudo systemctl restart swiftlets     # Restart service
+sudo systemctl stop swiftlets        # Stop service
+sudo journalctl -u swiftlets -f      # View logs (live)
+```
+
+### DNS Configuration
+
+The site is accessible via custom domain:
+- **URL**: http://swiftlet.eastlynx.com:8080/
+- **DNS**: Route 53 A record pointing to EC2 instance
+- **Note**: Port 8080 required in URL
+
+## Recent Updates (January 2025)
+
+- ✅ Systemd service configured for auto-restart
+- ✅ DNS configured with Route 53
+- ✅ GitHub URLs updated from `swiftlets/swiftlets` to `codelynx/swiftlets`
+- ✅ 22/27 pages successfully deployed
+- ✅ Docker-based build process established
+
 ## Next Steps
 
-- [ ] Set up systemd service for auto-restart
 - [ ] Configure SSL with Let's Encrypt
+- [ ] Set up port 80 redirect to remove :8080 requirement
 - [ ] Implement health checks
 - [ ] Set up automated deployments
 - [ ] Add CloudWatch monitoring

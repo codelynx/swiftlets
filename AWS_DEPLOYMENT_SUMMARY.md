@@ -7,7 +7,7 @@
 
 ### 1. Successfully Built and Deployed
 - **Swiftlets Server**: Compiled and running on AWS EC2
-- **Accessible URL**: http://ec2-3-92-76-113.compute-1.amazonaws.com:8080/
+- **Accessible URL**: http://ec2-<YOUR-EC2-PUBLIC-IP>.compute-1.amazonaws.com:8080/
 - **Working Pages**:
   - `/` - Homepage (index)
   - `/about` - About page

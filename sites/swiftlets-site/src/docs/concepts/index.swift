@@ -328,7 +328,7 @@ struct ConceptsIndex: SwiftletMain {
                         .class("active")
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
                 .class("nav-links")
@@ -619,7 +619,7 @@ struct ConceptsIndex: SwiftletMain {
                             H4("Community")
                                 .class("footer-heading")
                             Div {
-                                Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                                Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                                     .attribute("target", "_blank")
                                 Link(href: "/showcase", "Examples")
                                 Link(href: "/about", "About")

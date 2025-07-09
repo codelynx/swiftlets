@@ -3,7 +3,7 @@
 ## Instance Details
 - **Instance Type**: t4g.small (ARM64 Graviton2)
 - **OS**: Ubuntu 24.04 LTS
-- **IP**: 3.92.76.113
+- **IP**: <YOUR-EC2-IP>
 - **Architecture**: aarch64
 
 ## Issues Encountered

@@ -480,6 +480,135 @@ See our [detailed roadmap](docs/roadmap.md) for more information.
 
 Swiftlets is released under the MIT License. See [LICENSE](LICENSE) for details.
 
+## 🚀 Deployment
+
+### Local Development (macOS)
+
+Testing locally on macOS is straightforward:
+
+```bash
+# 1. Clone and build Swiftlets
+git clone https://github.com/codelynx/swiftlets.git
+cd swiftlets
+./build-server
+
+# 2. Build and run the showcase site
+./build-site sites/swiftlets-site
+./run-site sites/swiftlets-site
+
+# Visit http://localhost:8080
+
+# 3. For development with auto-rebuild
+./run-site sites/swiftlets-site --build --port 3000
+```
+
+### Production Deployment (AWS EC2)
+
+Deploy your Swiftlets application to AWS EC2 with our Docker-based build process:
+
+#### Prerequisites
+- AWS account with EC2 access
+- Docker installed locally (for cross-compilation)
+- SSH key pair for EC2
+- Domain name (optional, for custom DNS)
+
+#### Quick Start
+
+1. **Launch EC2 Instance**
+   - **Recommended**: t4g.small (ARM64, 2GB RAM) - best price/performance
+   - **OS**: Ubuntu 24.04 LTS
+   - **Security Group**: Open ports 22 (SSH), 8080 (HTTP)
+
+2. **Setup EC2 Instance**
+   ```bash
+   # Connect to your EC2
+   ssh -i ~/.ssh/your-key.pem ubuntu@<YOUR-EC2-IP>
+   
+   # Run setup script (installs Swift, Nginx, creates swap)
+   curl -fsSL https://raw.githubusercontent.com/codelynx/swiftlets/main/deploy/ec2/setup-instance-ubuntu24.sh | bash
+   ```
+
+3. **Build Linux Executables (Local)**
+   ```bash
+   # From your local machine (in swiftlets directory)
+   # Build all executables using Docker
+   ./deploy/docker-build-deploy/direct-docker-build.sh
+   
+   # This creates Linux ARM64 executables in sites/swiftlets-site/bin/
+   ```
+
+4. **Deploy to EC2**
+   ```bash
+   # Set your EC2 details
+   export EC2_HOST="<YOUR-EC2-IP>"
+   export KEY_FILE="~/.ssh/your-key.pem"
+   
+   # Deploy
+   ./deploy/deploy-swiftlets-site.sh
+   ```
+
+5. **Access Your Site**
+   - URL: `http://<YOUR-EC2-IP>:8080`
+   - Or with custom domain: `http://yoursite.com:8080`
+
+#### Production Features
+
+- **Auto-restart**: Systemd service ensures the server stays running
+- **Nginx proxy**: Handles incoming requests on port 8080
+- **Process isolation**: Each route runs as separate executable
+- **Easy updates**: Just rebuild and redeploy executables
+
+#### DNS Setup (Optional)
+
+Configure custom domain with Route 53:
+```bash
+# Create A record pointing to your EC2 IP
+aws route53 change-resource-record-sets \
+  --hosted-zone-id <YOUR-ZONE-ID> \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "swiftlet.yourdomain.com",
+        "Type": "A",
+        "TTL": 300,
+        "ResourceRecords": [{"Value": "<YOUR-EC2-IP>"}]
+      }
+    }]
+  }'
+```
+
+#### Monitoring & Management
+
+```bash
+# Check service status
+sudo systemctl status swiftlets
+
+# View logs
+sudo journalctl -u swiftlets -f
+
+# Restart service
+sudo systemctl restart swiftlets
+
+# Update deployment
+./deploy/deploy-swiftlets-site.sh  # Just run again
+```
+
+For detailed deployment documentation, see:
+- [AWS EC2 Deployment Guide](docs/aws-ec2-deployment.md)
+- [Production Deployment Guide](docs/PRODUCTION-DEPLOYMENT.md)
+
+### Docker Deployment (Alternative)
+
+For containerized deployments:
+```bash
+# Build Docker image
+docker build -t swiftlets .
+
+# Run container
+docker run -d -p 8080:8080 --name swiftlets-app swiftlets
+```
+
 ## 🔧 Troubleshooting
 
 ### Common Issues
@@ -487,6 +616,7 @@ Swiftlets is released under the MIT License. See [LICENSE](LICENSE) for details.
 - **Only one file builds on Linux**: This is a known bash loop issue. See [Ubuntu Scripting Issue](docs/ubuntu-scripting-issue.md) for details.
 - **MD5 command not found**: The scripts automatically handle differences between macOS (md5) and Linux (md5sum).
 - **Build errors**: Use `--verbose` flag for detailed output: `./build-site sites/your-site --verbose`
+- **EC2 deployment fails**: Ensure Docker is installed locally and EC2 has sufficient resources (2GB+ RAM)
 
 For more troubleshooting help, see the [documentation](docs/).
 

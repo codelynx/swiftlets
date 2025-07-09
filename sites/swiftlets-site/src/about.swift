@@ -543,7 +543,7 @@ struct AboutPage: SwiftletMain {
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
                         .class("active")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
                 .class("nav-links")
@@ -779,7 +779,7 @@ struct AboutPage: SwiftletMain {
                 .style("z-index", "1")
             
             Div {
-                Link(href: "https://github.com/swiftlets/swiftlets", "View on GitHub")
+                Link(href: "https://github.com/codelynx/swiftlets", "View on GitHub")
                     .class("btn-primary")
                     .attribute("target", "_blank")
                 Link(href: "/docs/troubleshooting", "Get Help")
@@ -847,7 +847,7 @@ struct AboutPage: SwiftletMain {
                         Link(href: "/docs", "Documentation")
                         Link(href: "/showcase", "Examples")
                         Link(href: "/docs/troubleshooting", "Help")
-                        Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                             .attribute("target", "_blank")
                     }
                     .class("footer-nav")

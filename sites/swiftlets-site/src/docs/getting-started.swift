@@ -314,7 +314,7 @@ struct GettingStartedPage: SwiftletMain {
                         .class("active")
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
                 .class("nav-links")
@@ -663,7 +663,7 @@ struct GettingStartedPage: SwiftletMain {
                         .style("color", "#718096")
                     Spacer()
                     HStack(spacing: 24) {
-                        Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         Link(href: "/docs", "Docs")
                         Link(href: "/showcase", "Examples")
                     }
