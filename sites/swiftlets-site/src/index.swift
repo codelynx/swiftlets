@@ -32,7 +32,7 @@ struct HomePage: SwiftletMain {
                         .style("margin-right", "20px")
                     Link(href: "/about", "About")
                         .style("margin-right", "20px")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
             }
@@ -191,7 +191,7 @@ struct HomePage: SwiftletMain {
                         Link(href: "/docs", "Documentation")
                             .style("color", "#cbd5e0")
                             .style("margin-right", "20px")
-                        Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                        Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                             .style("color", "#cbd5e0")
                             .style("margin-right", "20px")
                         Link(href: "/about", "About")

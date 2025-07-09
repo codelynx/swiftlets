@@ -68,3 +68,6 @@ docs/_build/
 
 # Untracked documentation
 docs-untracked/
+# Build directories that may contain secrets
+**/.build/
+**/build-cache/

@@ -145,7 +145,7 @@ func showcaseNav() -> some HTMLElement {
                     Link(href: "/showcase", "Showcase")
                         .class("active")
                     Link(href: "/about", "About")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
             }
@@ -166,7 +166,7 @@ func showcaseFooter() -> some HTMLElement {
                     .style("color", "#6c757d")
                 Spacer()
                 HStack(spacing: 20) {
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                     Link(href: "/docs", "Docs")
                     Link(href: "/showcase", "Examples")
                 }

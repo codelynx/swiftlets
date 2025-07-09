@@ -395,7 +395,7 @@ struct ArchitecturePage: SwiftletMain {
                         .class("active")
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
                 .class("nav-links")

@@ -140,17 +140,21 @@ struct BasicElementsShowcase: SwiftletMain {
                 H4("Heading Level 4")
                 H5("Heading Level 5")
                 H6("Heading Level 6")
-                """
-            ) {
-                VStack(alignment: .leading, spacing: 10) {
-                    H1("Heading Level 1")
-                    H2("Heading Level 2")
-                    H3("Heading Level 3")
-                    H4("Heading Level 4")
-                    H5("Heading Level 5")
-                    H6("Heading Level 6")
-                }
-            }
+                """,
+                preview: headingsPreview
+            )
+        }
+    }
+    
+    @HTMLBuilder
+    func headingsPreview() -> some HTMLElement {
+        VStack(alignment: .leading, spacing: 10) {
+            H1("Heading Level 1")
+            H2("Heading Level 2")
+            H3("Heading Level 3")
+            H4("Heading Level 4")
+            H5("Heading Level 5")
+            H6("Heading Level 6")
         }
     }
     
@@ -172,13 +176,17 @@ struct BasicElementsShowcase: SwiftletMain {
             P("This is a paragraph with some text content.")
             P("Another paragraph with different content.")
                 .style("color", "#6c757d")
-            """
-        ) {
-            VStack(alignment: .leading, spacing: 16) {
-                P("This is a paragraph with some text content.")
-                P("Another paragraph with different content.")
-                    .style("color", "#6c757d")
-            }
+            """,
+            preview: paragraphPreview
+        )
+    }
+    
+    @HTMLBuilder
+    func paragraphPreview() -> some HTMLElement {
+        VStack(alignment: .leading, spacing: 16) {
+            P("This is a paragraph with some text content.")
+            P("Another paragraph with different content.")
+                .style("color", "#6c757d")
         }
     }
     
@@ -190,14 +198,18 @@ struct BasicElementsShowcase: SwiftletMain {
             Text("Plain text without paragraph wrapper")
             Span("Inline span element")
                 .style("color", "#667eea")
-            """
-        ) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Plain text without paragraph wrapper")
-                Span("Inline span element")
-                    .style("color", "#667eea")
-                    .style("font-weight", "500")
-            }
+            """,
+            preview: textModifiersPreview
+        )
+    }
+    
+    @HTMLBuilder
+    func textModifiersPreview() -> some HTMLElement {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Plain text without paragraph wrapper")
+            Span("Inline span element")
+                .style("color", "#667eea")
+                .style("font-weight", "500")
         }
     }
     
@@ -212,18 +224,22 @@ struct BasicElementsShowcase: SwiftletMain {
                     .attribute("target", "_blank")
                 Link(href: "#section", "Anchor Link")
                     .class("btn-modern")
-                """
-            ) {
-                VStack(alignment: .leading, spacing: 16) {
-                    Link(href: "/", "Home Link")
-                        .style("color", "#667eea")
-                    Link(href: "https://example.com", "External Link →")
-                        .attribute("target", "_blank")
-                        .style("color", "#764ba2")
-                    Link(href: "#section", "Anchor Link")
-                        .class("btn-modern")
-                }
-            }
+                """,
+                preview: linksPreview
+            )
+        }
+    }
+    
+    @HTMLBuilder
+    func linksPreview() -> some HTMLElement {
+        VStack(alignment: .leading, spacing: 16) {
+            Link(href: "/", "Home Link")
+                .style("color", "#667eea")
+            Link(href: "https://example.com", "External Link →")
+                .attribute("target", "_blank")
+                .style("color", "#764ba2")
+            Link(href: "#section", "Anchor Link")
+                .class("btn-modern")
         }
     }
     
@@ -249,17 +265,21 @@ struct BasicElementsShowcase: SwiftletMain {
             .style("padding", "1.5rem")
             .style("background", "#f8f9fa")
             .style("border-radius", "0.5rem")
-            """
-        ) {
-            Div {
-                H3("Container Title")
-                P("Content inside a div container")
-            }
-            .style("padding", "1.5rem")
-            .style("background", "#f8f9fa")
-            .style("border-radius", "0.5rem")
-            .style("border", "1px solid #e9ecef")
+            """,
+            preview: divPreview
+        )
+    }
+    
+    @HTMLBuilder
+    func divPreview() -> some HTMLElement {
+        Div {
+            H3("Container Title")
+            P("Content inside a div container")
         }
+        .style("padding", "1.5rem")
+        .style("background", "#f8f9fa")
+        .style("border-radius", "0.5rem")
+        .style("border", "1px solid #e9ecef")
     }
     
     @HTMLBuilder
@@ -274,17 +294,21 @@ struct BasicElementsShowcase: SwiftletMain {
                     .style("padding", "0.2rem 0.4rem")
                 Text(" within it.")
             }
-            """
-        ) {
-            P {
-                Text("This paragraph contains ")
-                Span("highlighted text")
-                    .style("background", "linear-gradient(135deg, #ffd93d 0%, #ffb74d 100%)")
-                    .style("padding", "0.2rem 0.5rem")
-                    .style("border-radius", "0.25rem")
-                    .style("font-weight", "500")
-                Text(" within it.")
-            }
+            """,
+            preview: spanPreview
+        )
+    }
+    
+    @HTMLBuilder
+    func spanPreview() -> some HTMLElement {
+        P {
+            Text("This paragraph contains ")
+            Span("highlighted text")
+                .style("background", "linear-gradient(135deg, #ffd93d 0%, #ffb74d 100%)")
+                .style("padding", "0.2rem 0.5rem")
+                .style("border-radius", "0.25rem")
+                .style("font-weight", "500")
+            Text(" within it.")
         }
     }
 }

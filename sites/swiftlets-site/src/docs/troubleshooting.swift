@@ -449,7 +449,7 @@ struct TroubleshootingPage: SwiftletMain {
                         .class("active")
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
-                    Link(href: "https://github.com/swiftlets/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
                 .class("nav-links")
@@ -944,7 +944,7 @@ struct TroubleshootingPage: SwiftletMain {
                     
                     UL {
                         LI {
-                            Link(href: "https://github.com/swiftlets/swiftlets/issues", "Report an issue on GitHub")
+                            Link(href: "https://github.com/codelynx/swiftlets/issues", "Report an issue on GitHub")
                                 .attribute("target", "_blank")
                                 .style("color", "#667eea")
                         }

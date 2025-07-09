@@ -24,7 +24,7 @@ struct HomePage {
                         
                         P {
                             Text("Powered by ")
-                            Link(href: "https://github.com/swiftlets/swiftlets", "Swiftlets")
+                            Link(href: "https://github.com/codelynx/swiftlets", "Swiftlets")
                         }
                         .style("color", "#666")
                         .style("font-size", "0.9em")

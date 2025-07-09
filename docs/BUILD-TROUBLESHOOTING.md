@@ -219,7 +219,7 @@ ls -la sites/your-site/bin/
 
 If you encounter issues not covered here:
 
-1. Check existing issues: https://github.com/swiftlets/swiftlets/issues
+1. Check existing issues: https://github.com/codelynx/swiftlets/issues
 2. Enable verbose logging: `export SWIFTLETS_DEBUG=1`
 3. Collect diagnostic info:
    - Swift version: `swift --version`

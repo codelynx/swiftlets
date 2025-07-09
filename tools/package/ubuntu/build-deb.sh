@@ -8,7 +8,7 @@ PACKAGE_NAME="swiftlets"
 VERSION="0.1.0"
 MAINTAINER="Swiftlets Team <team@swiftlets.org>"
 DESCRIPTION="Modern Swift web framework with executable-per-route architecture"
-HOMEPAGE="https://github.com/swiftlets/swiftlets"
+HOMEPAGE="https://github.com/codelynx/swiftlets"
 
 # Architecture mapping
 ARCH=$(dpkg --print-architecture)
