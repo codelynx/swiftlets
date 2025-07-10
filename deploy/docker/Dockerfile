@@ -1,5 +1,6 @@
-# Multi-stage Dockerfile for Swiftlets
-# Builds and runs Swiftlets in a minimal container
+# Traditional Dockerfile for Swiftlets (with full Swift runtime)
+# For smaller containers without Swift runtime, use Dockerfile.static
+# This approach is more compatible but creates larger containers (~500MB)
 
 # Stage 1: Build stage
 FROM swift:5.9-jammy AS builder

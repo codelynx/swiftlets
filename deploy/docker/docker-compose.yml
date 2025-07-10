@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Traditional deployment with full Swift runtime
+  swiftlets-traditional:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SITE_NAME=swiftlets-site
+      - PORT=8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # Optimized deployment with Swift slim runtime (smaller container)
+  swiftlets-static:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.static
+      args:
+        SITE_NAME: swiftlets-site
+    ports:
+      - "8081:8080"
+    environment:
+      - SITE_NAME=swiftlets-site
+      - PORT=8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # Alpine deployment attempt (experimental - has glibc compatibility issues)
+  # Moved to experimental/ directory - uncomment and update path if needed
+  # swiftlets-alpine-static:
+  #   build:
+  #     context: ../..
+  #     dockerfile: deploy/docker/experimental/Dockerfile.alpine
+  #     args:
+  #       SITE_NAME: swiftlets-site
+  #   ports:
+  #     - "8082:8080"
+  #   environment:
+  #     - SITE_NAME=swiftlets-site
+  #     - PORT=8080
+  #   profiles:
+  #     - experimental  # Only run with --profile experimental

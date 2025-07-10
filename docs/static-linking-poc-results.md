@@ -2,7 +2,7 @@
 
 ## Summary
 
-We attempted to create minimal containers with static Swift binaries for Apple's container service. Here's what we learned:
+We explored various approaches to reduce container sizes and eliminate Swift runtime dependencies. Here's what we learned:
 
 ## Key Findings
 
@@ -37,23 +37,26 @@ Expected sizes with partial static linking:
 
 ## Recommended Approach
 
-For Apple's container service and similar deployments:
+For container deployments:
 
-### 1. Use Alpine with Static Stdlib
+### 1. Use Ubuntu with Static Stdlib (Alpine doesn't work)
 ```dockerfile
 FROM swift:6.0.2 AS builder
 RUN swift build -c release -Xswiftc -static-stdlib
 
-FROM alpine:3.19
-RUN apk add --no-cache ca-certificates libc6-compat
+FROM ubuntu:22.04  # Note: Alpine doesn't work due to glibc dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates libstdc++6 libgcc-s1
 COPY --from=builder /app/bin /app/bin
 ```
+
+**Important**: Despite attempts, Alpine Linux is NOT compatible with Swift binaries built with `-static-stdlib` due to glibc dependencies.
 
 ### 2. Benefits
 - 40-50% smaller than full runtime containers
 - No Swift runtime installation needed
 - Still has necessary system libraries
-- Works with Apple's container service
+- Works with standard container platforms
 
 ### 3. Trade-offs
 - Not fully static (still needs libc)
@@ -78,4 +81,4 @@ While full static linking isn't feasible due to glibc limitations, partial stati
 - No Swift runtime management
 - Compatible with modern container platforms
 
-This approach aligns well with Vapor's deployment strategy and is suitable for production use with Apple's container service.
+This approach aligns well with Vapor's deployment strategy and is suitable for production use.

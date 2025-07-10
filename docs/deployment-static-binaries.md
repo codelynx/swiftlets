@@ -1,35 +1,43 @@
 # Deploying Swiftlets with Static Binaries
 
-This guide explains how to deploy Swiftlets to EC2 using static binaries, eliminating the need for Swift runtime on the server.
+This guide explains how to deploy Swiftlets to EC2 using static binaries to reduce Swift runtime dependencies.
 
 ## Overview
 
-Static linking embeds all Swift runtime dependencies directly into the executable, creating self-contained binaries that can run on any Linux system without installing Swift. This approach, suggested by the Vapor community using `--static-swift-stdlib`, significantly simplifies deployment.
+**Important Note**: The term "static binaries" in Swift context is somewhat misleading. The `--static-swift-stdlib` flag (used by Vapor and others) only statically links the Swift standard library, NOT system libraries like glibc. These binaries still require system libraries to be present on the target system.
+
+### What Static Linking Actually Does
+
+- **Embeds**: Swift standard library and Swift runtime
+- **Does NOT embed**: System libraries (glibc, libstdc++, OpenSSL, etc.)
+- **Result**: Binaries that don't need Swift installed but still need Linux system libraries
 
 ## Benefits
 
-- **No Swift runtime required** on EC2 instances
-- **Smaller deployment packages** (no need to bundle runtime libraries)
-- **Simplified deployment** process
-- **Better performance** (no dynamic library loading)
-- **Improved security** (fewer external dependencies)
+- **No Swift runtime installation required** on EC2 instances
+- **Simplified deployment** process (but larger binaries)
+- **Version consistency** (Swift stdlib version is fixed)
+- **Reduced dependency conflicts**
+
+## Limitations
+
+- **NOT truly static**: Still requires system libraries
+- **Alpine Linux incompatible**: glibc dependencies prevent Alpine usage
+- **Larger binaries**: Each binary includes Swift stdlib (~30MB overhead)
+- **Memory overhead**: Each process loads its own copy of Swift stdlib
 
 ## Building Static Binaries
 
 ### Option 1: Using Docker (Recommended)
 
-The Alpine-based Dockerfile automatically builds static binaries:
+**Note**: The Alpine-based approach doesn't actually work due to glibc dependencies. Use Ubuntu-based containers instead.
 
 ```bash
-# Setup Docker buildx for native ARM64 builds (one-time setup)
-./deploy/docker/setup-buildx.sh
-
-# Build static binaries for EC2 ARM64
-./deploy/docker/build-for-ec2.sh swiftlets-site
+# Build with static stdlib (Ubuntu-based)
+docker build -f deploy/docker/Dockerfile.static -t swiftlets-static .
 
 # Extract the binaries
-docker create --name extract swiftlets-ec2-static
-docker cp extract:/app/bin ./static-bin
+docker create --name extract swiftlets-static
 docker cp extract:/app/sites ./static-sites
 docker rm extract
 ```
@@ -47,14 +55,20 @@ Note: Static linking is NOT supported on macOS. The `--static` flag will be igno
 
 ## Verifying Static Binaries
 
-To verify that binaries are truly static:
+To check what libraries your "static" binaries actually need:
 
 ```bash
 # On Linux, use ldd
 ldd bin/index
 
-# Should output: "not a dynamic executable"
-# If it shows library dependencies, it's not fully static
+# Will show something like:
+#   linux-vdso.so.1
+#   libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6
+#   libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
+#   libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1
+#   libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
+
+# Note: These are SYSTEM libraries, not Swift libraries
 ```
 
 ## Deployment Process
@@ -98,17 +112,18 @@ cd swiftlets-deploy
 
 ## Docker Build Configuration
 
-The Alpine Dockerfile (`deploy/docker/Dockerfile.alpine`) uses these key settings:
+**Important**: The `-static-executable` flag doesn't work on Linux due to glibc requirements. Only use `-static-stdlib`:
 
 ```dockerfile
-# Build with static linking
+# Build with static stdlib only
 RUN swift build -c release \
-    -Xswiftc -static-stdlib \
-    -Xswiftc -static-executable
+    -Xswiftc -static-stdlib
 
 # Build site with static flag
 RUN ./build-site sites/${SITE_NAME} --static
 ```
+
+**Note**: Alpine Linux containers won't work with these binaries due to glibc dependencies.
 
 ## Performance Considerations
 
@@ -132,9 +147,12 @@ This is normal for static binaries. Each executable contains the entire Swift ru
 
 ### Build failures with Alpine
 
-Some Swift packages may not be compatible with musl libc used by Alpine. If you encounter issues:
-- Try the standard Ubuntu-based Dockerfile
-- Report incompatible packages to their maintainers
+Swift binaries built with `-static-stdlib` are NOT compatible with Alpine Linux because:
+- They link against glibc (GNU C Library)
+- Alpine uses musl libc instead
+- The binaries will fail with "not found" errors even though the file exists
+
+**Solution**: Use Ubuntu or other glibc-based distributions only.
 
 ## Best Practices
 
@@ -146,21 +164,22 @@ Some Swift packages may not be compatible with musl libc used by Alpine. If you 
 
 ## Comparison with Dynamic Linking
 
-| Aspect | Static Binaries | Dynamic Linking |
-|--------|----------------|-----------------|
+| Aspect | Static Stdlib | Dynamic Linking |
+|--------|---------------|-----------------|
 | Swift runtime on server | Not required | Required |
-| Binary size | Larger (100-150MB) | Smaller (1-10MB) |
-| Deployment complexity | Simple | Complex |
+| System libraries | Still required | Required |
+| Binary size | Larger (~35MB each) | Smaller (~5MB) |
+| Container compatibility | Ubuntu/Debian only | Any Linux |
 | Build time | Slower | Faster |
-| Runtime performance | Slightly better | Standard |
-| Memory usage | Higher | Lower |
+| Runtime performance | Similar | Similar |
+| Memory usage | Higher (duplicate stdlib) | Lower (shared) |
 
 ## Future Improvements
 
-- Swift Static Linux SDK (when available) for even better static linking
-- Multi-stage builds to reduce final image size
-- Automated deployment pipelines
-- Binary compression/optimization techniques
+- **Swift Static Linux SDK**: When available, may enable truly static binaries
+- **Better tooling**: For managing partially static deployments
+- **Container optimizations**: Using distroless or minimal base images
+- **Build caching**: To speed up static stdlib compilation
 
 ## References
 

@@ -1,0 +1,87 @@
+# Production Dockerfile with Swift slim runtime for smaller containers
+# Uses Swift slim image which includes only essential runtime libraries
+# Reduces container size while maintaining full compatibility
+
+# Build stage
+FROM swift:6.0.2-jammy AS builder
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy source files
+COPY Package.swift Package.resolved ./
+COPY Sources ./Sources
+COPY Tests ./Tests
+COPY sites ./sites
+COPY build-site build-server run-site ./
+
+RUN chmod +x build-site build-server run-site
+
+# Build server first (regular build)
+RUN swift build -c release --product swiftlets-server
+
+# Build site - work around Docker bash array issue by building files one at a time
+ARG SITE_NAME=swiftlets-site
+RUN cd sites/${SITE_NAME}/src && \
+    for file in $(find . -name "*.swift" -type f | grep -v "/shared/"); do \
+        echo "Building $file..." && \
+        rel_path="${file#./}" && \
+        output_dir="/build/sites/${SITE_NAME}/bin/$(dirname "$rel_path")" && \
+        output_file="/build/sites/${SITE_NAME}/bin/${rel_path%.swift}" && \
+        mkdir -p "$output_dir" && \
+        if [ -d "/build/sites/${SITE_NAME}/src/shared" ]; then \
+            shared_files=$(find /build/sites/${SITE_NAME}/src/shared -name "*.swift" -type f 2>/dev/null | tr '\n' ' '); \
+        else \
+            shared_files=""; \
+        fi && \
+        swiftc -parse-as-library -module-name Swiftlets \
+            /build/Sources/Swiftlets/**/*.swift \
+            $shared_files \
+            "$file" \
+            -o "$output_file" && \
+        chmod +x "$output_file" && \
+        echo "    ✓ Built: $output_file" || \
+        echo "    ✗ Failed: $file"; \
+    done
+
+# Runtime stage - Use Swift slim for runtime libraries
+FROM swift:6.0.2-jammy-slim
+
+# Install additional runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -s /bin/bash swiftlets
+
+WORKDIR /app
+
+# Copy artifacts
+COPY --from=builder /build/.build/release/swiftlets-server /app/swiftlets-server
+COPY --from=builder /build/sites /app/sites
+COPY --from=builder /build/run-site /app/
+
+RUN chmod +x /app/swiftlets-server /app/run-site && \
+    mkdir -p /app/.build/release && \
+    ln -s /app/swiftlets-server /app/.build/release/swiftlets-server && \
+    chown -R swiftlets:swiftlets /app
+
+USER swiftlets
+
+EXPOSE 8080
+
+ENV SWIFTLETS_ENV=production
+ENV PORT=8080
+ARG SITE_NAME=swiftlets-site
+ENV SITE_NAME=${SITE_NAME}
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/ || exit 1
+
+CMD sh -c "/app/run-site /app/sites/${SITE_NAME} --port ${PORT} --host 0.0.0.0"

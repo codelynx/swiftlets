@@ -82,22 +82,19 @@ Required inbound rules:
 # This creates Linux ARM64 executables
 ```
 
-### Option B: Static Binary Build (NEW - No Swift Runtime Required)
+### Option B: Container-Based Deployment (Recommended)
 
 ```bash
-# Setup Docker buildx (one-time)
-./deploy/docker/setup-buildx.sh
+# Build optimized container
+./deploy/docker/build-optimized-container.sh swiftlets-site
 
-# Build static binaries
-./deploy/docker/build-for-ec2.sh swiftlets-site
+# Save container for transfer
+docker save swiftlets-optimized:latest -o swiftlets.tar
 
-# Extract binaries
-docker create --name extract swiftlets-ec2-static
-docker cp extract:/app/bin ./static-bin
-docker rm extract
+# On EC2: Load and run
+docker load < swiftlets.tar
+docker run -d -p 80:8080 swiftlets-optimized:latest
 ```
-
-Static binaries are self-contained and don't require Swift to be installed on EC2. This approach uses `--static-swift-stdlib` similar to Vapor deployments.
 
 ### 2. Deploy to EC2
 
@@ -292,7 +289,7 @@ The site is accessible via custom domain:
 
 - Deployment scripts: `/deploy/`
 - Docker build: `/deploy/direct-docker-build.sh`
-- Static build: `/deploy/docker/build-for-ec2.sh`
+- Optimized build: `/deploy/docker/build-optimized-container.sh`
 - Main deploy script: `/deploy/deploy-swiftlets-site.sh`
-- Static binaries guide: `/docs/deployment-static-binaries.md`
+- Deployment options: `/docs/deployment-overview.md`
 - Archive of attempts: `/deploy/archive/`
