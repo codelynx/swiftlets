@@ -1,6 +1,16 @@
 #!/bin/bash
 # build-site - Swiftlets site builder
 # Reliable build system with proper error handling and timeout support
+#
+# STATIC BUILD SUPPORT:
+# This script supports building static binaries with embedded Swift runtime.
+# Use the --static flag to create self-contained executables that don't require
+# Swift to be installed on the deployment target.
+#
+# Static linking is only supported on Linux. On macOS, the flag is ignored.
+# Static binaries are larger (100-150MB) but simplify deployment to EC2.
+#
+# Example: ./build-site sites/swiftlets-site --static
 
 set -e
 
@@ -19,6 +29,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VERBOSE=false
 FORCE_BUILD=false
 CLEAN_BUILD=false
+STATIC_BUILD=false
 BUILD_TIMEOUT=60  # Increased from 30s for complex Swift files on EC2
 PARALLEL_BUILDS=1  # Sequential builds for memory-constrained environments
 
@@ -54,6 +65,9 @@ Options:
   -v, --verbose     Show detailed build output
   -f, --force       Force rebuild all files (ignore timestamps)
   -c, --clean       Clean bin directory and .webbin files (use alone to clean only)
+  -s, --static      Build with static Swift stdlib (Linux only, for deployment)
+                    Creates self-contained binaries that don't need Swift runtime
+                    Note: Increases binary size to ~100-150MB per executable
   -t, --timeout N   Set build timeout per file in seconds (default: 60)
   -j, --jobs N      Number of parallel builds (default: 1)
   -h, --help        Show this help message
@@ -71,7 +85,14 @@ Examples:
   $SCRIPT_NAME sites/swiftlets-site --verbose --force
   $SCRIPT_NAME sites/swiftlets-site --clean              # Clean only
   $SCRIPT_NAME sites/swiftlets-site --clean --force      # Clean then build
+  $SCRIPT_NAME sites/swiftlets-site --static             # Static build for Linux deployment
   $SCRIPT_NAME sites/swiftlets-site -t 60 -j 4
+
+Static Build Notes:
+  - Static builds embed the Swift runtime into each executable
+  - Only works on Linux (ignored on macOS with warning)
+  - Ideal for deployment to servers without Swift installed
+  - See docs/deployment-static-binaries.md for details
 
 EOF
 }
@@ -97,6 +118,10 @@ parse_args() {
                 ;;
             -c|--clean)
                 CLEAN_BUILD=true
+                shift
+                ;;
+            -s|--static)
+                STATIC_BUILD=true
                 shift
                 ;;
             -t|--timeout)
@@ -308,6 +333,16 @@ build_swift_file() {
     # Build command
     local build_cmd="swiftc -parse-as-library -module-name Swiftlets"
     
+    # Add static linking flags if requested (Linux only)
+    if [ "$STATIC_BUILD" = true ]; then
+        if [ "$OS" = "linux" ]; then
+            build_cmd="$build_cmd -static-stdlib -static-executable"
+        else
+            log WARN "Static linking is only supported on Linux. Ignoring --static flag on $OS."
+            STATIC_BUILD=false  # Reset flag to avoid confusion in logs
+        fi
+    fi
+    
     # Add framework sources
     build_cmd="$build_cmd $(get_framework_sources)"
     
@@ -399,6 +434,11 @@ build_swift_file() {
 build_site() {
     log INFO "Building site: $SITE_ROOT"
     log INFO "Platform: $OS/$ARCH"
+    if [ "$STATIC_BUILD" = true ]; then
+        log INFO "Build mode: Static (with stdlib)"
+    else
+        log INFO "Build mode: Dynamic"
+    fi
     log INFO "Timeout: ${BUILD_TIMEOUT}s per file"
     
     # Create directories

@@ -73,7 +73,7 @@ Required inbound rules:
 
 ## Quick Deployment
 
-### 1. Build Linux Executables Locally
+### Option A: Traditional Build (with Swift Runtime)
 
 ```bash
 # Build with Docker (from project root)
@@ -81,6 +81,23 @@ Required inbound rules:
 
 # This creates Linux ARM64 executables
 ```
+
+### Option B: Static Binary Build (NEW - No Swift Runtime Required)
+
+```bash
+# Setup Docker buildx (one-time)
+./deploy/docker/setup-buildx.sh
+
+# Build static binaries
+./deploy/docker/build-for-ec2.sh swiftlets-site
+
+# Extract binaries
+docker create --name extract swiftlets-ec2-static
+docker cp extract:/app/bin ./static-bin
+docker rm extract
+```
+
+Static binaries are self-contained and don't require Swift to be installed on EC2. This approach uses `--static-swift-stdlib` similar to Vapor deployments.
 
 ### 2. Deploy to EC2
 
@@ -212,10 +229,17 @@ htop
 ## Updates
 
 To update the site:
+
+### With Traditional Build:
 1. Build new executables locally with Docker
 2. Package with runtime libraries
 3. Upload and extract on EC2
 4. Restart the Swiftlets process
+
+### With Static Binaries (Simpler):
+1. Build static executables: `./deploy/docker/build-for-ec2.sh swiftlets-site`
+2. Extract and upload binaries (no runtime libraries needed)
+3. Restart the Swiftlets process
 
 ## Cost Optimization
 
@@ -252,6 +276,9 @@ The site is accessible via custom domain:
 - ✅ GitHub URLs updated from `swiftlets/swiftlets` to `codelynx/swiftlets`
 - ✅ 22/27 pages successfully deployed
 - ✅ Docker-based build process established
+- ✅ Static binary support added with `--static` flag
+- ✅ Alpine Docker build for self-contained executables
+- ✅ Docker buildx setup for native ARM64 builds
 
 ## Next Steps
 
@@ -265,5 +292,7 @@ The site is accessible via custom domain:
 
 - Deployment scripts: `/deploy/`
 - Docker build: `/deploy/direct-docker-build.sh`
+- Static build: `/deploy/docker/build-for-ec2.sh`
 - Main deploy script: `/deploy/deploy-swiftlets-site.sh`
+- Static binaries guide: `/docs/deployment-static-binaries.md`
 - Archive of attempts: `/deploy/archive/`

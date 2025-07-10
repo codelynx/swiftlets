@@ -110,6 +110,9 @@ The build scripts make it easy to work with any site:
 # Clean build artifacts
 ./build-site path/to/site --clean
 
+# Build with static binaries (Linux only, for deployment)
+./build-site path/to/site --static
+
 # Run a site
 ./run-site path/to/site
 
@@ -599,6 +602,7 @@ sudo systemctl restart swiftlets
 For detailed deployment documentation, see:
 - [AWS EC2 Deployment Guide](docs/aws-ec2-deployment.md)
 - [Production Deployment Guide](docs/PRODUCTION-DEPLOYMENT.md)
+- [Static Binary Deployment](docs/deployment-static-binaries.md) - Deploy without Swift runtime
 
 ### Docker Deployment (Alternative)
 
@@ -610,6 +614,27 @@ docker build -t swiftlets .
 # Run container
 docker run -d -p 8080:8080 --name swiftlets-app swiftlets
 ```
+
+#### Static Binary Deployment (NEW!)
+
+Build self-contained executables that don't require Swift runtime on the server:
+
+```bash
+# Setup Docker buildx for native ARM64 builds
+./deploy/docker/setup-buildx.sh
+
+# Build static binaries for EC2
+./deploy/docker/build-for-ec2.sh swiftlets-site
+
+# Extract static binaries
+docker create --name extract swiftlets-ec2-static
+docker cp extract:/app/bin ./static-bin
+docker rm extract
+```
+
+The extracted binaries are fully static and can run on any Linux ARM64 system without Swift installed. This approach, inspired by Vapor's `--static-swift-stdlib` flag, simplifies deployment significantly.
+
+See [Static Binary Deployment Guide](docs/deployment-static-binaries.md) for details.
 
 ## 🔧 Troubleshooting
 
