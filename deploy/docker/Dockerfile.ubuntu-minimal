@@ -1,0 +1,56 @@
+# Ubuntu-based minimal container with static stdlib
+# More compatible than Alpine for glibc-linked binaries
+
+FROM swift:6.0.2-jammy AS builder
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+COPY Package.swift Package.resolved ./
+COPY Sources ./Sources
+COPY Tests ./Tests
+
+# Build with static stdlib only (not fully static)
+RUN swift build -c release \
+    --product swiftlets-server \
+    -Xswiftc -static-stdlib
+
+# Runtime stage - Ubuntu minimal
+FROM ubuntu:22.04
+
+# Install only essential runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libstdc++6 \
+    libgcc-s1 \
+    libc6 \
+    libssl3 \
+    zlib1g \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -s /bin/bash swiftlets
+
+WORKDIR /app
+
+# Copy server binary
+COPY --from=builder /build/.build/release/swiftlets-server /app/swiftlets-server
+RUN chmod +x /app/swiftlets-server
+
+# Create test site
+RUN mkdir -p /app/sites/test/bin /app/sites/test/web && \
+    echo '#!/bin/sh\necho "{\"status\":200,\"headers\":{\"Content-Type\":\"text/html\"},\"body\":\"<h1>Hello from static stdlib Swift!</h1>\"}" | base64' > /app/sites/test/bin/index && \
+    chmod +x /app/sites/test/bin/index && \
+    touch /app/sites/test/web/index.webbin && \
+    chown -R swiftlets:swiftlets /app
+
+USER swiftlets
+
+EXPOSE 8080
+
+CMD ["/app/swiftlets-server", "--port", "8080", "--root", "/app/sites/test"]

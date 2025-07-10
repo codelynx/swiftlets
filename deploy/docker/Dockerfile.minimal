@@ -1,0 +1,48 @@
+# Minimal container image using static binaries
+# For use with Apple's container service or any OCI runtime
+
+# Build stage - create static binaries
+FROM swift:6.0.2-jammy AS builder
+
+# Install dependencies for static linking
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy source files
+COPY Package.swift Package.resolved ./
+COPY Sources ./Sources
+COPY Tests ./Tests
+COPY sites ./sites
+COPY build-site build-server ./
+
+RUN chmod +x build-site build-server
+
+# Build server with static stdlib (not fully static due to glibc issues)
+RUN swift build -c release \
+    -Xswiftc -static-stdlib
+
+# Build site with static flag
+ARG SITE_NAME=swiftlets-site
+RUN ./build-site sites/${SITE_NAME} --static
+
+# Runtime stage - minimal image
+FROM scratch
+
+# Copy only the static binaries
+COPY --from=builder /build/.build/release/SwiftletsServer /SwiftletsServer
+COPY --from=builder /build/sites/swiftlets-site/bin /app/bin
+COPY --from=builder /build/sites/swiftlets-site/web /app/web
+
+# Set working directory
+WORKDIR /app
+
+# Expose port
+EXPOSE 8080
+
+# Run the server
+ENTRYPOINT ["/SwiftletsServer", "--port", "8080", "--root", "/app"]

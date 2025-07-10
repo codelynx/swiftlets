@@ -1,0 +1,42 @@
+# Minimal static server binary for Apple's container service
+# This creates just the server binary with static stdlib
+
+FROM swift:6.0.2-jammy AS builder
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy only what's needed for server build
+COPY Package.swift Package.resolved ./
+COPY Sources ./Sources
+COPY Tests ./Tests
+
+# Build server with static stdlib
+RUN swift build -c release \
+    --product swiftlets-server \
+    -Xswiftc -static-stdlib
+
+# Runtime stage - Alpine minimal
+FROM alpine:3.19
+
+RUN apk add --no-cache ca-certificates libc6-compat libstdc++ libgcc
+
+WORKDIR /app
+
+# Copy just the server binary
+COPY --from=builder /build/.build/release/swiftlets-server /app/swiftlets-server
+
+# Create a simple test site structure
+RUN mkdir -p /app/sites/test/bin /app/sites/test/web && \
+    echo '#!/bin/sh\necho "{\"status\":200,\"headers\":{\"Content-Type\":\"text/html\"},\"body\":\"<h1>Hello from static Swift!</h1>\"}" | base64' > /app/sites/test/bin/index && \
+    chmod +x /app/sites/test/bin/index && \
+    touch /app/sites/test/web/index.webbin
+
+EXPOSE 8080
+
+CMD ["/app/swiftlets-server", "--port", "8080", "--root", "/app/sites/test"]

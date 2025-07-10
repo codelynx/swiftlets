@@ -1,5 +1,5 @@
 # Alpine-based Dockerfile for smaller images
-# Uses static linking for minimal runtime dependencies
+# Uses static stdlib linking to embed Swift runtime
 
 # Build stage
 FROM swift:6.0.2-jammy AS builder
@@ -16,40 +16,42 @@ WORKDIR /build
 # Copy and build
 COPY Package.swift Package.resolved ./
 COPY Sources ./Sources
+COPY Tests ./Tests
 COPY sites ./sites
 COPY build-site build-server ./
 
 RUN chmod +x build-site build-server
 
-# Build with static linking
+# Build with static stdlib (embeds Swift runtime into binaries)
+# Note: -static-executable doesn't work due to glibc dependencies
 RUN swift build -c release \
-    -Xswiftc -static-stdlib \
-    -Xswiftc -static-executable
+    -Xswiftc -static-stdlib
 
-ARG SITE_NAME=swiftlets-site
-RUN ./build-site sites/${SITE_NAME} --static
+# Skip site build for POC - known bash loop issue on Linux
+# ARG SITE_NAME=swiftlets-site
+# RUN ./build-site sites/${SITE_NAME} --static
 
 # Runtime stage - Alpine
 FROM alpine:3.19
 
 # Install minimal runtime dependencies
+# Note: Static stdlib binaries still need some system libraries
 RUN apk add --no-cache \
     ca-certificates \
     tzdata \
-    curl
+    curl \
+    libstdc++ \
+    libgcc
 
 # Create user
 RUN adduser -D -s /bin/sh swiftlets
 
 WORKDIR /app
 
-# Copy artifacts
-COPY --from=builder /build/.build/release/SwiftletsServer /app/
-COPY --from=builder /build/bin /app/bin
-COPY --from=builder /build/sites /app/sites
-COPY --from=builder /build/run-site /app/
+# Copy server binary
+COPY --from=builder /build/.build/release/swiftlets-server /app/swiftlets-server
 
-RUN chmod +x /app/SwiftletsServer /app/run-site && \
+RUN chmod +x /app/swiftlets-server && \
     chown -R swiftlets:swiftlets /app
 
 USER swiftlets
@@ -64,4 +66,5 @@ ENV SITE_NAME=${SITE_NAME}
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT}/ || exit 1
 
-CMD ["./run-site", "sites/${SITE_NAME}", "--port", "${PORT}"]
+# For POC, just verify the server works
+CMD ["/app/swiftlets-server", "--help"]

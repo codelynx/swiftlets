@@ -1,0 +1,52 @@
+# Ultra-minimal Alpine-based container with static binaries
+# Smallest possible image that still has basic utilities
+
+FROM swift:6.0.2-jammy AS builder
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+COPY Package.swift Package.resolved ./
+COPY Sources ./Sources
+COPY Tests ./Tests
+COPY sites ./sites
+COPY build-site build-server ./
+
+RUN chmod +x build-site build-server
+
+# Build with static stdlib
+RUN swift build -c release \
+    -Xswiftc -static-stdlib
+
+# Skip site build in POC - focusing on static server binary
+# ARG SITE_NAME=swiftlets-site
+# RUN ./build-site sites/${SITE_NAME} --static
+
+# Runtime - Alpine minimal
+FROM alpine:3.19
+
+# Only install CA certificates for HTTPS
+RUN apk add --no-cache ca-certificates
+
+# Create non-root user
+RUN adduser -D -s /bin/sh swiftlets
+
+WORKDIR /app
+
+# Copy server binary only for POC
+COPY --from=builder /build/.build/release/swiftlets-server /app/swiftlets-server
+
+RUN chmod +x /app/swiftlets-server && \
+    chown -R swiftlets:swiftlets /app
+
+USER swiftlets
+
+EXPOSE 8080
+
+# Simple test - just show that the server binary works
+CMD ["/app/swiftlets-server", "--help"]
