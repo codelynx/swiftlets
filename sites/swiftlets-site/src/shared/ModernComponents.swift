@@ -74,17 +74,18 @@ struct ModernFooter: HTMLElement {
                 links: [
                     ("Documentation", "/docs"),
                     ("Showcase", "/showcase"),
-                    ("Examples", "/showcase"),
-                    ("Tutorials", "/docs/tutorials")
+                    ("Examples", "/showcase")
+                    // ("Tutorials", "/docs/tutorials") // TODO: Create tutorials
                 ]
             )
             footerSection(
                 title: "Resources",
                 links: [
                     ("Getting Started", "/docs/getting-started"),
-                    ("API Reference", "/docs/api"),
-                    ("Best Practices", "/docs/best-practices"),
-                    ("FAQ", "/docs/faq")
+                    // ("API Reference", "/docs/api"), // TODO: Create API reference
+                    // ("Best Practices", "/docs/best-practices"), // TODO: Create best practices guide
+                    ("Troubleshooting", "/docs/troubleshooting")
+                    // ("FAQ", "/docs/faq") // TODO: Create FAQ page
                 ]
             )
             footerSection(
@@ -158,12 +159,17 @@ struct ModernFooter: HTMLElement {
                     .style("font-size", "0.875rem")
                 Spacer()
                 HStack(spacing: 20) {
-                    Link(href: "/privacy", "Privacy")
+                    // TODO: Add these pages
+                    // Link(href: "/privacy", "Privacy")
+                    //     .style("color", "#A1A1AA")
+                    //     .style("font-size", "0.875rem")
+                    // Link(href: "/terms", "Terms")
+                    //     .style("color", "#A1A1AA")
+                    //     .style("font-size", "0.875rem")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .style("color", "#A1A1AA")
                         .style("font-size", "0.875rem")
-                    Link(href: "/terms", "Terms")
-                        .style("color", "#A1A1AA")
-                        .style("font-size", "0.875rem")
+                        .attribute("target", "_blank")
                 }
             }
         }

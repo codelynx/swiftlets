@@ -17,9 +17,10 @@ This guide documents the current production deployment of Swiftlets on AWS EC2 w
 - **IP**: `<YOUR-EC2-IP>` (Elastic IP recommended)
 
 ### Software Stack
-- **Swift**: 6.1.2 (runtime) / 6.0.2 (Docker builds)
+- **Swift**: 6.0.2 (via Docker slim runtime)
+- **Container**: Docker with optimized image (433MB)
 - **Web Server**: Nginx reverse proxy
-- **Process Manager**: systemd
+- **Process Manager**: Docker with auto-restart
 - **DNS**: AWS Route 53
 
 ## DNS Configuration
@@ -50,7 +51,42 @@ nslookup swiftlet.yourdomain.com
 dig swiftlet.yourdomain.com
 ```
 
-## Systemd Service Configuration
+## Docker Deployment (Current Production)
+
+As of January 2025, production runs using Docker for better isolation and easier deployment.
+
+### Docker Container Details
+- **Image**: `swiftlets-static:latest` (433MB)
+- **Base**: Ubuntu 22.04 with Swift slim runtime
+- **Port**: Container 8080 → Host 8081
+- **Restart**: Always (unless stopped)
+
+### Container Management
+
+```bash
+# View container status
+sudo docker ps | grep swiftlets
+
+# View logs
+sudo docker logs swiftlets
+sudo docker logs -f swiftlets  # Follow logs
+
+# Restart container
+sudo docker restart swiftlets
+
+# Stop/Start container
+sudo docker stop swiftlets
+sudo docker start swiftlets
+
+# Update deployment
+docker save swiftlets-static:latest | gzip > swiftlets-update.tar.gz
+scp -i ~/.ssh/your-key.pem swiftlets-update.tar.gz ubuntu@your-ec2:/home/ubuntu/
+# On EC2:
+sudo docker load < swiftlets-update.tar.gz
+sudo docker restart swiftlets
+```
+
+## Systemd Service Configuration (Alternative - Not Currently Used)
 
 ### Service File
 

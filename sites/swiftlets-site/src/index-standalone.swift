@@ -25,7 +25,7 @@ struct HomePage {
                     Link(href: "/docs", "Documentation")
                     Link(href: "/showcase", "Showcase")
                     Link(href: "/about", "About")
-                    Link(href: "https://github.com/yourusername/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                         .attribute("target", "_blank")
                 }
             }
@@ -163,7 +163,7 @@ struct HomePage {
                 Spacer()
                 HStack(spacing: 20) {
                     Link(href: "/docs", "Docs")
-                    Link(href: "https://github.com/yourusername/swiftlets", "GitHub")
+                    Link(href: "https://github.com/codelynx/swiftlets", "GitHub")
                     Link(href: "/about", "About")
                 }
             }

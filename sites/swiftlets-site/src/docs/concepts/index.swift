@@ -610,7 +610,7 @@ struct ConceptsIndex: SwiftletMain {
                             Div {
                                 Link(href: "/docs/getting-started", "Getting Started")
                                 Link(href: "/docs/concepts", "Core Concepts")
-                                Link(href: "/docs/api", "API Reference")
+                                // Link(href: "/docs/api", "API Reference") // TODO: Create API docs
                             }
                             .class("footer-links")
                         }
@@ -632,8 +632,8 @@ struct ConceptsIndex: SwiftletMain {
                                 .class("footer-heading")
                             Div {
                                 Link(href: "/docs/troubleshooting", "Troubleshooting")
-                                Link(href: "/docs/faq", "FAQ")
-                                Link(href: "/docs/changelog", "Changelog")
+                                // Link(href: "/docs/faq", "FAQ") // TODO: Create FAQ
+                                // Link(href: "/docs/changelog", "Changelog") // TODO: Create changelog
                             }
                             .class("footer-links")
                         }

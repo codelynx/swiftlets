@@ -900,7 +900,7 @@ Button("Click Me").primaryButton()
             }
             
             Div {
-            Link(href: "/showcase/layout", "Layout Components")
+            Link(href: "/showcase/layout-components", "Layout Components")
                 .class("nav-button")
             Link(href: "/showcase", "Back to Showcase")
                 .class("nav-button nav-button-next")
