@@ -125,6 +125,10 @@ GitHub Actions workflows available:
 - EC2: CloudWatch, systemd logs
 - Lambda: CloudWatch Logs, X-Ray tracing
 
+## Getting Started
+
+📖 **New to Swiftlets?** Follow [Alice's Journey](../docs/alice-story-getting-started.md) - a beginner-friendly narrative guide that walks you through building and deploying your first Swiftlets site.
+
 ## Support
 
 For deployment issues:
