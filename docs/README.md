@@ -40,7 +40,7 @@
 ## Deployment
 
 - **[Deployment Overview](deployment-overview.md)** - Comprehensive guide to all deployment options
-- **[Container Deployment](container-deployment.md)** - Using Swift Container Plugin and Docker
+- **[Docker Container Deployment](container-deployment.md)** - Production deployment with Docker
 - **[AWS EC2 Deployment](aws-ec2-deployment.md)** - Traditional server deployment on EC2
 - **[Deployment Scripts](../deploy/README.md)** - Ready-to-use deployment scripts
 

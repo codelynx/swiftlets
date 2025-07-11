@@ -13,29 +13,30 @@ This document provides a comprehensive overview of all deployment options for Sw
 ## 1. Container Deployment (Recommended)
 
 ### Overview
-Uses Apple's Swift Container Plugin or traditional Dockerfiles to create OCI-compliant containers.
+Uses Docker to create optimized containers for Swiftlets applications.
 
 ### Approaches
-1. **Swift Container Plugin** (Swift 6.0+)
-   - Native Swift approach
-   - Minimal container size
-   - Static linking with musl
+1. **Optimized Docker Build** (Recommended)
+   - Multi-stage builds for smaller images
+   - Swift slim runtime (433MB vs 500MB+)
+   - Production-ready with all dependencies
    
-2. **Traditional Dockerfile**
-   - Works with any Swift version
-   - More control over layers
-   - Familiar to DevOps teams
+2. **Full Docker Build**
+   - Complete Swift development image
+   - Includes build tools
+   - Better for development environments
 
 ### Quick Start
 ```bash
-# Build container
-./deploy/container/build-full-container.sh swiftlets-site
+# Build optimized container
+./deploy/docker/build-optimized-container.sh swiftlets-site
 
 # Run locally
-docker run -p 8080:8080 swiftlets-full:latest
+docker run -p 8080:8080 swiftlets-optimized:latest
 
-# Push to registry
-./deploy/container/push-to-registry.sh swiftlets-full latest ghcr
+# Deploy to EC2
+docker save swiftlets-optimized:latest | gzip > swiftlets.tar.gz
+scp swiftlets.tar.gz ubuntu@ec2-host:~/
 ```
 
 ### Deployment Targets
@@ -221,7 +222,8 @@ deploy:
 
 ## Support and Resources
 
-- [Container Deployment Guide](./container-deployment.md)
+- [Docker Deployment Guide](./container-deployment.md)
 - [EC2 Deployment Guide](./aws-ec2-deployment.md)
+- [Docker Deployment Summary](./DOCKER-DEPLOYMENT-SUMMARY.md)
 - [Deploy Directory](../deploy/) - All deployment scripts
-- [GitHub Issues](https://github.com/yourusername/swiftlets/issues) - Community support
+- [GitHub Issues](https://github.com/codelynx/swiftlets/issues) - Community support

@@ -32,7 +32,7 @@ Alice opened Terminal and got to work:
 
 ```bash
 # Clone Swiftlets
-git clone https://github.com/yourusername/swiftlets.git
+git clone https://github.com/codelynx/swiftlets.git
 cd swiftlets
 
 # Build the server
@@ -185,12 +185,13 @@ ssh -i alice-key.pem ubuntu@ec2-3-14-159-265.compute-1.amazonaws.com
 She remembered the Swiftlets deployment guide and ran:
 
 ```bash
-# Download setup script
-wget https://raw.githubusercontent.com/swiftlets/main/deploy/ec2/setup-instance.sh
-chmod +x setup-instance.sh
+# Clone the repository on EC2
+git clone https://github.com/codelynx/swiftlets.git
+cd swiftlets
 
-# Run it
-./setup-instance.sh
+# Run setup script
+chmod +x deploy/ec2/setup-instance.sh
+./deploy/ec2/setup-instance.sh
 ```
 
 The script worked its magic, installing Swift, Nginx, and all dependencies. Alice watched the terminal scroll by, feeling like a real DevOps engineer.
@@ -262,6 +263,30 @@ jobs:
 
 Now every push to main automatically deployed her changes!
 
+## Chapter 9: Alice Discovers Docker
+
+Three months into running her blog, Alice discovered an even easier way to deploy.
+
+"Docker containers?" she read in the Swiftlets updates. "No more managing Swift versions on the server?"
+
+She decided to try it:
+
+```bash
+# Build optimized container locally
+./deploy/docker/build-optimized-container.sh alice-blog
+
+# Save and transfer
+docker save swiftlets-optimized | gzip > alice-blog.tar.gz
+scp -i alice-key.pem alice-blog.tar.gz ubuntu@her-ec2:/home/ubuntu/
+
+# On EC2: Load and run
+ssh -i alice-key.pem ubuntu@her-ec2
+sudo docker load < alice-blog.tar.gz
+sudo docker run -d --name alice-blog --restart always -p 80:8080 swiftlets-optimized
+```
+
+"That's it?" Alice couldn't believe how simple it was. No more Swift installation, no more version conflicts, just a container that worked everywhere.
+
 ## Epilogue: Alice's Reflection
 
 Six months later, Alice's blog had grown. She'd added:
@@ -296,8 +321,10 @@ Alice smiled. She'd gone from iOS developer to full-stack Swift engineer, and th
 ---
 
 *Want to follow Alice's path? Check out:*
-- [Swiftlets Documentation](https://github.com/swiftlets/docs)
+- [Swiftlets Repository](https://github.com/codelynx/swiftlets)
+- [Live Demo](http://swiftlet.eastlynx.com:8080/)
 - [AWS EC2 Deployment Guide](./aws-ec2-deployment.md)
 - [Deployment Overview](./deployment-overview.md)
+- [Docker Deployment](./DOCKER-DEPLOYMENT-SUMMARY.md)
 
 *Remember: Every expert was once a beginner. Your Swift website journey starts with a single file.*

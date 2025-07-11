@@ -4,19 +4,20 @@ This directory contains deployment configurations for various platforms and serv
 
 ## Available Deployment Methods
 
-### 1. 🐳 Container Deployment (Recommended)
-**Location**: `container/`
+### 1. 🐳 Docker Container Deployment (Recommended)
+**Location**: `docker/`
 
-Two approaches available:
-- **Swift Container Plugin** (Swift 6.0+) - Native Swift approach
-- **Traditional Dockerfile** - Works with any Docker-compatible runtime
+Production-ready Docker deployment with optimized images:
+- **Optimized Build** - Uses Swift slim runtime (433MB)
+- **Multi-stage Builds** - Smaller, secure images
+- **Platform Support** - ARM64 and AMD64
 
 ```bash
-# Using Swift Container Plugin (requires Docker running)
-./deploy/container/build-container.sh swiftlets latest linux/amd64
+# Build optimized container
+./deploy/docker/build-optimized-container.sh swiftlets-site
 
-# Using traditional Dockerfile
-docker build -f deploy/docker/Dockerfile -t swiftlets .
+# Run locally
+docker run -p 8080:8080 swiftlets-optimized:latest
 ```
 
 **Best for**: Kubernetes, Docker Swarm, AWS ECS/Fargate, Google Cloud Run
@@ -51,30 +52,34 @@ Run Swiftlets as serverless functions using AWS Lambda runtime.
 
 ## Quick Start Guide
 
-### For Container Deployment
+### For Docker Container Deployment
 
 1. **Prerequisites**:
    - Docker installed and running
-   - Swift 6.0+ (for Container Plugin)
-   - OR Swift 5.9+ (for Dockerfile approach)
+   - Docker buildx for multi-platform builds (optional)
 
 2. **Build**:
    ```bash
-   # Build with Swift Container Plugin
-   ./deploy/container/build-full-container.sh swiftlets-site
-
-   # OR build with Dockerfile
-   docker build -f deploy/docker/Dockerfile -t swiftlets .
+   # Build optimized container
+   ./deploy/docker/build-optimized-container.sh swiftlets-site
+   
+   # Or specify platform
+   ./deploy/docker/build-optimized-container.sh swiftlets-site my-image linux/arm64
    ```
 
 3. **Run locally**:
    ```bash
-   docker run -p 8080:8080 swiftlets:latest
+   docker run -p 8080:8080 swiftlets-optimized:latest
    ```
 
-4. **Push to registry**:
+4. **Deploy to EC2**:
    ```bash
-   ./deploy/container/push-to-registry.sh swiftlets latest ghcr
+   # Save container
+   docker save swiftlets-optimized:latest | gzip > swiftlets.tar.gz
+   
+   # Transfer and load on EC2
+   scp swiftlets.tar.gz ubuntu@ec2-host:~/
+   ssh ubuntu@ec2-host 'docker load < swiftlets.tar.gz'
    ```
 
 ### For EC2 Deployment

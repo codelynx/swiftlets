@@ -1,148 +1,84 @@
-# Container Deployment with Swift Container Plugin
+# Docker Container Deployment for Swiftlets
 
-This guide covers deploying Swiftlets using Apple's Swift Container Plugin, which provides a native Swift approach to building OCI-compliant container images.
+This guide covers deploying Swiftlets using Docker containers, providing a consistent and portable deployment solution.
 
 ## Overview
 
-The Swift Container Plugin allows you to build container images directly from Swift Package Manager, without writing Dockerfiles. This approach:
+Docker deployment offers several advantages:
 
-- ✅ Builds minimal, secure containers
-- ✅ Uses static linking for smaller images
-- ✅ Integrates with Swift Package Manager
-- ✅ Supports cross-compilation from macOS
-- ✅ Works with any OCI-compliant registry
+- ✅ Consistent environment across development and production
+- ✅ No Swift runtime installation required on servers
+- ✅ Easy horizontal scaling
+- ✅ Works with any container orchestration platform
+- ✅ Simplified dependency management
 
-## Prerequisites
+## Container Architecture
 
-1. **Swift 6.0+** (comes with container plugin support)
-2. **Docker** or compatible container runtime
-3. **Swift SDK for Linux** (required for cross-compilation from macOS):
-   ```bash
-   # Install Linux SDK
-   swift sdk install x86_64-swift-linux-musl    # For AMD64
-   swift sdk install aarch64-swift-linux-musl   # For ARM64
-   ```
-4. **Container registry** access (optional, for pushing images)
+### Optimized Production Container
+
+The optimized container uses Swift's slim runtime image for smaller size:
+
+```
+Optimized Container (433MB)
+├── Swift 6.0.2 slim runtime
+├── SwiftletsServer executable
+├── Site executables (pre-built)
+├── Site static files
+└── Minimal system dependencies
+```
+
+### Build Process
+
+1. **Build Stage**: Uses full Swift image to compile
+2. **Runtime Stage**: Uses Swift slim image for deployment
+3. **Result**: 13% smaller than traditional approach
 
 ## Quick Start
 
-### 1. Install Swift SDK for Linux (macOS only)
+### 1. Build Container
 
 ```bash
-# For x86_64
-swift sdk install x86_64-swift-linux-musl
+# Build optimized container for your site
+./deploy/docker/build-optimized-container.sh swiftlets-site
 
-# For ARM64
-swift sdk install aarch64-swift-linux-musl
+# Or specify custom image name and platform
+./deploy/docker/build-optimized-container.sh swiftlets-site my-image linux/arm64
 ```
 
-### 2. Build Container Image
+### 2. Run Locally
 
 ```bash
-# Build for linux/amd64
-./deploy/container/build-container.sh swiftlets latest linux/amd64
+# Run with default settings
+docker run -p 8080:8080 swiftlets-optimized:latest
 
-# Build for linux/arm64
-./deploy/container/build-container.sh swiftlets latest linux/arm64
-```
-
-### 3. Run Locally
-
-```bash
-docker run -p 8080:8080 swiftlets:latest
-```
-
-## Architecture
-
-### Swift Container Plugin Approach
-
-The plugin builds a minimal container with just your Swift executable:
-
-```
-Container Image
-├── SwiftletsServer (statically linked binary)
-└── Minimal runtime dependencies
-```
-
-### Full Swiftlets Container
-
-Since Swiftlets needs additional files (sites, executables), we use a two-stage approach:
-
-1. **Base Container**: Built by Swift Container Plugin (just the server)
-2. **Full Container**: Adds sites, swiftlet executables, and configuration
-
-```
-Full Container
-├── /app/
-│   ├── SwiftletsServer      # Main server
-│   ├── bin/                 # Swiftlet executables
-│   │   └── linux/x86_64/    # Platform-specific binaries
-│   ├── sites/               # Site content
-│   │   └── swiftlets-site/  
-│   └── run-site            # Runner script
-```
-
-## Building Containers
-
-### Using Swift Container Plugin (Base)
-
-```bash
-# Direct plugin usage
-swift package --swift-sdk x86_64-swift-linux-musl \
-    plugin build-container-image \
-    --product swiftlets-server \
-    --repository myregistry/swiftlets
-
-# Or use our script
-./deploy/container/build-container.sh
-```
-
-**Note**: The Swift Container Plugin creates minimal containers with just the executable. For a complete Swiftlets deployment with sites, use the full container build script.
-
-### Building Full Container with Sites
-
-```bash
-# Build complete container with a specific site
-./deploy/container/build-full-container.sh \
-    swiftlets-site \      # Site name
-    swiftlets-full \      # Repository name
-    latest \              # Tag
-    linux/amd64 \         # Platform
-    ghcr.io/username      # Registry (optional)
+# Run with custom environment
+docker run -p 8080:8080 \
+    -e SITE_NAME=my-site \
+    -e PORT=3000 \
+    -p 3000:3000 \
+    swiftlets-optimized:latest
 ```
 
 ## Deployment Options
 
-### 1. Local Development
-
-```bash
-# Run with default settings
-docker run -p 8080:8080 swiftlets-full:latest
-
-# Run with custom environment
-docker run -p 8080:8080 \
-    -e SWIFTLETS_ENV=development \
-    -e PORT=3000 \
-    -p 3000:3000 \
-    swiftlets-full:latest
-```
-
-### 2. Docker Compose
+### Docker Compose
 
 ```yaml
 version: '3.8'
 services:
   swiftlets:
-    image: ghcr.io/username/swiftlets:latest
+    image: swiftlets-optimized:latest
     ports:
       - "8080:8080"
     environment:
-      - SWIFTLETS_ENV=production
+      - SITE_NAME=swiftlets-site
+      - PORT=8080
+    restart: unless-stopped
     volumes:
-      - ./data:/app/var
+      - ./data:/app/var  # Optional: persistent storage
 ```
 
-### 3. Kubernetes
+### Kubernetes
 
 ```yaml
 apiVersion: apps/v1
@@ -161,15 +97,22 @@ spec:
     spec:
       containers:
       - name: swiftlets
-        image: ghcr.io/username/swiftlets:latest
+        image: swiftlets-optimized:latest
         ports:
         - containerPort: 8080
         env:
-        - name: SWIFTLETS_ENV
-          value: production
+        - name: SITE_NAME
+          value: swiftlets-site
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
 ```
 
-### 4. AWS ECS/Fargate
+### AWS ECS Task Definition
 
 ```json
 {
@@ -182,17 +125,45 @@ spec:
   "memory": "512",
   "containerDefinitions": [{
     "name": "swiftlets",
-    "image": "ghcr.io/username/swiftlets:latest",
+    "image": "swiftlets-optimized:latest",
     "portMappings": [{
       "containerPort": 8080,
       "protocol": "tcp"
     }],
     "environment": [{
-      "name": "SWIFTLETS_ENV",
-      "value": "production"
-    }]
+      "name": "SITE_NAME",
+      "value": "swiftlets-site"
+    }],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/swiftlets",
+        "awslogs-region": "us-east-1",
+        "awslogs-stream-prefix": "ecs"
+      }
+    }
   }]
 }
+```
+
+## Building for Different Platforms
+
+### Multi-Architecture Support
+
+```bash
+# Build for ARM64 (default for AWS Graviton)
+./deploy/docker/build-optimized-container.sh my-site my-image linux/arm64
+
+# Build for AMD64
+./deploy/docker/build-optimized-container.sh my-site my-image linux/amd64
+
+# Build for both platforms
+docker buildx build \
+    --platform linux/amd64,linux/arm64 \
+    -t my-image:latest \
+    -f deploy/docker/Dockerfile.static \
+    --build-arg SITE_NAME=my-site \
+    .
 ```
 
 ## CI/CD Integration
@@ -200,7 +171,7 @@ spec:
 ### GitHub Actions
 
 ```yaml
-name: Build and Push Container
+name: Build and Deploy
 
 on:
   push:
@@ -212,48 +183,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: swift-actions/setup-swift@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          swift-version: "6.0"
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Install Swift SDK
-        run: swift sdk install x86_64-swift-linux-musl
-      
-      - name: Build Container
-        run: |
-          ./deploy/container/build-full-container.sh \
-            swiftlets-site \
-            swiftlets \
-            ${{ github.sha }} \
-            linux/amd64 \
-            ghcr.io/${{ github.repository_owner }}
-      
-      - name: Push to Registry
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker push ghcr.io/${{ github.repository_owner }}/swiftlets:${{ github.sha }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.static
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/swiftlets:latest
+          build-args: |
+            SITE_NAME=swiftlets-site
 ```
 
-## Multi-Architecture Builds
+### GitLab CI
 
-Build for multiple platforms:
-
-```bash
-# Build AMD64
-./deploy/container/build-full-container.sh site swiftlets amd64 linux/amd64
-
-# Build ARM64
-./deploy/container/build-full-container.sh site swiftlets arm64 linux/arm64
-
-# Create manifest for multi-arch
-docker manifest create swiftlets:latest \
-    swiftlets:amd64 \
-    swiftlets:arm64
-
-docker manifest push swiftlets:latest
+```yaml
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -f deploy/docker/Dockerfile.static --build-arg SITE_NAME=swiftlets-site -t swiftlets:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest
 ```
 
 ## Container Registries
+
+### Docker Hub
+
+```bash
+# Tag and push
+docker tag swiftlets-optimized:latest yourusername/swiftlets:latest
+docker push yourusername/swiftlets:latest
+```
 
 ### GitHub Container Registry
 
@@ -261,13 +234,9 @@ docker manifest push swiftlets:latest
 # Login
 echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
-# Build and push
-./deploy/container/build-full-container.sh \
-    swiftlets-site \
-    swiftlets \
-    latest \
-    linux/amd64 \
-    ghcr.io/username
+# Tag and push
+docker tag swiftlets-optimized:latest ghcr.io/username/swiftlets:latest
+docker push ghcr.io/username/swiftlets:latest
 ```
 
 ### AWS ECR
@@ -278,78 +247,97 @@ aws ecr get-login-password --region us-east-1 | \
     docker login --username AWS --password-stdin \
     123456789.dkr.ecr.us-east-1.amazonaws.com
 
-# Build and push
-./deploy/container/build-full-container.sh \
-    swiftlets-site \
-    swiftlets \
-    latest \
-    linux/amd64 \
-    123456789.dkr.ecr.us-east-1.amazonaws.com
+# Create repository if needed
+aws ecr create-repository --repository-name swiftlets
+
+# Tag and push
+docker tag swiftlets-optimized:latest \
+    123456789.dkr.ecr.us-east-1.amazonaws.com/swiftlets:latest
+docker push 123456789.dkr.ecr.us-east-1.amazonaws.com/swiftlets:latest
 ```
 
-## Best Practices
+## Production Best Practices
 
 ### 1. Security
 
-- Always run as non-root user
-- Use minimal base images
+- Run containers as non-root user
 - Scan images for vulnerabilities
-- Don't include build tools in production images
+- Use secrets management for sensitive data
+- Keep base images updated
 
-### 2. Size Optimization
+```dockerfile
+# Add to Dockerfile
+RUN useradd -m -u 1001 swiftlets
+USER swiftlets
+```
 
-- Use static linking with musl
-- Multi-stage builds
-- Only include necessary files
-- Compress static assets
+### 2. Health Checks
 
-### 3. Performance
+```dockerfile
+# Add to Dockerfile
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+```
 
-- Use container orchestration for scaling
-- Implement health checks
-- Configure resource limits
-- Use CDN for static assets
+### 3. Resource Limits
 
-### 4. Monitoring
+```yaml
+# Docker Compose
+services:
+  swiftlets:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+```
 
-- Export metrics (Prometheus format)
-- Structured logging (JSON)
-- Distributed tracing support
-- Health check endpoints
+### 4. Logging
+
+Configure structured logging:
+
+```bash
+# Run with JSON logging
+docker run -e LOG_FORMAT=json swiftlets-optimized:latest
+```
 
 ## Troubleshooting
 
-### Build Failures
+### Container Won't Start
 
 ```bash
-# Check Swift SDK installation
-swift sdk list
-
-# Verbose build output
-swift build --swift-sdk x86_64-swift-linux-musl -v
-
-# Test executable locally
-.build/release/SwiftletsServer
-```
-
-### Runtime Issues
-
-```bash
-# Check container logs
+# Check logs
 docker logs <container-id>
 
-# Debug shell access
-docker run -it --entrypoint /bin/bash swiftlets:latest
+# Debug interactively
+docker run -it --entrypoint /bin/bash swiftlets-optimized:latest
 
-# Test health endpoint
-curl http://localhost:8080/health
+# Check file permissions
+docker run --rm swiftlets-optimized:latest ls -la /app
 ```
 
-### Cross-Compilation Issues
+### Port Binding Issues
 
-- Ensure Swift SDK matches target architecture
-- Check for platform-specific dependencies
-- Verify static linking with `ldd`
+```bash
+# Check if port is in use
+lsof -i :8080
+
+# Use different port
+docker run -p 9000:8080 swiftlets-optimized:latest
+```
+
+### Performance Issues
+
+```bash
+# Monitor resource usage
+docker stats <container-id>
+
+# Increase memory limit
+docker run -m 1g swiftlets-optimized:latest
+```
 
 ## Advanced Configuration
 
@@ -357,31 +345,81 @@ curl http://localhost:8080/health
 
 ```bash
 # Override default command
-docker run swiftlets:latest \
-    ./run-site sites/custom-site --port 9000
+docker run swiftlets-optimized:latest \
+    /app/run-site /app/sites/custom-site --port 9000
 ```
 
 ### Volume Mounts
 
 ```bash
-# Mount custom sites
-docker run -v ./my-sites:/app/sites swiftlets:latest
+# Mount custom configuration
+docker run -v ./config:/app/config:ro swiftlets-optimized:latest
 
-# Persistent data
-docker run -v swiftlets-data:/app/var swiftlets:latest
+# Persistent storage
+docker run -v swiftlets-data:/app/var swiftlets-optimized:latest
 ```
 
 ### Environment Variables
 
-- `SWIFTLETS_ENV`: Environment (development/production)
-- `PORT`: Server port (default: 8080)
-- `SITE_NAME`: Site to run (default: swiftlets-site)
-- `LOG_LEVEL`: Logging verbosity
+- `SITE_NAME`: Site directory to serve (default: swiftlets-site)
+- `PORT`: Port to listen on (default: 8080)
+- `HOST`: Host to bind to (default: 0.0.0.0)
+- `LOG_LEVEL`: Logging verbosity (debug, info, warn, error)
+
+## Monitoring
+
+### Prometheus Metrics
+
+```yaml
+# docker-compose.yml
+services:
+  swiftlets:
+    image: swiftlets-optimized:latest
+    ports:
+      - "8080:8080"
+      - "9090:9090"  # Metrics port
+    environment:
+      - METRICS_ENABLED=true
+      - METRICS_PORT=9090
+```
+
+### Health Endpoint
+
+```bash
+# Check health
+curl http://localhost:8080/health
+
+# Expected response
+{"status": "healthy", "uptime": 3600}
+```
+
+## Migration Guide
+
+### From Traditional Deployment
+
+1. Build container: `./deploy/docker/build-optimized-container.sh your-site`
+2. Test locally: `docker run -p 8080:8080 swiftlets-optimized:latest`
+3. Deploy to your platform of choice
+4. Update DNS/load balancer to point to container
+
+### From Other Container Solutions
+
+1. Review current Dockerfile
+2. Adapt build arguments to match Swiftlets structure
+3. Test with sample site
+4. Gradually migrate sites
 
 ## Next Steps
 
-1. Set up CI/CD pipeline
-2. Configure container orchestration
-3. Implement monitoring and logging
-4. Set up automated security scanning
-5. Configure CDN for static assets
+- Set up container orchestration (Kubernetes, Swarm)
+- Implement auto-scaling policies
+- Configure monitoring and alerting
+- Set up automated security scanning
+- Implement blue-green deployments
+
+## References
+
+- [Dockerfile.static](../deploy/docker/Dockerfile.static) - Production Dockerfile
+- [Build Script](../deploy/docker/build-optimized-container.sh) - Build helper
+- [EC2 Deployment](./aws-ec2-deployment.md) - EC2-specific guide
+- [Deployment Overview](./deployment-overview.md) - All deployment options
